@@ -1,0 +1,29 @@
+{
+    "launches": [
+        {
+            "id": 1343,
+            "name": "Ariane 5 ECA | Eutelsat 7C & AT&T T-16",
+            "windowstart": "June 20, 2019 21:43:00 UTC",
+            "windowend": "June 20, 2019 23:30:00 UTC",
+            "rocket": {
+                "id": 27,
+                "name": "Ariane 5 ECA",
+                "imageURL": "https://s3.amazonaws.com/launchlibrary/RocketImages/Ariane+5+ECA_1920.jpg"
+            }
+        },
+        {
+            "id": 1112,
+            "name": "Proton-M/Blok DM-03 | Spektr-RG",
+            "windowstart": "June 21, 2019 12:17:14 UTC",
+            "windowend": "June 21, 2019 12:17:14 UTC",
+            "rocket": {
+                "id": 62,
+                "name": "Proton-M/Blok DM-03",
+                "imageURL": "https://s3.amazonaws.com/launchlibrary/RocketImages/placeholder_1920.png"
+            }
+        }
+    ],
+    "total": 202,
+    "offset": 0,
+    "count": 5
+}
