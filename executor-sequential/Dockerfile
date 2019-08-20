@@ -8,11 +8,10 @@ ENV SLUGIFY_USES_TEXT_UNIDECODE=yes \
 	AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
 
 RUN mkdir -p /root/airflow_book
-COPY entrypoint.sh /root/airflow_book
+COPY executor-sequential/entrypoint.sh /root/airflow_book
 COPY dags /root/airflow/dags
 
-RUN apt update && \
-    pip install --no-cache-dir apache-airflow==1.10.3 werkzeug>=0.15.0 && \
+RUN pip install --no-cache-dir apache-airflow[crypto,postgres]==1.10.4 && \
     yes | airflow initdb
 
 EXPOSE 8080
