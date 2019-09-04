@@ -1,15 +1,11 @@
-.PHONY: build
-build:
-	docker build -t basph/airflow-book -f executor-sequential/Dockerfile .
+.PHONY: dockerbuild
+dockerbuild:
+	docker build -t airflowbook/airflow -f docker/Dockerfile .
 
-.PHONY: run
-run:
-	docker run -d -p 8080:8080 -v `pwd`/dags:/root/airflow/dags basph/airflow-book:latest
+.PHONY: dockerrun
+dockerrun:
+	docker run -d -p 8080:8080 -v `pwd`/dags:/root/airflow/dags --name airflowbook airflowbook/airflow:latest
 
-.PHONY: build-local
-build-local:
-	docker build -t basph/airflow-book:local -f executor-local/Dockerfile .
-
-.PHONY: run-local
-run-local:
-	docker-compose -f executor-local/docker-compose.yml up -d
+.PHONY: dockerrun-local
+dockerrun-local:
+	docker-compose -f docker/docker-compose-LocalExecutor.yml up -d
