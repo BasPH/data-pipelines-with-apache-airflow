@@ -5,31 +5,66 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 
+ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
+
 
 def _pick_erp_system(**context):
-    if context["execution_date"] < airflow.utils.dates.days_ago(1):
+    if context["execution_date"] < ERP_CHANGE_DATE:
         return "fetch_sales_old"
     else:
         return "fetch_sales_new"
 
+
+def _fetch_sales_old(**context):
+    print("Fetching sales data (OLD)...")
+
+
+def _fetch_sales_new(**context):
+    print("Fetching sales data (NEW)...")
+
+
+def _preprocess_sales_old(**context):
+    print("Preprocessing sales data (OLD)...")
+
+
+def _preprocess_sales_new(**context):
+    print("Preprocessing sales data (NEW)...")
+
+
 with DAG(
-    dag_id="chapter5_5",
+    dag_id="chapter5_4_branch_in_dag_explicit_join",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    pick_erp = BranchPythonOperator(
+    sales_branch = BranchPythonOperator(
         task_id='pick_erp_system',
         provide_context=True,
         python_callable=_pick_erp_system,
     )
 
-    fetch_sales_old = DummyOperator(task_id="fetch_sales_old")
-    preprocess_sales_old = DummyOperator(task_id="preprocess_sales_old")
+    fetch_sales_old= PythonOperator(
+        task_id="fetch_sales_old",
+        python_callable=_fetch_sales_old,
+        provide_context=True
+    )
+    preprocess_sales_old = PythonOperator(
+        task_id="preprocess_sales_old",
+        python_callable=_preprocess_sales_old,
+        provide_context=True
+    )
 
-    fetch_sales_new = DummyOperator(task_id="fetch_sales_new")
-    preprocess_sales_new = DummyOperator(task_id="preprocess_sales_new")
+    fetch_sales_new = PythonOperator(
+        task_id="fetch_sales_new",
+        python_callable=_fetch_sales_new,
+        provide_context=True
+    )
+    preprocess_sales_new = PythonOperator(
+        task_id="preprocess_sales_new",
+        python_callable=_preprocess_sales_new,
+        provide_context=True
+    )
 
     join_erp = DummyOperator(task_id="join_erp_branch", trigger_rule="none_failed")
 
@@ -40,8 +75,8 @@ with DAG(
     train_model = DummyOperator(task_id="train_model")
     notify = DummyOperator(task_id="notify")
 
-    start >> [pick_erp, fetch_weather]
-    pick_erp >> [fetch_sales_old, fetch_sales_new]
+    start >> [sales_branch, fetch_weather]
+    sales_branch >> [fetch_sales_old, fetch_sales_new]
     fetch_sales_old >> preprocess_sales_old
     fetch_sales_new >> preprocess_sales_new
     [preprocess_sales_old, preprocess_sales_new] >> join_erp
