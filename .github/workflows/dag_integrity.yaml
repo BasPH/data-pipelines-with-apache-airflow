@@ -1,6 +1,6 @@
 name: DAG integrity tests
 
-on: [push]
+on:
   push:
     paths:
       - "dags/**/*.py"
