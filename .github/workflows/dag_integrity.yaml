@@ -1,9 +1,9 @@
 name: DAG integrity tests
 
-on:
-  push:
-    paths:
-      - "dags/**/*.py"
+on: [push]
+#  push:
+#    paths:
+#      - "dags/**/*.py"
 
 jobs:
   dag_integrity_test:
