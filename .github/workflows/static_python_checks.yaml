@@ -1,0 +1,20 @@
+# https://help.github.com/en/github/automating-your-workflow-with-github-actions
+# https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
+
+name: Static Python checks
+
+on: [push]
+#  push:
+#    paths:
+#      - "*.py"
+
+jobs:
+  flake8:
+    name: Flake8
+    runs-on: ubuntu-18.04 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    steps:
+      - uses: actions/checkout@v1 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/configuring-a-workflow#using-the-checkout-action
+      - name: Install Flake8
+        run: pip install flake8
+      - name: Run Flake8
+        run: flake8

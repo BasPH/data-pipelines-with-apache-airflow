@@ -1,8 +1,0 @@
-name: CI/CD
-on: [push]
-jobs:
-  static_tests:
-    name: Flake8
-    steps:
-      - name: Flake8
-        run: echo 'test'
