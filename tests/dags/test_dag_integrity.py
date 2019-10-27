@@ -1,13 +1,13 @@
 """Test integrity of dags."""
-
+import glob
 import importlib
 import os
 
 import pytest
 from airflow import models as af_models
 
-DAG_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "dags")
-DAG_FILES = [f for f in os.listdir(DAG_PATH) if f.endswith(".py")]
+DAG_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "dags", "**/*.py")
+DAG_FILES = glob.glob(DAG_PATH)
 
 
 @pytest.mark.parametrize("dag_file", DAG_FILES)
