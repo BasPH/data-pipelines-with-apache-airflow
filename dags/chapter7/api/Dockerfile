@@ -1,7 +1,6 @@
 FROM python:3.8-slim
 
-RUN pip install Flask==1.1.1 pandas==0.25.2 && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y wget unzip && \
     wget http://files.grouplens.org/datasets/movielens/ml-20m.zip && \
     unzip ml-20m.zip && \
@@ -10,9 +9,12 @@ RUN pip install Flask==1.1.1 pandas==0.25.2 && \
     rm -r /ml-20m && \
     rm -rf /var/lib/apt/lists/*
 
-COPY api.py /
+ADD requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+
+COPY app.py /
 
 EXPOSE 5000
 
 ENTRYPOINT ["python"]
-CMD ["api.py"]
+CMD ["/app.py"]
