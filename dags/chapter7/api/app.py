@@ -1,19 +1,16 @@
 import time
 
 import pandas as pd
-from flask import Flask, jsonify, request, g
+from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-
 
 app = Flask(__name__)
 app.config["ratings"] = pd.read_csv("/ratings.csv").sort_values(by=["timestamp", "userId", "movieId"])
 
 auth = HTTPBasicAuth()
 
-users = {
-    "airflow": generate_password_hash("airflow"),
-}
+users = {"airflow": generate_password_hash("airflow")}
 
 
 @auth.verify_password
@@ -60,14 +57,14 @@ def ratings():
     if start_date_ts:
         ratings_df = ratings_df.loc[ratings_df["timestamp"] < end_date_ts]
 
-    subset = ratings_df.iloc[offset:offset+limit]
+    subset = ratings_df.iloc[offset : offset + limit]
 
     return jsonify(
         {
             "result": subset.to_dict(orient="records"),
             "offset": offset,
             "limit": limit,
-            "total": ratings_df.shape[0]
+            "total": ratings_df.shape[0],
         }
     )
 

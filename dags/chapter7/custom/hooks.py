@@ -1,9 +1,4 @@
-from builtins import super
-from itertools import chain
-
 from airflow.hooks.base_hook import BaseHook
-
-from airflow_fs.ports import glob
 
 
 class MovielensHook(BaseHook):
