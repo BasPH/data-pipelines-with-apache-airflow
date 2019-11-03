@@ -1,5 +1,9 @@
+import glob
+import posixpath
+
 from airflow.models import BaseOperator
 from airflow.utils import apply_defaults
+from airflow_fs.hooks import LocalHook
 
 
 class CopyFileOperator(BaseOperator):
