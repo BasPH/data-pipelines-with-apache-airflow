@@ -1,20 +1,55 @@
+import datetime as dt
 import time
 
+import numpy as np
 import pandas as pd
+
 from flask import Flask, jsonify, request, g
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+def _read_ratings(file_path, shift_ts=True):
+    ratings = pd.read_csv(file_path)
+
+    # Subsample dataset.
+    ratings = ratings.sample(n=100000)
+
+    # Sort by ts, user, movie for convenience.
+    ratings = ratings.sort_values(
+        by=["timestamp", "userId", "movieId"]
+    )
+
+    # Replace timestamps with timestamps from
+    # within the last month.
+    today = dt.datetime.now().date()
+
+    ratings["timestamp"] = _random_timestamps(
+        start_date=today + dt.timedelta(days=-30),
+        end_date=today,
+        size=ratings.shape[0]
+    )
+
+    return ratings
+
+
+def _random_timestamps(start_date=None, end_date=None, size=100):
+    """Generates random timestamps (in seconds) between given start/end dates."""
+
+    def _date_to_datetime(date):
+        return dt.datetime.combine(date, dt.datetime.min.time())
+
+    start_ts = int(_date_to_datetime(start_date).timestamp())
+    end_ts = int(_date_to_datetime(end_date).timestamp())
+
+    return np.random.randint(low=start_ts, high=end_ts, size=size)
+
+
 app = Flask(__name__)
-app.config["ratings"] = pd.read_csv("/ratings.csv").sort_values(by=["timestamp", "userId", "movieId"])
+app.config["ratings"] = _read_ratings("/ratings.csv", shift_ts=True)
 
 auth = HTTPBasicAuth()
-
-users = {
-    "airflow": generate_password_hash("airflow"),
-}
-
+users = {"airflow": generate_password_hash("airflow")}
 
 @auth.verify_password
 def verify_password(username, password):
@@ -60,14 +95,14 @@ def ratings():
     if start_date_ts:
         ratings_df = ratings_df.loc[ratings_df["timestamp"] < end_date_ts]
 
-    subset = ratings_df.iloc[offset:offset+limit]
+    subset = ratings_df.iloc[offset : offset + limit]
 
     return jsonify(
         {
             "result": subset.to_dict(orient="records"),
             "offset": offset,
             "limit": limit,
-            "total": ratings_df.shape[0]
+            "total": ratings_df.shape[0],
         }
     )
 
