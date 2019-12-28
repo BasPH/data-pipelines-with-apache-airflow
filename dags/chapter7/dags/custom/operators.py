@@ -1,42 +1,81 @@
+import json
+import os
+
 from airflow.models import BaseOperator
 from airflow.utils import apply_defaults
 
+from custom.hooks import MovielensHook
 
-class CopyFileOperator(BaseOperator):
-    """Operator for copying files between file systems.
-    :param str src_path: File path to copy files from. Can be any valid file path or
-        glob pattern. Note that if a glob pattern is given, dest_path is taken to be
-        a destination directory, rather than a destination file path.
-    :param str dest_path: File path top copy files to.
-    :param FsHook src_hook: File system hook to copy files from.
-    :param FsHook dest_hook: File system hook to copy files to.
+
+class MovielensFetchRatingsOperator(BaseOperator):
+    """
+    Operator that fetches ratings from the Movielens API.
+
+    Parameters
+    ----------
+    conn_id : str
+        ID of the connection to use to connect to the Movielens API. Connection
+        is expected to include authentication details (login/password) and the
+        host that is serving the API.
+    output_path : str
+        Path to write the fetched ratings to.
+    start_date : str
+        (Templated) start date to start fetching ratings from (inclusive).
+        Expected format is YYYY-MM-DD (equal to Airflow's ds formats).
+    end_date : str
+        (Templated) end date to fetching ratings up to (exclusive).
+        Expected format is YYYY-MM-DD (equal to Airflow's ds formats).
+    batch_size : int
+        Size of the batches (pages) to fetch from the API. Larger values
+        mean less requests, but more data transferred per request.
     """
 
-    template_fields = ("_src_path", "_dest_path")
+    template_fields = ("_start_date", "_end_date", "_output_path")
 
     @apply_defaults
-    def __init__(self, src_path, dest_path, src_hook=None, dest_hook=None, **kwargs):
-        super(CopyFileOperator, self).__init__(**kwargs)
+    def __init__(
+        self,
+        conn_id,
+        output_path,
+        start_date="{{ds}}",
+        end_date="{{next_ds}}",
+        batch_size=1000,
+        **kwargs,
+    ):
+        super(MovielensFetchRatingsOperator, self).__init__(**kwargs)
 
-        self._src_path = src_path
-        self._dest_path = dest_path
+        self._conn_id = conn_id
+        self._output_path = output_path
+        self._start_date = start_date
+        self._end_date = end_date
+        self._batch_size = batch_size
 
-        self._src_hook = src_hook or LocalHook()
-        self._dest_hook = dest_hook or LocalHook()
-
+    # pylint: disable=unused-argument,missing-docstring
     def execute(self, context):
-        with self._src_hook as src_hook, self._dest_hook as dest_hook:
-            for src_path, dest_path in self._glob_copy_paths(
-                self._src_path, self._dest_path, src_hook=src_hook
-            ):
-                dest_hook.copy(src_path, dest_path, src_hook=src_hook)
+        hook = MovielensHook(self._conn_id)
 
-    @staticmethod
-    def _glob_copy_paths(src_path, dest_path, src_hook):
-        if glob.has_magic(src_path):
-            for src_file_path in src_hook.glob(src_path):
-                base_name = posixpath.basename(src_file_path)
-                dest_file_path = posixpath.join(dest_path, base_name)
-                yield src_file_path, dest_file_path
-        else:
-            yield src_path, dest_path
+        try:
+            self.log.info(
+                f"Fetching ratings for {self._start_date} to {self._end_date}"
+            )
+            ratings = list(
+                hook.get_ratings(
+                    start_date=self._start_date,
+                    end_date=self._end_date,
+                    batch_size=self._batch_size,
+                )
+            )
+            self.log.info(f"Fetched {len(ratings)} ratings")
+        finally:
+            # Make sure we always close our hook's session.
+            hook.close()
+
+        self.log.info(f"Writing ratings to {self._output_path}")
+
+        # Make sure output directory exists.
+        output_dir = os.path.dirname(self._output_path)
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Write output as JSON.
+        with open(self._output_path, "w") as file_:
+            json.dump(ratings, fp=file_)

@@ -5,7 +5,22 @@ from airflow.hooks.base_hook import BaseHook
 
 
 class MovielensHook(BaseHook):
-    """Hook for our MovieLens API."""
+    """
+    Hook for the MovieLens API.
+
+    Abstracts details of the Movielens (REST) API and provides several convenience
+    methods for fetching data (e.g. ratings, users, movies) from the API. Also
+    provides support for automatic retries of failed requests, transparent
+    handling of pagination, authentication, etc.
+
+    Parameters
+    ----------
+    conn_id : str
+        ID of the connection to use to connect to the Movielens API. Connection
+        is expected to include authentication details (login/password) and the
+        host that is serving the API.
+
+    """
 
     DEFAULT_SCHEMA = "http"
     DEFAULT_PORT = 5000
@@ -25,6 +40,11 @@ class MovielensHook(BaseHook):
         self.close()
 
     def get_conn(self):
+        """
+        Returns the connection used by the hook for querying data.
+        Should in principle not be used directly.
+        """
+
         if self._session is None:
             # Fetch config for the given connection (host, login, etc).
             config = self.get_connection(self._conn_id)
@@ -47,19 +67,37 @@ class MovielensHook(BaseHook):
         return self._session
 
     def close(self):
-        self._session.close()
+        """Closes any active session."""
+        if self._session:
+            self._session.close()
         self._session = None
 
     # API methods:
 
     def get_movies(self):
+        """Fetches a list of movies."""
         raise NotImplementedError()
 
     def get_users(self):
+        """Fetches a list of users."""
         raise NotImplementedError()
 
     def get_ratings(self, start_date=None, end_date=None, batch_size=100):
-        """Fetches ratings between the given start/end date."""
+        """
+        Fetches ratings between the given start/end date.
+
+        Parameters
+        ----------
+        start_date : str
+            Start date to start fetching ratings from (inclusive). Expected
+            format is YYYY-MM-DD (equal to Airflow's ds formats).
+        end_date : str
+            End date to fetching ratings up to (exclusive). Expected
+            format is YYYY-MM-DD (equal to Airflow's ds formats).
+        batch_size : int
+            Size of the batches (pages) to fetch from the API. Larger values
+            mean less requests, but more data transferred per request.
+        """
 
         yield from self._get_with_pagination(
             url="/ratings",
@@ -94,10 +132,10 @@ class HttpSession:
     """
     Helper class wrapping a requests session with extra functionality, including:
 
-        - Basic auth using user/password (optional)
-        - Automatic retries (optional)
+        - Basic auth using user/password (optional).
+        - Automatic retries (optional).
         - A default host - meaning we can do requests with path URLs
-            (e.g., /ratings) without having to specify the full URL (optional)
+            (e.g., /ratings) without having to specify the full URL (optional).
 
     The main benefit of this class for Airflow is the default host functionality,
     which means we can keep the entire config for the connection in one place,
@@ -145,7 +183,22 @@ class HttpSession:
         return session
 
     def get(self, url_or_endpoint, **kwargs):
-        """Performs a GET request."""
+        """
+        Performs a GET request.
+
+        Parameters
+        ----------
+        url_or_endpoint : str
+            (Partial) URL pointing the the address to be queried. If a full URL is
+            given, the request is performed directly to that address. If a partial URL
+            is given (e.g. /index.html), then the partial URL is supplemented
+            supplemented with the host base URL (e.g., if the host URL is
+            http://example.com, the actual request is sent to
+            http://example.com/index.html). Note that an error is raised for partial
+            URLs if the session does not have a host defined.
+        **kwargs
+            Any kwargs are passed to requests.Session.get.
+        """
 
         url = self._build_url(url_or_endpoint)
 
@@ -166,7 +219,22 @@ class HttpSession:
         return url
 
     def post(self, url_or_endpoint, **kwargs):
-        """Performs a POST request."""
+        """
+        Performs a POST request.
+
+        Parameters
+        ----------
+        url_or_endpoint : str
+            (Partial) URL pointing the the address to be queried. If a full URL is
+            given, the request is performed directly to that address. If a partial URL
+            is given (e.g. /index.html), then the partial URL is supplemented
+            supplemented with the host base URL (e.g., if the host URL is
+            http://example.com, the actual request is sent to
+            http://example.com/index.html). Note that an error is raised for partial
+            URLs if the session does not have a host defined.
+        **kwargs
+            Any kwargs are passed to requests.Session.post.
+        """
 
         url = self._build_url(url_or_endpoint)
 
