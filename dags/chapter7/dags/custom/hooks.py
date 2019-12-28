@@ -1,6 +1,3 @@
-from builtins import super
-from itertools import chain
-
 from airflow.hooks.base_hook import BaseHook
 
 
