@@ -19,7 +19,6 @@ class MovielensHook(BaseHook):
         ID of the connection to use to connect to the Movielens API. Connection
         is expected to include authentication details (login/password) and the
         host that is serving the API.
-
     """
 
     DEFAULT_SCHEMA = "http"
