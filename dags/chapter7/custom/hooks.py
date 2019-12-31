@@ -63,11 +63,11 @@ class MovielensHook(BaseHook):
         return session
 
     def close(self):
-        self._session.close()
-        self._session = None
+        if self._session:
+            self._session.close()
+            self._session = None
 
     # API methods:
-
     def get_movies(self):
         raise NotImplementedError()
 
