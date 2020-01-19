@@ -9,8 +9,8 @@ from custom.hooks import MovielensHook
 
 
 with DAG(
-    dag_id="chapter7_movielens_hook",
-    description="Fetches ratings from a Movielens API.",
+    dag_id="chapter7_movielens_custom_hook",
+    description="Fetches ratings from the Movielens API using a custom hook.",
     start_date=airflow_utils.dates.days_ago(7),
     schedule_interval="@daily",
 ) as dag:
@@ -47,7 +47,7 @@ with DAG(
         templates_dict={
             "start_date": "{{ds}}",
             "end_date": "{{next_ds}}",
-            "output_path": "/tmp/ratings/hook/{{ds}}.json",
+            "output_path": "/data/custom_hook/{{ds}}.json",
         },
         provide_context=True,
     )

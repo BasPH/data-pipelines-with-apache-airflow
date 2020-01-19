@@ -6,7 +6,7 @@ from custom.sensors import MovielensRatingsSensor
 
 with DAG(
     dag_id="chapter7_movielens_sensor",
-    description="Fetches ratings from a Movielens API.",
+    description="Fetches ratings from the Movielens API, with a custom sensor.",
     start_date=airflow_utils.dates.days_ago(7),
     schedule_interval="@daily",
 ) as dag:
@@ -22,7 +22,7 @@ with DAG(
         conn_id="movielens",
         start_date="{{ds}}",
         end_date="{{next_ds}}",
-        output_path="/tmp/ratings/operator/{{ds}}.json"
+        output_path="/data/custom_sensor/{{ds}}.json"
     )
 
     wait_for_ratings >> fetch_ratings

@@ -22,7 +22,7 @@ class MovielensRatingsSensor(BaseSensorOperator):
 
     @apply_defaults
     def __init__(self, conn_id, start_date="{{ds}}", end_date="{{next_ds}}", **kwargs):
-        super(MovielensRatingsSensor, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._conn_id = conn_id
         self._start_date = start_date
         self._end_date = end_date

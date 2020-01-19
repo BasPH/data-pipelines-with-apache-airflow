@@ -5,8 +5,8 @@ from custom.operators import MovielensFetchRatingsOperator
 
 
 with DAG(
-    dag_id="chapter7_movielens_operator",
-    description="Fetches ratings from a Movielens API.",
+    dag_id="chapter7_movielens_custom_operator",
+    description="Fetches ratings from the Movielens API using a custom operator.",
     start_date=airflow_utils.dates.days_ago(7),
     schedule_interval="@daily",
 ) as dag:
@@ -15,5 +15,5 @@ with DAG(
         conn_id="movielens",
         start_date="{{ds}}",
         end_date="{{next_ds}}",
-        output_path="/tmp/ratings/operator/{{ds}}.json"
+        output_path="/data/custom_operator/{{ds}}.json"
     )

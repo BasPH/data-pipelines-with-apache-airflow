@@ -6,10 +6,13 @@ services:
       - "8080:8080"
     environment:
       AIRFLOW_CONN_MOVIELENS: http://airflow:airflow@movielens
+      MOVIELENS_USER: airflow
+      MOVIELENS_PASSWORD: airflow
     networks:
       - airflow
     volumes:
       - ./dags:/root/airflow/dags
+      - ./data:/data
     depends_on:
       - movielens
   movielens:
@@ -19,6 +22,9 @@ services:
       - "5000:5000"
     networks:
       - airflow
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
 
 networks:
   airflow:

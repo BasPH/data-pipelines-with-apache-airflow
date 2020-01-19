@@ -1,3 +1,5 @@
+import requests
+
 from airflow.hooks.base_hook import BaseHook
 
 
@@ -27,7 +29,7 @@ class MovielensHook(BaseHook):
         self._retry = retry
 
         self._session = None
-        self._host = None
+        self._base_url = None
 
     def __enter__(self):
         return self
@@ -51,22 +53,23 @@ class MovielensHook(BaseHook):
             schema = config.schema or self.DEFAULT_SCHEMA
             port = config.port or self.DEFAULT_PORT
 
-            host = f"{schema}://{config.host}:{port}"
+            self._base_url = f"{schema}://{config.host}:{port}"
 
             # Build our session instance, which we will use for any
             # requests to the API.
-            self._session = HttpSession(
-                user=config.login,
-                password=config.password,
-                host=host
-            )
-        return self._session
+            self._session = requests.Session()
+
+            if config.login:
+                self._session.auth = (config.login, config.password)
+
+        return self._session, self._base_url
 
     def close(self):
         """Closes any active session."""
         if self._session:
             self._session.close()
         self._session = None
+        self._base_url = None
 
     # API methods:
 
@@ -96,18 +99,19 @@ class MovielensHook(BaseHook):
         """
 
         yield from self._get_with_pagination(
-            url="/ratings",
+            endpoint="/ratings",
             params={"start_date": start_date, "end_date": end_date},
             batch_size=batch_size,
         )
 
-    def _get_with_pagination(self, url, params, batch_size=100):
+    def _get_with_pagination(self, endpoint, params, batch_size=100):
         """
         Fetches records using a get request with given url/params,
         taking pagination into account.
         """
 
-        session = self.get_conn()
+        session, base_url = self.get_conn()
+        url = base_url + endpoint
 
         offset = 0
         total = None
@@ -122,125 +126,3 @@ class MovielensHook(BaseHook):
 
             offset += batch_size
             total = response_json["total"]
-
-
-class HttpSession:
-    """
-    Helper class wrapping a requests session with extra functionality, including:
-
-        - Basic auth using user/password (optional).
-        - Automatic retries (optional).
-        - A default host - meaning we can do requests with path URLs
-            (e.g., /ratings) without having to specify the full URL (optional).
-
-    The main benefit of this class for Airflow is the default host functionality,
-    which means we can keep the entire config for the connection in one place,
-    instead of requiring separate session/base_url parameters.
-    """
-
-    def __init__(self, user=None, password=None, host=None, retry=None, headers=None):
-        # Make sure that we have a full URL, including schema.
-        if host and not host.startswith("http"):
-            host = "http://" + host
-
-        # Remove any trailing slashes.
-        host = host.rstrip("/")
-
-        self._user = user
-        self._password = password
-        self._host = host
-        self._retry = retry
-        self._headers = headers or {}
-
-        self._session = None
-
-    def _get_session(self):
-        if self._session is None:
-            self._session = self._build_session()
-        return self._session
-
-    def _build_session(self):
-        import requests
-        from requests.adapters import HTTPAdapter
-
-        session = requests.Session()
-
-        if self._user:
-            session.auth = (self._user, self._password)
-
-        if self._headers:
-            session.headers.update(self._headers)
-
-        if self._retry:
-            adapter = HTTPAdapter(max_retries=self._retry)
-            session.mount("http://", adapter)
-            session.mount("https://", adapter)
-
-        return session
-
-    def get(self, url_or_endpoint, **kwargs):
-        """
-        Performs a GET request.
-
-        Parameters
-        ----------
-        url_or_endpoint : str
-            (Partial) URL pointing the the address to be queried. If a full URL is
-            given, the request is performed directly to that address. If a partial URL
-            is given (e.g. /index.html), then the partial URL is supplemented
-            supplemented with the host base URL (e.g., if the host URL is
-            http://example.com, the actual request is sent to
-            http://example.com/index.html). Note that an error is raised for partial
-            URLs if the session does not have a host defined.
-        **kwargs
-            Any kwargs are passed to requests.Session.get.
-        """
-
-        url = self._build_url(url_or_endpoint)
-
-        session = self._get_session()
-        response = session.get(url, **kwargs)
-
-        return response
-
-    def _build_url(self, url_or_endpoint):
-        if url_or_endpoint.startswith("http"):
-            # Passed value is a full URL.
-            url = url_or_endpoint
-        else:
-            # Build full URL using host + given end point path
-            if not self._host:
-                raise ValueError("URLs must start with http if no host is given!")
-            url = self._host + url_or_endpoint
-        return url
-
-    def post(self, url_or_endpoint, **kwargs):
-        """
-        Performs a POST request.
-
-        Parameters
-        ----------
-        url_or_endpoint : str
-            (Partial) URL pointing the the address to be queried. If a full URL is
-            given, the request is performed directly to that address. If a partial URL
-            is given (e.g. /index.html), then the partial URL is supplemented
-            supplemented with the host base URL (e.g., if the host URL is
-            http://example.com, the actual request is sent to
-            http://example.com/index.html). Note that an error is raised for partial
-            URLs if the session does not have a host defined.
-        **kwargs
-            Any kwargs are passed to requests.Session.post.
-        """
-
-        url = self._build_url(url_or_endpoint)
-
-        session = self._get_session()
-        response = session.post(url, **kwargs)
-
-        return response
-
-    def close(self):
-        """Closes any active session."""
-        if self._session:
-            self._session.close()
-        self._session = None
