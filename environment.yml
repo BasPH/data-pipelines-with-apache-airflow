@@ -1,0 +1,5 @@
+name: manning-airflow
+dependencies:
+  - python
+  - pandas
+  - jupyterlab
