@@ -25,12 +25,12 @@ jobs:
       - name: Run Flake8
         run: flake8
 
-      - name: Install Pylint
-        run: pip install pylint
-      - name: Run Pylint
-        run: find . -name "*.py" | xargs pylint --output-format=colorized
+      # - name: Install Pylint
+      #   run: pip install pylint
+      # - name: Run Pylint
+      #   run: find . -name "*.py" | xargs pylint --output-format=colorized
 
-      - name: Install Black
-        run: pip install black
-      - name: Run Black
-        run: find . -name "*.py" | xargs black --check
+      # - name: Install Black
+      #   run: pip install black
+      # - name: Run Black
+      #   run: find . -name "*.py" | xargs black --check
