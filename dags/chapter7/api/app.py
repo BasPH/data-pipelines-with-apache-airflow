@@ -5,7 +5,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from flask import Flask, jsonify, request, g
+from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -55,6 +55,7 @@ app.config["ratings"] = _read_ratings("/ratings.csv", shift_ts=True)
 auth = HTTPBasicAuth()
 users = {os.environ["API_USER"]: generate_password_hash(os.environ["API_PASSWORD"])}
 
+
 @auth.verify_password
 def verify_password(username, password):
     if username in users:
@@ -99,7 +100,7 @@ def ratings():
     if end_date_ts:
         ratings_df = ratings_df.loc[ratings_df["timestamp"] < end_date_ts]
 
-    subset = ratings_df.iloc[offset : offset + limit]
+    subset = ratings_df.iloc[offset: offset + limit]
 
     return jsonify(
         {

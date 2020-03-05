@@ -1,5 +1,4 @@
 from airflow import DAG, utils as airflow_utils
-from airflow.operators.python_operator import PythonOperator
 
 from custom.operators import MovielensFetchRatingsOperator
 from custom.sensors import MovielensRatingsSensor

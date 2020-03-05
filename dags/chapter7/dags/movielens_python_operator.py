@@ -4,10 +4,8 @@ import os
 
 import pandas as pd
 import requests
-from requests.adapters import HTTPAdapter
 
 from airflow import DAG, utils as airflow_utils
-from airflow.hooks.base_hook import BaseHook
 from airflow.operators.python_operator import PythonOperator
 
 from custom.ranking import rank_movies_by_rating
