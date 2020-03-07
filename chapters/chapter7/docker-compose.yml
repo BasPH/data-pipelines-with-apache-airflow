@@ -1,7 +1,8 @@
 version: "3.7"
 services:
   airflow:
-    image: airflowbook/airflow:latest
+    build: ../../docker
+    image: manning-airflow:latest
     ports:
       - "8080:8080"
     environment:
