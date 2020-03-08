@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM continuumio/miniconda3:4.7.12
 
 ENV SLUGIFY_USES_TEXT_UNIDECODE=yes \
 	PYTHONDONTWRITEBYTECODE=1 \
@@ -7,14 +7,16 @@ ENV SLUGIFY_USES_TEXT_UNIDECODE=yes \
 	AIRFLOW__WEBSERVER__DAG_DEFAULT_VIEW=graph \
 	AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=15
 
-RUN mkdir -p /root/airflow_book
-COPY docker/entrypoint.sh /root/airflow_book
+COPY docker/entrypoint.sh /root/scripts/entrypoint.sh
 COPY dags /root/airflow/dags
+COPY src /airflowbook/src
+COPY setup.py /airflowbook
 
 RUN apt update && \
-    apt install -y postgresql-client && \
-    pip install --no-cache-dir apache-airflow[crypto,postgres]==1.10.6
+    apt install -y gcc postgresql-client && \
+    pip install --no-cache-dir apache-airflow[crypto,postgres,s3]==1.10.7 && \
+    pip install -e /airflowbook
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/bash", "/root/airflow_book/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/root/scripts/entrypoint.sh"]

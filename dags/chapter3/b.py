@@ -58,7 +58,7 @@ send_stats = PythonOperator(
     task_id="send_stats",
     python_callable=_send_stats,
     op_kwargs={"email": "user@example.com"},
-    template_dict={"stats_path": "data/stats/{{ds}}.csv"},
+    templates_dict={"stats_path": "data/stats/{{ds}}.csv"},
     provide_context=True,
     dag=dag,
 )
