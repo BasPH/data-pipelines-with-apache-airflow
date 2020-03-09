@@ -10,7 +10,8 @@ services:
       - POSTGRES_DB=airflow
 
   airflow:
-    image: airflowbook/airflow
+    build: ../../docker
+    image: manning-airflow:latest
     depends_on:
       - postgres
     environment:
