@@ -7,7 +7,7 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter3_a",
+    dag_id="chapter3_09_templated_path",
     schedule_interval=timedelta(days=3),
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
@@ -38,7 +38,10 @@ def _calculate_stats(**context):
 calculate_stats = PythonOperator(
     task_id="calculate_stats",
     python_callable=_calculate_stats,
-    templates_dict={"input_path": "data/events/{{ds}}.json", "output_path": "data/stats/{{ds}}.csv"},
+    templates_dict={
+        "input_path": "data/events/{{ds}}.json",
+        "output_path": "data/stats/{{ds}}.csv",
+    },
     provide_context=True,
     dag=dag,
 )

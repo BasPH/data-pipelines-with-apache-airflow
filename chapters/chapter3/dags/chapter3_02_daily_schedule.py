@@ -5,10 +5,16 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
-dag = DAG(dag_id="chapter3_2", start_date=datetime(2015, 6, 1), schedule_interval="@daily")
+dag = DAG(
+    dag_id="chapter3_02_daily_schedule",
+    start_date=datetime(2015, 6, 1),
+    schedule_interval="@daily",
+)
 
 fetch_events = BashOperator(
-    task_id="fetch_events", bash_command="curl -o data/events.json https://localhost:5000/events", dag=dag
+    task_id="fetch_events",
+    bash_command="curl -o data/events.json https://localhost:5000/events",
+    dag=dag,
 )
 
 

@@ -13,7 +13,6 @@ services:
       - airflow
     volumes:
       - ./dags:/root/airflow/dags
-      - ./data:/data
     depends_on:
       - movielens
   movielens:

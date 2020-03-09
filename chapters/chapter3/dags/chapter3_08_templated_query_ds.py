@@ -7,7 +7,7 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter3_7",
+    dag_id="chapter3_08_templated_query_ds",
     schedule_interval=timedelta(days=3),
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
@@ -18,8 +18,8 @@ fetch_events = BashOperator(
     bash_command=(
         "curl -o data/events.json "
         "http://localhost:5000/events?"
-        "start_date={{execution_date.strftime('%Y-%m-%d')}}&"
-        "end_date={{next_execution_date.strftime('%Y-%m-%d')}}"
+        "start_date={{ds}}&"
+        "end_date={{next_ds}}"
     ),
     dag=dag,
 )

@@ -1,5 +1,4 @@
-import datetime as dt
-from datetime import timedelta
+from datetime import datetime
 
 import pandas as pd
 from airflow import DAG
@@ -7,20 +6,14 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter3_9",
-    schedule_interval=timedelta(days=3),
-    start_date=dt.datetime(year=2019, month=1, day=1),
-    end_date=dt.datetime(year=2019, month=1, day=5),
+    dag_id="chapter3_01_unscheduled",
+    start_date=datetime(2015, 6, 1),
+    schedule_interval=None,
 )
 
 fetch_events = BashOperator(
     task_id="fetch_events",
-    bash_command=(
-        "curl -o data/events/{{ds}}.json "
-        "http://localhost:5000/events?"
-        "start_date={{ds}}&"
-        "end_date={{next_ds}}"
-    ),
+    bash_command="curl -o data/events.json https://localhost:5000/events",
     dag=dag,
 )
 

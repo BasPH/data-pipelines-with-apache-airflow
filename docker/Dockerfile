@@ -12,7 +12,9 @@ COPY entrypoint.sh /root/airflow
 
 RUN apt update && \
     apt install -y postgresql-client && \
-    pip install --no-cache-dir apache-airflow[crypto,postgres]==1.10.5 werkzeug==0.16.0
+    pip install --no-cache-dir \
+		apache-airflow[crypto,postgres]==1.10.5 \
+		werkzeug==0.16.0
 
 EXPOSE 8080
 

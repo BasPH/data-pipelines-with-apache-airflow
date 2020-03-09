@@ -5,7 +5,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 
 dag = DAG(
-    dag_id="chapter1_figure1",
+    dag_id="chapter1_01_figure1",
     description="DAG demonstrating structure between tasks with dummy nodes and dependencies.",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval=None,
