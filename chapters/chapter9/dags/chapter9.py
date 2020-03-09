@@ -2,7 +2,7 @@ from datetime import datetime
 
 from airflow import DAG
 
-from airflowbook.operators.postgres_to_s3_operator import PostgresToS3Operator
+from custom.postgres_to_s3_operator import PostgresToS3Operator
 
 dag = DAG(
     dag_id="chapter9",

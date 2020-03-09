@@ -29,9 +29,17 @@ chapter2:
 chapter3:
 	docker-compose -f chapters/chapter3/docker-compose.yml up
 
+.PHONY: chapter5
+chapter5:
+	docker-compose -f chapters/chapter5/docker-compose.yml up
+
 .PHONY: chapter7
 chapter7:
 	docker-compose -f chapters/chapter7/docker-compose.yml up
+
+.PHONY: chapter9
+chapter9:
+	docker-compose -f chapters/chapter9/docker-compose.yml up
 
 .PHONY: chapter10
 chapter10:
