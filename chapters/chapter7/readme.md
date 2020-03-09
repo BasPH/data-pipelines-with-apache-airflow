@@ -24,7 +24,7 @@ Besides this, the example also contains the following files:
 │   │   └── sensors.py
 │   └── *.py                    <- The DAGs mentioned above.
 ├── docker-compose.yml
-├── package
+├── src
 │   └── airflow-movielens       <- Same code as the 'custom' directory,
 │       ├── setup.py               built as a proper Python package.
 │       └── src
