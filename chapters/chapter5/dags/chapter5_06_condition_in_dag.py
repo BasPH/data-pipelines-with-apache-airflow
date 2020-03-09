@@ -3,7 +3,6 @@ import pendulum
 
 from airflow import DAG
 from airflow.exceptions import AirflowSkipException
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 

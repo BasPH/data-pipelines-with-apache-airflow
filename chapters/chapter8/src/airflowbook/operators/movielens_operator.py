@@ -19,7 +19,9 @@ class MovielensDownloadOperator(BaseOperator):
 
     def execute(self, context):
         with MovielensHook(self._conn_id) as hook:
-            ratings = list(hook.get_ratings(start_date=self._start_date, end_date=self._end_date))
+            ratings = list(
+                hook.get_ratings(start_date=self._start_date, end_date=self._end_date)
+            )
 
         with open(self._output_path, "w") as f:
             f.write(json.dumps(ratings))
@@ -36,24 +38,39 @@ class MovielensPopularityOperator(BaseOperator):
 
     def execute(self, context):
         with MovielensHook(self._conn_id) as hook:
-            ratings = hook.get_ratings(start_date=self._start_date, end_date=self._end_date)
+            ratings = hook.get_ratings(
+                start_date=self._start_date, end_date=self._end_date
+            )
 
             rating_sums = defaultdict(Counter)
             for rating in ratings:
                 rating_sums[rating["movieId"]].update(count=1, rating=rating["rating"])
 
             averages = {
-                movie_id: (rating_counter["rating"] / rating_counter["count"], rating_counter["count"])
+                movie_id: (
+                    rating_counter["rating"] / rating_counter["count"],
+                    rating_counter["count"],
+                )
                 for movie_id, rating_counter in rating_sums.items()
                 if rating_counter["count"] >= self._min_ratings
             }
-            return sorted(averages.items(), key=lambda x: x[1], reverse=True)[: self._top_n]
+            return sorted(averages.items(), key=lambda x: x[1], reverse=True)[
+                : self._top_n
+            ]
 
 
 class MovielensToPostgresOperator(BaseOperator):
     template_fields = ("_start_date", "_end_date", "_insert_query")
 
-    def __init__(self, movielens_conn_id, start_date, end_date, postgres_conn_id, insert_query, **kwargs):
+    def __init__(
+        self,
+        movielens_conn_id,
+        start_date,
+        end_date,
+        postgres_conn_id,
+        insert_query,
+        **kwargs
+    ):
         super().__init__(**kwargs)
         self._movielens_conn_id = movielens_conn_id
         self._start_date = start_date
@@ -63,13 +80,21 @@ class MovielensToPostgresOperator(BaseOperator):
 
     def execute(self, context):
         with MovielensHook(self._movielens_conn_id) as movielens_hook:
-            ratings = list(movielens_hook.get_ratings(start_date=self._start_date, end_date=self._end_date))
+            ratings = list(
+                movielens_hook.get_ratings(
+                    start_date=self._start_date, end_date=self._end_date
+                )
+            )
 
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
 
         postgres_hook = PostgresHook(postgres_conn_id=self._postgres_conn_id)
         insert_queries = [
-            self._insert_query.format(",".join([str(_[1]) for _ in sorted(rating.items())]))
+            self._insert_query.format(
+                ",".join([str(_[1]) for _ in sorted(rating.items())])
+            )
             for rating in ratings
         ]
         postgres_hook.run(insert_queries)

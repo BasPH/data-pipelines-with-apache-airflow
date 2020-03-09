@@ -1,9 +1,8 @@
 import airflow
 
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import PythonOperator
+
 
 with DAG(
     dag_id="chapter5_01_start",

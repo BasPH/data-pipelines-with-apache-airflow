@@ -2,12 +2,11 @@ import airflow
 import pendulum
 
 from airflow import DAG
-from airflow.exceptions import AirflowSkipException
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 
 ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
+
 
 def _pick_erp_system(**context):
     if context["execution_date"] < airflow.utils.dates.days_ago(1):
@@ -23,8 +22,8 @@ def _notify(**context):
 
 def _is_latest_run(**context):
     now = pendulum.utcnow()
-    left_window = context['dag'].following_schedule(context['execution_date'])
-    right_window = context['dag'].following_schedule(left_window)
+    left_window = context["dag"].following_schedule(context["execution_date"])
+    right_window = context["dag"].following_schedule(left_window)
     return left_window < now <= right_window
 
 
@@ -36,7 +35,7 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     pick_erp = BranchPythonOperator(
-        task_id='pick_erp_system',
+        task_id="pick_erp_system",
         provide_context=True,
         python_callable=_pick_erp_system,
     )
@@ -56,9 +55,7 @@ with DAG(
     train_model = DummyOperator(task_id="train_model")
 
     notify = PythonOperator(
-        task_id="notify",
-        python_callable=_notify,
-        provide_context=True
+        task_id="notify", python_callable=_notify, provide_context=True
     )
 
     start >> [pick_erp, fetch_weather]

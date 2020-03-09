@@ -1,7 +1,6 @@
 import airflow
 
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 
@@ -39,40 +38,37 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     sales_branch = BranchPythonOperator(
-        task_id='pick_erp_system',
+        task_id="pick_erp_system",
         provide_context=True,
         python_callable=_pick_erp_system,
     )
 
-    fetch_sales_old= PythonOperator(
+    fetch_sales_old = PythonOperator(
         task_id="fetch_sales_old",
         python_callable=_fetch_sales_old,
-        provide_context=True
+        provide_context=True,
     )
     preprocess_sales_old = PythonOperator(
         task_id="preprocess_sales_old",
         python_callable=_preprocess_sales_old,
-        provide_context=True
+        provide_context=True,
     )
 
     fetch_sales_new = PythonOperator(
         task_id="fetch_sales_new",
         python_callable=_fetch_sales_new,
-        provide_context=True
+        provide_context=True,
     )
     preprocess_sales_new = PythonOperator(
         task_id="preprocess_sales_new",
         python_callable=_preprocess_sales_new,
-        provide_context=True
+        provide_context=True,
     )
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
     preprocess_weather = DummyOperator(task_id="preprocess_weather")
 
-    build_dataset = DummyOperator(
-        task_id="build_dataset",
-        trigger_rule="none_failed"
-    )
+    build_dataset = DummyOperator(task_id="build_dataset", trigger_rule="none_failed")
     train_model = DummyOperator(task_id="train_model")
     notify = DummyOperator(task_id="notify")
 

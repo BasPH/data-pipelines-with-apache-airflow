@@ -1,7 +1,6 @@
 import airflow
 
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 
@@ -44,7 +43,7 @@ with DAG(
         python_callable=_pick_erp_system,
     )
 
-    fetch_sales_old= PythonOperator(
+    fetch_sales_old = PythonOperator(
         task_id="fetch_sales_old",
         python_callable=_fetch_sales_old,
         provide_context=True

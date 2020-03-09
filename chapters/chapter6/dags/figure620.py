@@ -11,10 +11,14 @@ dag1 = DAG(
     schedule_interval="0 16 * * *",
 )
 dag2 = DAG(
-    dag_id="chapter6_create_metrics", start_date=airflow.utils.dates.days_ago(3), schedule_interval="0 18 * * *"
+    dag_id="chapter6_create_metrics",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval="0 18 * * *",
 )
 
-DummyOperator(task_id="copy_to_raw", dag=dag1) >> DummyOperator(task_id="process_supermarket", dag=dag1)
+DummyOperator(task_id="copy_to_raw", dag=dag1) >> DummyOperator(
+    task_id="process_supermarket", dag=dag1
+)
 
 wait = ExternalTaskSensor(
     task_id="wait_for_process_supermarket",

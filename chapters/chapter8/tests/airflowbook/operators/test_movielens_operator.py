@@ -67,7 +67,9 @@ def test_movielens_operator(tmp_path: Path, mocker: MockFixture):
     )
 
 
-def test_movielens_to_postgres_operator(mocker: MockFixture, test_dag: DAG, postgres, postgres_credentials):
+def test_movielens_to_postgres_operator(
+    mocker: MockFixture, test_dag: DAG, postgres, postgres_credentials
+):
     mocker.patch.object(
         MovielensHook,
         "get_connection",
@@ -92,7 +94,10 @@ def test_movielens_to_postgres_operator(mocker: MockFixture, test_dag: DAG, post
         start_date="{{ prev_ds }}",
         end_date="{{ ds }}",
         postgres_conn_id="postgres_id",
-        insert_query="INSERT INTO movielens (movieId,rating,ratingTimestamp,userId,scrapeTime) VALUES ({0}, '{{ macros.datetime.now() }}')",
+        insert_query=(
+            "INSERT INTO movielens (movieId,rating,ratingTimestamp,userId,scrapeTime) "
+            "VALUES ({0}, '{{ macros.datetime.now() }}')"
+        ),
         dag=test_dag,
     )
 

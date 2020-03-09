@@ -23,7 +23,7 @@ def _wait_for_supermarket(supermarket_id_):
     return data_files and success_file.exists()
 
 
-for supermarket_id in range(1,5):
+for supermarket_id in range(1, 5):
     wait = PythonSensor(
         task_id=f"wait_for_supermarket_{supermarket_id}",
         python_callable=_wait_for_supermarket,
