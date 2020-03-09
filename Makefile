@@ -17,6 +17,14 @@ dockerrun: ## Run Airflow with SequentialExecutor (single Docker container)
 dockerrun-local: ## Run Airflow with LocalExecutor (Docker Compose setup with Airflow & Postgres containers)
 	docker-compose -f docker/docker-compose-LocalExecutor.yml up -d
 
+.PHONY: chapter1
+chapter1:
+	docker-compose -f chapters/chapter1/docker-compose.yml up
+
+.PHONY: chapter2
+chapter2:
+	docker-compose -f chapters/chapter2/docker-compose.yml up
+
 .PHONY: chapter3
 chapter3:
 	docker-compose -f chapters/chapter3/docker-compose.yml up

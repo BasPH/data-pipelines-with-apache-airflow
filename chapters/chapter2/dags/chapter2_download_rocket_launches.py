@@ -38,10 +38,14 @@ def _get_pictures():
             print(f"Downloaded {image_url} to {target_file}")
 
 
-get_pictures = PythonOperator(task_id="get_pictures", python_callable=_get_pictures, dag=dag)
+get_pictures = PythonOperator(
+    task_id="get_pictures", python_callable=_get_pictures, dag=dag
+)
 
 notify = BashOperator(
-    task_id="notify", bash_command='echo "There are now $(ls /tmp/images/ | wc -l) images."', dag=dag
+    task_id="notify",
+    bash_command='echo "There are now $(ls /tmp/images/ | wc -l) images."',
+    dag=dag,
 )
 
 download_launches >> get_pictures >> notify

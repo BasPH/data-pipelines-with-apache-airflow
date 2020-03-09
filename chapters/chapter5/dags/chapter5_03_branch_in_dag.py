@@ -32,7 +32,7 @@ def _preprocess_sales_new(**context):
 
 
 with DAG(
-    dag_id="chapter5_3_branch_in_dag",
+    dag_id="chapter5_03_branch_in_dag",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:

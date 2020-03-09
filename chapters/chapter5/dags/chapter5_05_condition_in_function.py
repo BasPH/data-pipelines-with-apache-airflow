@@ -9,25 +9,27 @@ from airflow.operators.python_operator import PythonOperator, BranchPythonOperat
 
 ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
 
-
 def _pick_erp_system(**context):
-    if context["execution_date"] < ERP_CHANGE_DATE:
+    if context["execution_date"] < airflow.utils.dates.days_ago(1):
         return "fetch_sales_old"
     else:
         return "fetch_sales_new"
 
 
-def _latest_only(**context):
+def _notify(**context):
+    if _is_latest_run(**context):
+        print("Sending notification")
+
+
+def _is_latest_run(**context):
     now = pendulum.utcnow()
     left_window = context['dag'].following_schedule(context['execution_date'])
     right_window = context['dag'].following_schedule(left_window)
-
-    if not left_window < now <= right_window:
-        raise AirflowSkipException()
+    return left_window < now <= right_window
 
 
 with DAG(
-    dag_id="chapter5_6_condition_in_dag",
+    dag_id="chapter5_05_condition_in_function",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:
@@ -53,13 +55,11 @@ with DAG(
     build_dataset = DummyOperator(task_id="build_dataset")
     train_model = DummyOperator(task_id="train_model")
 
-    if_most_recent = PythonOperator(
-        task_id="latest_only",
-        python_callable=_latest_only,
-        provide_context=True,
+    notify = PythonOperator(
+        task_id="notify",
+        python_callable=_notify,
+        provide_context=True
     )
-
-    notify = DummyOperator(task_id="notify")
 
     start >> [pick_erp, fetch_weather]
     pick_erp >> [fetch_sales_old, fetch_sales_new]
@@ -69,4 +69,3 @@ with DAG(
     fetch_weather >> preprocess_weather
     [join_erp, preprocess_weather] >> build_dataset
     build_dataset >> train_model >> notify
-    if_most_recent >> notify

@@ -5,24 +5,14 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
-
-def _fetch_sales(**context):
-    if context["execution_date"] > airflow.utils.dates.days_ago(2):
-        raise Exception("Something when wrong")
-
-
 with DAG(
-    dag_id="chapter5_7_trigger_rules",
+    dag_id="chapter5_01_start",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    fetch_sales = PythonOperator(
-        task_id="fetch_sales",
-        python_callable=_fetch_sales,
-        provide_context=True
-    )
+    fetch_sales = DummyOperator(task_id="fetch_sales")
     preprocess_sales = DummyOperator(task_id="preprocess_sales")
 
     fetch_weather = DummyOperator(task_id="fetch_weather")

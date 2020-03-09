@@ -5,41 +5,14 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
-ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
-
 
 def _fetch_sales(**context):
-    if context["execution_date"] < ERP_CHANGE_DATE:
-        _fetch_sales_old(**context)
-    else:
-        _fetch_sales_new(**context)
-
-
-def _fetch_sales_old(**context):
-    print("Fetching sales data (OLD)...")
-
-
-def _fetch_sales_new(**context):
-    print("Fetching sales data (NEW)...")
-
-
-def _preprocess_sales(**context):
-    if context["execution_date"] < airflow.utils.dates.days_ago(1):
-        _preprocess_sales_old(**context)
-    else:
-        _preprocess_sales_new(**context)
-
-
-def _preprocess_sales_old(**context):
-    print("Preprocessing sales data (OLD)...")
-
-
-def _preprocess_sales_new(**context):
-    print("Preprocessing sales data (NEW)...")
+    if context["execution_date"] > airflow.utils.dates.days_ago(2):
+        raise Exception("Something when wrong")
 
 
 with DAG(
-    dag_id="chapter5_2_branch_in_function",
+    dag_id="chapter5_07_trigger_rules",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:
@@ -50,11 +23,7 @@ with DAG(
         python_callable=_fetch_sales,
         provide_context=True
     )
-    preprocess_sales = PythonOperator(
-        task_id="preprocess_sales",
-        python_callable=_preprocess_sales,
-        provide_context=True
-    )
+    preprocess_sales = DummyOperator(task_id="preprocess_sales")
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
     preprocess_weather = DummyOperator(task_id="preprocess_weather")
