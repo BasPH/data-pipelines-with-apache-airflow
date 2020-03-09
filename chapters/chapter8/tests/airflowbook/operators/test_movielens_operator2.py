@@ -4,7 +4,11 @@ import pytest
 from airflow.models import Connection
 from pytest_docker_tools import fetch, container
 
-from airflowbook.operators.movielens_operator import MovielensHook, MovielensToPostgresOperator, PostgresHook
+from airflowbook.operators.movielens_operator import (
+    MovielensHook,
+    MovielensToPostgresOperator,
+    PostgresHook,
+)
 
 postgres_image = fetch(repository="postgres:11.1-alpine")
 postgres = container(

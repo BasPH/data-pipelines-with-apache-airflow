@@ -19,9 +19,7 @@ def _read_ratings(file_path, shift_ts=True):
     ratings = ratings.sample(n=100000)
 
     # Sort by ts, user, movie for convenience.
-    ratings = ratings.sort_values(
-        by=["timestamp", "userId", "movieId"]
-    )
+    ratings = ratings.sort_values(by=["timestamp", "userId", "movieId"])
 
     # Replace timestamps with timestamps from
     # within the last month.
@@ -31,7 +29,7 @@ def _read_ratings(file_path, shift_ts=True):
         ratings["timestamp"] = _random_timestamps(
             start_date=today + dt.timedelta(days=-30),
             end_date=today,
-            size=ratings.shape[0]
+            size=ratings.shape[0],
         )
 
     return ratings
@@ -100,7 +98,7 @@ def ratings():
     if end_date_ts:
         ratings_df = ratings_df.loc[ratings_df["timestamp"] < end_date_ts]
 
-    subset = ratings_df.iloc[offset: offset + limit]
+    subset = ratings_df.iloc[offset : offset + limit]
 
     return jsonify(
         {

@@ -18,8 +18,8 @@ def _pick_erp_system(**context):
 
 def _latest_only(**context):
     now = pendulum.utcnow()
-    left_window = context['dag'].following_schedule(context['execution_date'])
-    right_window = context['dag'].following_schedule(left_window)
+    left_window = context["dag"].following_schedule(context["execution_date"])
+    right_window = context["dag"].following_schedule(left_window)
 
     if not left_window < now <= right_window:
         raise AirflowSkipException()
@@ -33,7 +33,7 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     pick_erp = BranchPythonOperator(
-        task_id='pick_erp_system',
+        task_id="pick_erp_system",
         provide_context=True,
         python_callable=_pick_erp_system,
     )
@@ -53,9 +53,7 @@ with DAG(
     train_model = DummyOperator(task_id="train_model")
 
     if_most_recent = PythonOperator(
-        task_id="latest_only",
-        python_callable=_latest_only,
-        provide_context=True,
+        task_id="latest_only", python_callable=_latest_only, provide_context=True,
     )
 
     notify = DummyOperator(task_id="notify")

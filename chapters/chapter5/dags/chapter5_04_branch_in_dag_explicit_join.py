@@ -38,7 +38,7 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     sales_branch = BranchPythonOperator(
-        task_id='pick_erp_system',
+        task_id="pick_erp_system",
         provide_context=True,
         python_callable=_pick_erp_system,
     )
@@ -46,23 +46,23 @@ with DAG(
     fetch_sales_old = PythonOperator(
         task_id="fetch_sales_old",
         python_callable=_fetch_sales_old,
-        provide_context=True
+        provide_context=True,
     )
     preprocess_sales_old = PythonOperator(
         task_id="preprocess_sales_old",
         python_callable=_preprocess_sales_old,
-        provide_context=True
+        provide_context=True,
     )
 
     fetch_sales_new = PythonOperator(
         task_id="fetch_sales_new",
         python_callable=_fetch_sales_new,
-        provide_context=True
+        provide_context=True,
     )
     preprocess_sales_new = PythonOperator(
         task_id="preprocess_sales_new",
         python_callable=_preprocess_sales_new,
-        provide_context=True
+        provide_context=True,
     )
 
     join_erp = DummyOperator(task_id="join_erp_branch", trigger_rule="none_failed")

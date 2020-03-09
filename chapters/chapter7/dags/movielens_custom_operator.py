@@ -14,5 +14,5 @@ with DAG(
         conn_id="movielens",
         start_date="{{ds}}",
         end_date="{{next_ds}}",
-        output_path="/data/custom_operator/{{ds}}.json"
+        output_path="/data/custom_operator/{{ds}}.json",
     )

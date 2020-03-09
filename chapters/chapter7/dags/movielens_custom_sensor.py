@@ -21,7 +21,7 @@ with DAG(
         conn_id="movielens",
         start_date="{{ds}}",
         end_date="{{next_ds}}",
-        output_path="/data/custom_sensor/{{ds}}.json"
+        output_path="/data/custom_sensor/{{ds}}.json",
     )
 
     wait_for_ratings >> fetch_ratings

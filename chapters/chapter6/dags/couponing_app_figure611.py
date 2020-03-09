@@ -20,10 +20,18 @@ process_supermarket_2 = DummyOperator(task_id="process_supermarket_2", dag=dag)
 process_supermarket_3 = DummyOperator(task_id="process_supermarket_3", dag=dag)
 process_supermarket_4 = DummyOperator(task_id="process_supermarket_4", dag=dag)
 
-create_metrics_supermarket_1 = DummyOperator(task_id="create_metrics_supermarket_1", dag=dag)
-create_metrics_supermarket_2 = DummyOperator(task_id="create_metrics_supermarket_2", dag=dag)
-create_metrics_supermarket_3 = DummyOperator(task_id="create_metrics_supermarket_3", dag=dag)
-create_metrics_supermarket_4 = DummyOperator(task_id="create_metrics_supermarket_4", dag=dag)
+create_metrics_supermarket_1 = DummyOperator(
+    task_id="create_metrics_supermarket_1", dag=dag
+)
+create_metrics_supermarket_2 = DummyOperator(
+    task_id="create_metrics_supermarket_2", dag=dag
+)
+create_metrics_supermarket_3 = DummyOperator(
+    task_id="create_metrics_supermarket_3", dag=dag
+)
+create_metrics_supermarket_4 = DummyOperator(
+    task_id="create_metrics_supermarket_4", dag=dag
+)
 
 copy_to_raw_supermarket_1 >> process_supermarket_1 >> create_metrics_supermarket_1
 copy_to_raw_supermarket_2 >> process_supermarket_2 >> create_metrics_supermarket_2

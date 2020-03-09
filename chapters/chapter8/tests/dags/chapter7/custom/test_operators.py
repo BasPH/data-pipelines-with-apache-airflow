@@ -1,7 +1,10 @@
 from airflow.models import Connection
 from airflow.operators.bash_operator import BashOperator
 
-from airflowbook.operators.movielens_operator import MovielensPopularityOperator, MovielensHook
+from airflowbook.operators.movielens_operator import (
+    MovielensPopularityOperator,
+    MovielensHook,
+)
 
 
 def test_movielenspopularityoperator(mocker):
@@ -11,7 +14,11 @@ def test_movielenspopularityoperator(mocker):
         return_value=Connection(conn_id="test", login="airflow", password="airflow"),
     )
     task = MovielensPopularityOperator(
-        task_id="test_id", conn_id="testconn", start_date="2015-01-01", end_date="2015-01-03", top_n=5
+        task_id="test_id",
+        conn_id="testconn",
+        start_date="2015-01-01",
+        end_date="2015-01-03",
+        top_n=5,
     )
     result = task.execute(context=None)
     assert len(result) == 5

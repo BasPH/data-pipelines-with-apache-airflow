@@ -38,7 +38,9 @@ get_data = PythonOperator(
     dag=dag,
 )
 
-extract_gz = BashOperator(task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz", dag=dag)
+extract_gz = BashOperator(
+    task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz", dag=dag
+)
 
 
 def _fetch_pageviews(pagenames, execution_date, **_):

@@ -26,4 +26,9 @@ copy_to_raw_supermarket_1 >> process_supermarket_1
 copy_to_raw_supermarket_2 >> process_supermarket_2
 copy_to_raw_supermarket_3 >> process_supermarket_3
 copy_to_raw_supermarket_4 >> process_supermarket_4
-[process_supermarket_1, process_supermarket_2, process_supermarket_3, process_supermarket_4] >> create_metrics
+[
+    process_supermarket_1,
+    process_supermarket_2,
+    process_supermarket_3,
+    process_supermarket_4,
+] >> create_metrics

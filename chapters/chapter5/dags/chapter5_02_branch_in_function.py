@@ -45,14 +45,12 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     fetch_sales = PythonOperator(
-        task_id="fetch_sales",
-        python_callable=_fetch_sales,
-        provide_context=True
+        task_id="fetch_sales", python_callable=_fetch_sales, provide_context=True
     )
     preprocess_sales = PythonOperator(
         task_id="preprocess_sales",
         python_callable=_preprocess_sales,
-        provide_context=True
+        provide_context=True,
     )
 
     fetch_weather = DummyOperator(task_id="fetch_weather")

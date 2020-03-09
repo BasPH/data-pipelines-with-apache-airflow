@@ -12,7 +12,9 @@ dag11 = DAG(
     schedule_interval="0 0 * * *",
 )
 dag12 = DAG(
-    dag_id="chapter6_figure617_dag12", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None
+    dag_id="chapter6_figure617_dag12",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval=None,
 )
 
 DummyOperator(task_id="etl", dag=dag11) >> TriggerDagRunOperator(
@@ -28,19 +30,31 @@ dag21 = DAG(
     schedule_interval="0 0 * * *",
 )
 dag22 = DAG(
-    dag_id="chapter6_figure617_dag22", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None
+    dag_id="chapter6_figure617_dag22",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval=None,
 )
 dag23 = DAG(
-    dag_id="chapter6_figure617_dag23", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None
+    dag_id="chapter6_figure617_dag23",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval=None,
 )
 dag24 = DAG(
-    dag_id="chapter6_figure617_dag24", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None
+    dag_id="chapter6_figure617_dag24",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval=None,
 )
 
 DummyOperator(task_id="etl", dag=dag21) >> [
-    TriggerDagRunOperator(task_id="trigger_dag2", trigger_dag_id="chapter6_figure617_dag22", dag=dag21),
-    TriggerDagRunOperator(task_id="trigger_dag3", trigger_dag_id="chapter6_figure617_dag23", dag=dag21),
-    TriggerDagRunOperator(task_id="trigger_dag4", trigger_dag_id="chapter6_figure617_dag24", dag=dag21),
+    TriggerDagRunOperator(
+        task_id="trigger_dag2", trigger_dag_id="chapter6_figure617_dag22", dag=dag21
+    ),
+    TriggerDagRunOperator(
+        task_id="trigger_dag3", trigger_dag_id="chapter6_figure617_dag23", dag=dag21
+    ),
+    TriggerDagRunOperator(
+        task_id="trigger_dag4", trigger_dag_id="chapter6_figure617_dag24", dag=dag21
+    ),
 ]
 PythonOperator(task_id="report", dag=dag22, python_callable=lambda: print("hello"))
 PythonOperator(task_id="report", dag=dag23, python_callable=lambda: print("hello"))
@@ -64,7 +78,9 @@ dag33 = DAG(
     schedule_interval="0 0 * * *",
 )
 dag34 = DAG(
-    dag_id="chapter6_figure617_dag34", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None
+    dag_id="chapter6_figure617_dag34",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval=None,
 )
 
 DummyOperator(task_id="etl", dag=dag31)

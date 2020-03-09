@@ -5,7 +5,9 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 
 
-def generate_tasks(dataset_name, raw_dir, processed_dir, preprocess_script, output_dir, dag):
+def generate_tasks(
+    dataset_name, raw_dir, processed_dir, preprocess_script, output_dir, dag
+):
     raw_path = os.path.join(raw_dir, dataset_name, "{ds_nodash}.json")
     processed_path = os.path.join(processed_dir, dataset_name, "{ds_nodash}.json")
     output_path = os.path.join(output_dir, dataset_name, "{ds_nodash}.json")

@@ -5,6 +5,10 @@
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: black
+black:  ## Check formatting with black.
+	black --check .
+
 .PHONY: chapter1
 chapter1:  ## Run Airflow DAGs for Chapter 1.
 	docker-compose -f chapters/chapter1/docker-compose.yml up
@@ -48,3 +52,4 @@ docker:  ## Build the Airflow Docker image
 .PHONY: flake8
 flake8:
 	flake8 .
+

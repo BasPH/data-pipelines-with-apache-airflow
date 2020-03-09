@@ -11,7 +11,9 @@ dag = DAG(
     schedule_interval=None,
 )
 
-download_weather_predictions = DummyOperator(task_id="download_weather_predictions", dag=dag)
+download_weather_predictions = DummyOperator(
+    task_id="download_weather_predictions", dag=dag
+)
 download_sales_data = DummyOperator(task_id="download_sales_data", dag=dag)
 clean_weather_predictions = DummyOperator(task_id="clean_weather_predictions", dag=dag)
 clean_sales_data = DummyOperator(task_id="clean_sales_data", dag=dag)

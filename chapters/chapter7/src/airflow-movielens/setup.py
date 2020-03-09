@@ -4,11 +4,7 @@ import setuptools
 
 requirements = ["apache-airflow", "requests"]
 
-extra_requirements = {
-    "dev": [
-        "pytest",
-    ]
-}
+extra_requirements = {"dev": ["pytest",]}
 
 setuptools.setup(
     name="airflow_movielens",
