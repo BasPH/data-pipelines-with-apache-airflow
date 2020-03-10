@@ -12,9 +12,6 @@ function create_user_and_database() {
     CREATE USER $database WITH PASSWORD '$database';
     CREATE DATABASE $database;
     GRANT ALL PRIVILEGES ON DATABASE $database TO $database;
-    \c $database;
-    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $database;
-    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $database;
 EOSQL
 }
 
@@ -146,5 +143,21 @@ FROM listings_tmp
 ORDER BY id, download_date DESC;
 DROP TABLE listings_tmp;
 EOSQL
+
+# Somehow the database-specific privileges must be set AFTERWARDS
+function grant_all() {
+	local database=$1
+	psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" $database <<-EOSQL
+    ALTER SCHEMA public OWNER TO $database;
+    GRANT USAGE ON SCHEMA public TO $database;
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $database;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $database;
+    GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO $database;
+EOSQL
+}
+
+for dbname in "airflow" "insideairbnb"; do
+  grant_all $dbname
+done
 
 pg_ctl stop
