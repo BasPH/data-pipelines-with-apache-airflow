@@ -12,9 +12,14 @@ COPY entrypoint.sh /root/airflow
 
 RUN apt update && \
     apt install -y postgresql-client && \
+	conda install -y pytest setproctitle psutil && \
     pip install --no-cache-dir \
 		apache-airflow[crypto,postgres]==1.10.5 \
-		werkzeug==0.16.0
+		werkzeug==0.16.0 \
+		pytest-mock pytest-helpers-namespace
+
+COPY airflowbook /tmp/airflowbook
+RUN pip install /tmp/airflowbook[dev]
 
 EXPOSE 8080
 
