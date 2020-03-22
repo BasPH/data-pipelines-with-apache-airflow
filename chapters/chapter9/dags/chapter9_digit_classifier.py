@@ -5,8 +5,12 @@ import pickle
 import airflow.utils.dates
 from airflow import DAG
 from airflow.contrib.operators.s3_copy_object_operator import S3CopyObjectOperator
-from airflow.contrib.operators.sagemaker_endpoint_operator import SageMakerEndpointOperator
-from airflow.contrib.operators.sagemaker_training_operator import SageMakerTrainingOperator
+from airflow.contrib.operators.sagemaker_endpoint_operator import (
+    SageMakerEndpointOperator,
+)
+from airflow.contrib.operators.sagemaker_training_operator import (
+    SageMakerTrainingOperator,
+)
 from airflow.hooks.S3_hook import S3Hook
 from airflow.operators.python_operator import PythonOperator
 from sagemaker.amazon.common import write_numpy_to_dense_tensor
@@ -40,9 +44,13 @@ def _extract_mnist_data():
     with gzip.GzipFile(fileobj=mnist_buffer, mode="rb") as f:
         train_set, _, _ = pickle.loads(f.read(), encoding="latin1")
         output_buffer = io.BytesIO()
-        write_numpy_to_dense_tensor(file=output_buffer, array=train_set[0], labels=train_set[1])
+        write_numpy_to_dense_tensor(
+            file=output_buffer, array=train_set[0], labels=train_set[1]
+        )
         output_buffer.seek(0)
-        s3hook.load_file_obj(output_buffer, key="mnist_data", bucket_name="your-bucket", replace=True)
+        s3hook.load_file_obj(
+            output_buffer, key="mnist_data", bucket_name="your-bucket", replace=True
+        )
 
 
 extract_mnist_data = PythonOperator(
@@ -71,8 +79,15 @@ sagemaker_train_model = SageMakerTrainingOperator(
             }
         ],
         "OutputDataConfig": {"S3OutputPath": "s3://your-bucket/mnistclassifier-output"},
-        "ResourceConfig": {"InstanceType": "ml.c4.xlarge", "InstanceCount": 1, "VolumeSizeInGB": 10},
-        "RoleArn": "arn:aws:iam::297623009465:role/service-role/AmazonSageMaker-ExecutionRole-20180905T153196",
+        "ResourceConfig": {
+            "InstanceType": "ml.c4.xlarge",
+            "InstanceCount": 1,
+            "VolumeSizeInGB": 10,
+        },
+        "RoleArn": (
+            "arn:aws:iam::297623009465:role/service-role/"
+            "AmazonSageMaker-ExecutionRole-20180905T153196"
+        ),
         "StoppingCondition": {"MaxRuntimeInSeconds": 24 * 60 * 60},
     },
     wait_for_completion=True,
@@ -91,12 +106,15 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
             "PrimaryContainer": {
                 "Image": "438346466558.dkr.ecr.eu-west-1.amazonaws.com/kmeans:1",
                 "ModelDataUrl": (
-                    "s3://your-bucket/mnistclassifier-output/"
-                    + "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
+                    "s3://your-bucket/mnistclassifier-output/mnistclassifier"
+                    "-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
                     "output/model.tar.gz"
                 ),  # this will link the model and the training job
             },
-            "ExecutionRoleArn": "arn:aws:iam::297623009465:role/service-role/AmazonSageMaker-ExecutionRole-20180905T153196",
+            "ExecutionRoleArn": (
+                "arn:aws:iam::297623009465:role/service-role/"
+                "AmazonSageMaker-ExecutionRole-20180905T153196"
+            ),
         },
         "EndpointConfig": {
             "EndpointConfigName": "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}",
