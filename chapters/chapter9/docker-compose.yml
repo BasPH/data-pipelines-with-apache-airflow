@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  airflow:
+    build: ../../docker
+    image: manning-airflow:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - airflow
+    volumes:
+      - ./dags:/root/airflow/dags
+  postgres:
+    build: insideairbnb
+    ports:
+      - "8080:8080"
+    networks:
+      - airflow
+    volumes:
+      - ./dags:/root/airflow/dags
+
+networks:
+  airflow:

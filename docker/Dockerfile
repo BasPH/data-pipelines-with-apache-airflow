@@ -7,16 +7,20 @@ ENV SLUGIFY_USES_TEXT_UNIDECODE=yes \
 	AIRFLOW__WEBSERVER__DAG_DEFAULT_VIEW=graph \
 	AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=15
 
-COPY docker/entrypoint.sh /root/scripts/entrypoint.sh
-COPY dags /root/airflow/dags
-COPY src /airflowbook/src
-COPY setup.py /airflowbook
+RUN mkdir -p /root/airflow
+COPY entrypoint.sh /root/airflow
 
 RUN apt update && \
-    apt install -y gcc postgresql-client && \
-    pip install --no-cache-dir apache-airflow[crypto,postgres,s3]==1.10.7 && \
-    pip install -e /airflowbook
+    apt install -y postgresql-client && \
+	conda install -y pytest setproctitle psutil && \
+    pip install --no-cache-dir \
+		apache-airflow[crypto,postgres]==1.10.5 \
+		werkzeug==0.16.0 \
+		pytest-mock pytest-helpers-namespace
+
+COPY airflowbook /tmp/airflowbook
+RUN pip install /tmp/airflowbook[dev]
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/bash", "/root/scripts/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/root/airflow/entrypoint.sh"]

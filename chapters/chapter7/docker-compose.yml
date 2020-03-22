@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  airflow:
+    build: ../../docker
+    image: manning-airflow:latest
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW_CONN_MOVIELENS: http://airflow:airflow@movielens
+      MOVIELENS_USER: airflow
+      MOVIELENS_PASSWORD: airflow
+    networks:
+      - airflow
+    volumes:
+      - ./dags:/root/airflow/dags
+    depends_on:
+      - movielens
+  movielens:
+    build: api
+    image: airflowbook/movielens-api
+    ports:
+      - "5000:5000"
+    networks:
+      - airflow
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
+
+networks:
+  airflow:
