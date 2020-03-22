@@ -22,11 +22,15 @@ def predict():
     """
     img = Image.open(BytesIO(app.current_request.raw_body)).convert("L")
     img_arr = np.array(img, dtype=np.float32)
-    runtime = boto3.Session().client(service_name="sagemaker-runtime", region_name="eu-west-1")
+    runtime = boto3.Session().client(
+        service_name="sagemaker-runtime", region_name="eu-west-1"
+    )
     response = runtime.invoke_endpoint(
         EndpointName="mnistclassifier",
         ContentType="application/x-recordio-protobuf",
         Body=numpy_to_record_serializer()(img_arr.flatten()),
     )
     result = json.loads(response["Body"].read().decode("utf-8"))
-    return Response(result, status_code=200, headers={"Content-Type": "application/json"})
+    return Response(
+        result, status_code=200, headers={"Content-Type": "application/json"}
+    )
