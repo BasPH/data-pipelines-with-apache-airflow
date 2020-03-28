@@ -6,7 +6,7 @@ from airflow import DAG, utils as airflow_utils
 from airflow.operators.docker_operator import DockerOperator
 
 with DAG(
-    dag_id="chapter12_movielens",
+    dag_id="chapter11_movielens_docker",
     description="Fetches ratings from the Movielens API using Docker.",
     start_date=airflow_utils.dates.days_ago(3),
     schedule_interval="@daily",
@@ -30,7 +30,7 @@ with DAG(
             "--host",
             os.environ["MOVIELENS_HOST"],
         ],
-        network_mode="chapter12_airflow",
+        network_mode="chapter11_airflow",
         # Note: this host path is on the HOST, not in the Airflow docker container.
         volumes=["/tmp/airflow/data:/data"],
     )
