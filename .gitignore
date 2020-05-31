@@ -140,3 +140,6 @@ dmypy.json
 # Editors
 .idea
 .vscode
+
+# Data folders
+chapters/chapter13/data

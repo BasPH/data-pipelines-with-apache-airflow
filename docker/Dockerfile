@@ -14,7 +14,8 @@ RUN apt update && \
     apt install -y postgresql-client && \
 	conda install -y pytest setproctitle psutil && \
     pip install --no-cache-dir \
-		apache-airflow[crypto,postgres]==1.10.5 \
+		apache-airflow[s3,crypto,postgres,kubernetes]==1.10.5 \
+		SQLAlchemy==1.3.15 \
 		werkzeug==0.16.0 \
 		pytest-mock pytest-helpers-namespace
 
