@@ -1,5 +1,3 @@
-import logging
-import json
 import os
 
 from airflow import DAG, utils as airflow_utils

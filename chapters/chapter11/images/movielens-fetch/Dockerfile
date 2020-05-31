@@ -1,12 +1,8 @@
 FROM python:3.8-slim
 
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN python -m pip install click==7.1.1 requests==2.23.0
 
-COPY scripts /etc/movielens/scripts
-RUN chmod +x /etc/movielens/scripts/*
+COPY scripts/fetch_ratings.py /usr/local/bin/fetch-ratings
+RUN chmod +x /usr/local/bin/fetch-ratings
 
-ENV PATH="/etc/movielens/scripts:${PATH}"
-
-# RUN useradd -ms /bin/bash movielens
-# USER movielens
+ENV PATH="/usr/local/bin:${PATH}"

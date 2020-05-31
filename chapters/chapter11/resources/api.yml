@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: movielens
-        image: jrderuiter/movielens-api:latest
+        image: airflowbook/movielens-api:latest
         ports:
         - containerPort: 5000
         env:

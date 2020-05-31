@@ -12,5 +12,5 @@ services:
       # the 'airflow' namespace, listening on port 80.
       MOVIELENS_HOST: http://movielens.airflow.svc.cluster.local:80
     volumes:
-      - ./dags:/root/airflow/dags
+      - ./dags/kubernetes:/root/airflow/dags
       - ~/.kube/config:/root/.kube/config

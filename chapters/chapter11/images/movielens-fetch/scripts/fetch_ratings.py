@@ -1,29 +1,65 @@
 #!/usr/bin/env python
 
-import json
 from pathlib import Path
+
+import logging
+import json
 
 import click
 import requests
 
 
+logging.basicConfig(level=logging.INFO)
+
+
 @click.command()
-@click.option("--start_date", type=click.DateTime(formats=["%Y-%m-%d"]), required=True)
-@click.option("--end_date", type=click.DateTime(formats=["%Y-%m-%d"]), required=True)
-@click.option("--output_path", type=click.Path(dir_okay=False), required=True)
-@click.option("--host", type=str, default="http://movielens:5000")
-@click.option("--user", type=str, envvar="MOVIELENS_USER", required=True)
-@click.option("--password", type=str, envvar="MOVIELENS_PASSWORD", required=True)
-@click.option("--batch_size", type=int, default=100)
+@click.option(
+    "--start_date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    required=True,
+    help="Start date for ratings.",
+)
+@click.option(
+    "--end_date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    required=True,
+    help="End date for ratings.",
+)
+@click.option(
+    "--output_path",
+    type=click.Path(dir_okay=False),
+    required=True,
+    help="Output file path.",
+)
+@click.option(
+    "--host", type=str, default="http://movielens:5000", help="Movielens API URL."
+)
+@click.option(
+    "--user",
+    type=str,
+    envvar="MOVIELENS_USER",
+    required=True,
+    help="Movielens API user.",
+)
+@click.option(
+    "--password",
+    type=str,
+    envvar="MOVIELENS_PASSWORD",
+    required=True,
+    help="Movielens API password.",
+)
+@click.option(
+    "--batch_size", type=int, default=100, help="Batch size for retrieving records."
+)
 def main(start_date, end_date, output_path, host, user, password, batch_size):
-    output_path = Path(output_path)
+    """CLI script for fetching movie ratings from the movielens API."""
 
     # Setup session.
     session = requests.Session()
     session.auth = (user, password)
 
     # Fetch ratings.
-    print("Fetching ratings from %s (user: %s)" % (host, user))
+    logging.info("Fetching ratings from %s (user: %s)", host, user)
 
     ratings = list(
         _get_ratings(
@@ -34,13 +70,15 @@ def main(start_date, end_date, output_path, host, user, password, batch_size):
             batch_size=batch_size,
         )
     )
-    print("Retrieved %d ratings!" % len(ratings))
+    logging.info("Retrieved %d ratings!", len(ratings))
 
     # Write output.
+    output_path = Path(output_path)
+
     output_dir = output_path.parent
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print("Writing to %s" % output_path)
+    logging.info("Writing to %s", output_path)
     with output_path.open("w") as file_:
         json.dump(ratings, file_)
 

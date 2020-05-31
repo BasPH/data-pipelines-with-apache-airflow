@@ -1,5 +1,3 @@
-import logging
-import json
 import os
 
 from airflow import DAG, utils as airflow_utils
@@ -14,9 +12,9 @@ with DAG(
 
     fetch_ratings = DockerOperator(
         task_id="fetch_ratings",
-        image="airflowbook/movielens-api",
+        image="airflowbook/movielens-fetch",
         command=[
-            "fetch_ratings.py",
+            "fetch-ratings",
             "--start_date",
             "{{ds}}",
             "--end_date",
@@ -37,9 +35,9 @@ with DAG(
 
     rank_movies = DockerOperator(
         task_id="rank_movies",
-        image="airflowbook/movielens-ranking",
+        image="airflowbook/movielens-rank",
         command=[
-            "rank_movies.py",
+            "rank-movies",
             "--input_path",
             "/data/ratings/{{ds}}.json",
             "--output_path",
