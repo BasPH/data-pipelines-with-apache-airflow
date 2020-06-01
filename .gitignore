@@ -142,4 +142,4 @@ dmypy.json
 .vscode
 
 # Data folders
-chapters/chapter13/data
+chapters/chapter13_aws/data
