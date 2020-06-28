@@ -12,12 +12,23 @@ COPY entrypoint.sh /root/airflow
 
 RUN apt update && \
     apt install -y postgresql-client && \
-	conda install -y pytest setproctitle psutil && \
+	conda install -y pytest setproctitle psutil pyodbc && \
     pip install --no-cache-dir \
 		apache-airflow[s3,crypto,postgres,kubernetes]==1.10.5 \
 		SQLAlchemy==1.3.15 \
 		werkzeug==0.16.0 \
-		pytest-mock pytest-helpers-namespace
+		pytest-mock pytest-helpers-namespace \
+		apache-airflow-backport-providers-odbc \
+		apache-airflow-backport-providers-microsoft-azure
+
+# Install odbc driver for Synapse.
+# TODO: Check how we do this EULA thing for the book.
+RUN apt-get update && \
+	apt-get install -y gnupg curl && \
+  	curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
 
 COPY airflowbook /tmp/airflowbook
 RUN pip install /tmp/airflowbook[dev]
