@@ -3,12 +3,10 @@ import os
 from os import path
 import tempfile
 
-import pandas as pd
-
 from airflow import DAG, utils as airflow_utils
 
-from airflow.contrib.operators.aws_athena_operator import AWSAthenaOperator
-from airflow.hooks.S3_hook import S3Hook
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
@@ -49,7 +47,7 @@ with DAG(
             )
 
     upload_ratings = PythonOperator(
-        task_id="upload_ratings",
+        task_id="fetch_ratings",
         python_callable=_upload_ratings,
         op_kwargs={
             "s3_conn_id": "my_aws_conn",

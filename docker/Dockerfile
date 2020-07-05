@@ -19,7 +19,8 @@ RUN apt update && \
 		werkzeug==0.16.0 \
 		pytest-mock pytest-helpers-namespace \
 		apache-airflow-backport-providers-odbc \
-		apache-airflow-backport-providers-microsoft-azure
+		apache-airflow-backport-providers-microsoft-azure \
+		apache-airflow-backport-providers-amazon
 
 # Install odbc driver for Synapse.
 # TODO: Check how we do this EULA thing for the book.

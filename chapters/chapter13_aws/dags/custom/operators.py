@@ -1,6 +1,6 @@
 import time
 
-from airflow.contrib.hooks.aws_hook import AwsHook
+from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
 from airflow.models import BaseOperator
 from airflow.utils import apply_defaults
 
@@ -36,7 +36,7 @@ class GlueTriggerCrawlerOperator(BaseOperator):
         self._region_name = region_name
 
     def execute(self, context):
-        hook = AwsHook(self._aws_conn_id)
+        hook = AwsBaseHook(self._aws_conn_id)
         glue_client = hook.get_client_type("glue", region_name=self._region_name)
 
         self.log.info("Triggering crawler")

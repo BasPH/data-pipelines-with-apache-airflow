@@ -43,7 +43,7 @@ def write_partitioned(ratings, output_dir):
     dates = pd.to_datetime(ratings['timestamp'], unit="s")
 
     for (year, month), grp in ratings.groupby([dates.dt.year, dates.dt.month]):
-        output_path = output_dir / str(year) / f"{month}.csv"
+        output_path = output_dir / str(year) / f"{month:02d}.csv"
         output_path.parent.mkdir(parents=True, exist_ok=True)
         grp.to_csv(output_path, index=False)
 
