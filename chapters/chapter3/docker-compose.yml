@@ -1,5 +1,12 @@
 version: "3.7"
 services:
+  events_api:
+    build: ./api
+    image: manning-airflow-events-api:latest
+    ports:
+      - "5000:5000"
+    networks:
+      - airflow
   airflow:
     build: ../../docker
     image: manning-airflow:latest
@@ -9,6 +16,7 @@ services:
       - airflow
     volumes:
       - ./dags:/root/airflow/dags
+      - ./data:/data
 
 networks:
   airflow:

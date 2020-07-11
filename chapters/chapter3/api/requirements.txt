@@ -1,0 +1,4 @@
+click
+faker
+flask
+pandas
