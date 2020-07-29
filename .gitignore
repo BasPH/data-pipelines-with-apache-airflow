@@ -141,7 +141,6 @@ dmypy.json
 .idea
 .vscode
 
-# Data folders
-data
-
 .DS_Store
+# Data
+data
