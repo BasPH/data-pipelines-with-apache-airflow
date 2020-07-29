@@ -48,7 +48,9 @@ with DAG(
         task_id="fetch_sales", python_callable=_fetch_sales, provide_context=True
     )
     clean_sales = PythonOperator(
-        task_id="clean_sales", python_callable=_clean_sales, provide_context=True,
+        task_id="clean_sales",
+        python_callable=_clean_sales,
+        provide_context=True,
     )
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
