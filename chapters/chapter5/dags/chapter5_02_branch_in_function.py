@@ -22,18 +22,18 @@ def _fetch_sales_new(**context):
     print("Fetching sales data (NEW)...")
 
 
-def _preprocess_sales(**context):
+def _clean_sales(**context):
     if context["execution_date"] < airflow.utils.dates.days_ago(1):
-        _preprocess_sales_old(**context)
+        _clean_sales_old(**context)
     else:
-        _preprocess_sales_new(**context)
+        _clean_sales_new(**context)
 
 
-def _preprocess_sales_old(**context):
+def _clean_sales_old(**context):
     print("Preprocessing sales data (OLD)...")
 
 
-def _preprocess_sales_new(**context):
+def _clean_sales_new(**context):
     print("Preprocessing sales data (NEW)...")
 
 
@@ -47,21 +47,21 @@ with DAG(
     fetch_sales = PythonOperator(
         task_id="fetch_sales", python_callable=_fetch_sales, provide_context=True
     )
-    preprocess_sales = PythonOperator(
-        task_id="preprocess_sales",
-        python_callable=_preprocess_sales,
+    clean_sales = PythonOperator(
+        task_id="clean_sales",
+        python_callable=_clean_sales,
         provide_context=True,
     )
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
-    preprocess_weather = DummyOperator(task_id="preprocess_weather")
+    clean_weather = DummyOperator(task_id="clean_weather")
 
-    build_dataset = DummyOperator(task_id="build_dataset")
+    join_datasets = DummyOperator(task_id="join_datasets")
     train_model = DummyOperator(task_id="train_model")
-    notify = DummyOperator(task_id="notify")
+    deploy_model = DummyOperator(task_id="deploy_model")
 
     start >> [fetch_sales, fetch_weather]
-    fetch_sales >> preprocess_sales
-    fetch_weather >> preprocess_weather
-    [preprocess_sales, preprocess_weather] >> build_dataset
-    build_dataset >> train_model >> notify
+    fetch_sales >> clean_sales
+    fetch_weather >> clean_weather
+    [clean_sales, clean_weather] >> join_datasets
+    join_datasets >> train_model >> deploy_model
