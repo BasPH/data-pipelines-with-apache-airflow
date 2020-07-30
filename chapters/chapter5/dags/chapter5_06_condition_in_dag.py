@@ -52,7 +52,7 @@ with DAG(
     join_datasets = DummyOperator(task_id="join_datasets")
     train_model = DummyOperator(task_id="train_model")
 
-    if_most_recent = PythonOperator(
+    latest_only = PythonOperator(
         task_id="latest_only", python_callable=_latest_only, provide_context=True,
     )
 
@@ -66,4 +66,4 @@ with DAG(
     fetch_weather >> clean_weather
     [join_erp, clean_weather] >> join_datasets
     join_datasets >> train_model >> deploy_model
-    if_most_recent >> deploy_model
+    latest_only >> deploy_model
