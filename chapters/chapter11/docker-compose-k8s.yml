@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  airflow:
+    build: ../../docker
+    image: manning-airflow:latest
+    ports:
+      - "8080:8080"
+    environment:
+      MOVIELENS_USER: airflow
+      MOVIELENS_PASSWORD: airflow
+      # Below host assumes service was named 'movielens' and is running in
+      # the 'airflow' namespace, listening on port 80.
+      MOVIELENS_HOST: http://movielens.airflow.svc.cluster.local:80
+    volumes:
+      - ./dags/kubernetes:/root/airflow/dags
+      - ~/.kube/config:/root/.kube/config

@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+  airflow:
+    build: ../../docker
+    image: manning-airflow:latest
+    ports:
+      - "8080:8080"
+    environment:
+      MOVIELENS_USER: airflow
+      MOVIELENS_PASSWORD: airflow
+      MOVIELENS_HOST: http://movielens:5000
+    networks:
+      - airflow
+    volumes:
+      - ./dags/docker:/root/airflow/dags
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - movielens
+  movielens:
+    build: images/movielens-api
+    image: airflowbook/movielens-api
+    ports:
+      - "5000:5000"
+    networks:
+      - airflow
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
+
+  # These aren't actual services, but we include them to make sure that the
+  # corresponding images are built by when pulling up docker-compose.
+  movielens-fetch:
+    build: images/movielens-fetch
+    image: airflowbook/movielens-fetch
+    restart: "no"
+  movielens-rank:
+    build: images/movielens-rank
+    image: airflowbook/movielens-rank
+    restart: "no"
+
+networks:
+  airflow:

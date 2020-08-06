@@ -1,3 +1,5 @@
+import uuid
+
 import airflow
 
 from airflow import DAG
@@ -5,29 +7,40 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
 
-def _fetch_sales(**context):
-    if context["execution_date"] > airflow.utils.dates.days_ago(2):
-        raise Exception("Something when wrong")
+def _train_model(**context):
+    model_id = str(uuid.uuid4())
+    context["task_instance"].xcom_push(key="model_id", value=model_id)
+
+
+def _deploy_model(**context):
+    model_id = context["task_instance"].xcom_pull(
+        task_ids="train_model", key="model_id"
+    )
+    print(f"Deploying model {model_id}")
 
 
 with DAG(
-    dag_id="chapter5_07_trigger_rules",
+    dag_id="chapter5_08_xcoms",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    fetch_sales = PythonOperator(
-        task_id="fetch_sales", python_callable=_fetch_sales, provide_context=True
-    )
+    fetch_sales = DummyOperator(task_id="fetch_sales")
     clean_sales = DummyOperator(task_id="clean_sales")
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
     clean_weather = DummyOperator(task_id="clean_weather")
 
     join_datasets = DummyOperator(task_id="join_datasets")
-    train_model = DummyOperator(task_id="train_model")
-    deploy_model = DummyOperator(task_id="deploy_model")
+
+    train_model = PythonOperator(
+        task_id="train_model", python_callable=_train_model, provide_context=True,
+    )
+
+    deploy_model = PythonOperator(
+        task_id="deploy_model", python_callable=_deploy_model, provide_context=True,
+    )
 
     start >> [fetch_sales, fetch_weather]
     fetch_sales >> clean_sales

@@ -15,9 +15,9 @@ def _pick_erp_system(**context):
         return "fetch_sales_new"
 
 
-def _notify(**context):
+def _deploy_model(**context):
     if _is_latest_run(**context):
-        print("Sending notification")
+        print("Deploying model")
 
 
 def _is_latest_run(**context):
@@ -41,28 +41,28 @@ with DAG(
     )
 
     fetch_sales_old = DummyOperator(task_id="fetch_sales_old")
-    preprocess_sales_old = DummyOperator(task_id="preprocess_sales_old")
+    clean_sales_old = DummyOperator(task_id="clean_sales_old")
 
     fetch_sales_new = DummyOperator(task_id="fetch_sales_new")
-    preprocess_sales_new = DummyOperator(task_id="preprocess_sales_new")
+    clean_sales_new = DummyOperator(task_id="clean_sales_new")
 
     join_erp = DummyOperator(task_id="join_erp_branch", trigger_rule="none_failed")
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
-    preprocess_weather = DummyOperator(task_id="preprocess_weather")
+    clean_weather = DummyOperator(task_id="clean_weather")
 
-    build_dataset = DummyOperator(task_id="build_dataset")
+    join_datasets = DummyOperator(task_id="join_datasets")
     train_model = DummyOperator(task_id="train_model")
 
-    notify = PythonOperator(
-        task_id="notify", python_callable=_notify, provide_context=True
+    deploy_model = PythonOperator(
+        task_id="deploy_model", python_callable=_deploy_model, provide_context=True
     )
 
     start >> [pick_erp, fetch_weather]
     pick_erp >> [fetch_sales_old, fetch_sales_new]
-    fetch_sales_old >> preprocess_sales_old
-    fetch_sales_new >> preprocess_sales_new
-    [preprocess_sales_old, preprocess_sales_new] >> join_erp
-    fetch_weather >> preprocess_weather
-    [join_erp, preprocess_weather] >> build_dataset
-    build_dataset >> train_model >> notify
+    fetch_sales_old >> clean_sales_old
+    fetch_sales_new >> clean_sales_new
+    [clean_sales_old, clean_sales_new] >> join_erp
+    fetch_weather >> clean_weather
+    [join_erp, clean_weather] >> join_datasets
+    join_datasets >> train_model >> deploy_model
