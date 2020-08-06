@@ -21,7 +21,7 @@ with DAG(
 
     fetch_ratings = KubernetesPodOperator(
         task_id="fetch_ratings",
-        image="jrderuiter/movielens-fetch",
+        image="airflowbook/movielens-fetch",
         cmds=["fetch_ratings.py"],
         arguments=[
             "--start_date",
@@ -46,7 +46,7 @@ with DAG(
 
     rank_movies = KubernetesPodOperator(
         task_id="rank_movies",
-        image="jrderuiter/movielens-rank",
+        image="airflowbook/movielens-rank",
         cmds=["rank_movies.py"],
         arguments=[
             "--input_path",
