@@ -11,11 +11,12 @@ RUN mkdir -p /root/airflow
 COPY entrypoint.sh /root/airflow
 
 RUN apt update && \
-    apt install -y postgresql-client && \
+    apt install -y postgresql-client curl && \
 	conda install -y pytest setproctitle psutil && \
     pip install --no-cache-dir \
 		apache-airflow[crypto,postgres]==1.10.5 \
 		werkzeug==0.16.0 \
+		SQLAlchemy==1.3.15 \
 		pytest-mock pytest-helpers-namespace
 
 COPY airflowbook /tmp/airflowbook

@@ -1,4 +1,5 @@
 import datetime as dt
+from pathlib import Path
 
 import pandas as pd
 from airflow import DAG
@@ -13,15 +14,21 @@ dag = DAG(
 
 fetch_events = BashOperator(
     task_id="fetch_events",
-    bash_command="curl -o data/events.json https://localhost:5000/events",
+    bash_command=(
+        "mkdir -p /data/events && "
+        "curl -o /data/events.json https://events_api:5000/events"
+    ),
     dag=dag,
 )
 
 
 def _calculate_stats(input_path, output_path):
     """Calculates event statistics."""
+
     events = pd.read_json(input_path)
     stats = events.groupby(["date", "user"]).size().reset_index()
+
+    Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
 
