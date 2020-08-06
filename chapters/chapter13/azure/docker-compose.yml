@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  airflow:
+    image: manning-airflow:latest
+    environment:
+      AIRFLOW_CONN_MY_WASB_CONN: 'wasb://${BLOB_ACCOUNT_NAME}:${BLOB_ACCOUNT_KEY}@azure'
+      AIRFLOW_CONN_MY_ODBC_CONN: 'odbc://${SYNAPSE_USER}:${SYNAPSE_PASSWORD}@${SYNAPSE_HOST}/${SYNAPSE_DB}'
+    ports:
+      - "8080:8080"
+    networks:
+      - airflow
+    volumes:
+      - ./data:/data
+      - ./dags:/root/airflow/dags
+networks:
+  airflow:

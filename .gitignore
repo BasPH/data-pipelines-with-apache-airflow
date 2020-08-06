@@ -141,5 +141,5 @@ dmypy.json
 .idea
 .vscode
 
-# Data
+# Data folders
 data

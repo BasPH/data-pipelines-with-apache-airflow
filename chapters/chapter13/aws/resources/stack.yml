@@ -1,0 +1,158 @@
+Description: Resources for the AWS use case.
+
+Parameters:
+  BucketPrefix:
+    Description: Prefix to apply to bucket names (makes them globally unique).
+    Type: String
+    AllowedPattern: (^[a-z0-9-]+$)
+  CrawlerName:
+    Description: Name to use for the ratings crawler.
+    Type: String
+    AllowedPattern: (^[a-z0-9-]+$)
+    Default: ratings-crawler
+
+Resources:
+  RatingsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketPrefix}-airflow-ratings"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+    DeletionPolicy: Retain
+
+  RankingsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${BucketPrefix}-airflow-rankings"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+    DeletionPolicy: Retain
+
+  RatingsCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: !Ref CrawlerName
+      Description: Crawler for indexing ratings from S3.
+      DatabaseName: airflow
+      Targets:
+        S3Targets:
+          - Path: !Sub "${RatingsBucket}/ratings"
+      Role: !Ref RatingsCrawlerRole
+
+  RatingsCrawlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: glue.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+        - !Ref CrawlRatingsPolicy
+
+  CrawlRatingsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy allowing the crawler to crawl the ratings bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub arn:aws:s3:::${RatingsBucket}/*
+
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "airflow"
+      ManagedPolicyArns:
+        - !Ref S3UploadPolicy
+        - !Ref GlueCrawlerPolicy
+        - !Ref AthenaQueryPolicy
+        - !Ref AthenaS3Policy
+
+  S3UploadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy allowing files to be uploaded to the ratings bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: s3:PutObject
+            Resource: !Sub arn:aws:s3:::${RatingsBucket}/*
+
+  GlueCrawlerPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy allowing starting of crawlers and getting their status.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - glue:GetCrawler
+              - glue:StartCrawler
+            Resource: '*'
+
+  AthenaQueryPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy giving access to Athena and Glue for executing queries.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - athena:StartQueryExecution
+              - athena:GetQueryExecution
+            Resource:
+              - arn:aws:athena:*:*:workgroup/*
+          - Effect: Allow
+            Action:
+              - glue:GetTable
+              - glue:GetPartitions
+            Resource:
+              - arn:aws:glue:*:*:catalog
+              - arn:aws:glue:*:*:database/*
+              - arn:aws:glue:*:*:table/*
+
+  AthenaS3Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy giving access to S3 for performing the Athena queries.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # Allows us to write results out to S3.
+          - Effect: Allow
+            Action:
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+              - s3:ListMultipartUploadParts
+              - s3:AbortMultipartUpload
+              - s3:CreateBucket
+              - s3:PutObject
+            Resource:
+                - !Sub arn:aws:s3:::${RankingsBucket}
+                - !Sub arn:aws:s3:::${RankingsBucket}/*
+          # Allows us to read input from ratings bucket.
+          - Effect: Allow
+            Action:
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - !Sub arn:aws:s3:::${RatingsBucket}
+              - !Sub arn:aws:s3:::${RatingsBucket}/*

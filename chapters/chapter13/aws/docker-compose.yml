@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  airflow:
+    image: manning-airflow:latest
+    environment:
+      AWS_DEFAULT_REGION: eu-west-1
+      AIRFLOW_CONN_MY_AWS_CONN: 's3://?aws_access_key_id=${AWS_ACCESS_KEY}&aws_secret_access_key=${AWS_ACCESS_SECRET}'
+      RATINGS_BUCKET: ${RATINGS_BUCKET}
+      RANKINGS_BUCKET: ${RANKINGS_BUCKET}
+      CRAWLER_NAME: ${CRAWLER_NAME}
+    ports:
+      - "8080:8080"
+    networks:
+      - airflow
+    volumes:
+      - ./data:/data
+      - ./dags:/root/airflow/dags
+networks:
+  airflow:
