@@ -37,7 +37,7 @@ with DAG(
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    sales_branch = BranchPythonOperator(
+    pick_erp_system = BranchPythonOperator(
         task_id="pick_erp_system",
         provide_context=True,
         python_callable=_pick_erp_system,
@@ -74,8 +74,8 @@ with DAG(
     train_model = DummyOperator(task_id="train_model")
     deploy_model = DummyOperator(task_id="deploy_model")
 
-    start >> [sales_branch, fetch_weather]
-    sales_branch >> [fetch_sales_old, fetch_sales_new]
+    start >> [pick_erp_system, fetch_weather]
+    pick_erp_system >> [fetch_sales_old, fetch_sales_new]
     fetch_sales_old >> clean_sales_old
     fetch_sales_new >> clean_sales_new
     [clean_sales_old, clean_sales_new] >> join_erp
