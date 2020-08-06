@@ -3,11 +3,10 @@ import os
 from os import path
 import tempfile
 
-from airflow import DAG, utils as airflow_utils
+from airflow import DAG
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 
 from custom.operators import GlueTriggerCrawlerOperator
@@ -20,9 +19,7 @@ with DAG(
     start_date=dt.datetime(year=2015, month=1, day=1),
     end_date=dt.datetime(year=2015, month=3, day=1),
     schedule_interval="@monthly",
-    default_args={
-        "depends_on_past": True
-    }
+    default_args={"depends_on_past": True},
 ) as dag:
 
     def _upload_ratings(s3_conn_id, s3_bucket, **context):

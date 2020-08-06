@@ -24,11 +24,7 @@ class GlueTriggerCrawlerOperator(BaseOperator):
 
     @apply_defaults
     def __init__(
-        self,
-        aws_conn_id: str,
-        crawler_name: str,
-        region_name: str = None,
-        **kwargs
+        self, aws_conn_id: str, crawler_name: str, region_name: str = None, **kwargs
     ):
         super().__init__(**kwargs)
         self._aws_conn_id = aws_conn_id

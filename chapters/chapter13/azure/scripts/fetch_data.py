@@ -7,8 +7,8 @@ import zipfile
 import pandas as pd
 
 logging.basicConfig(
-    format='[%(asctime)-15s] %(levelname)s - %(message)s',
-    level=logging.INFO)
+    format="[%(asctime)-15s] %(levelname)s - %(message)s", level=logging.INFO
+)
 
 
 def main():
@@ -40,7 +40,7 @@ def fetch_ratings(url):
 def write_partitioned(ratings, output_dir):
     """Writes ratings partitioned by year/month."""
 
-    dates = pd.to_datetime(ratings['timestamp'], unit="s")
+    dates = pd.to_datetime(ratings["timestamp"], unit="s")
 
     for (year, month), grp in ratings.groupby([dates.dt.year, dates.dt.month]):
         output_path = output_dir / str(year) / f"{month:02d}.csv"

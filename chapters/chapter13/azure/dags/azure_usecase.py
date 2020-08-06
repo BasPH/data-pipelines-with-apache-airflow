@@ -5,9 +5,8 @@ import tempfile
 
 import pandas as pd
 
-from airflow import DAG, utils as airflow_utils
+from airflow import DAG
 
-from airflow.models import Connection
 from airflow.providers.microsoft.azure.hooks.wasb import WasbHook
 from airflow.providers.odbc.hooks.odbc import OdbcHook
 from airflow.operators.python_operator import PythonOperator
@@ -39,14 +38,6 @@ GROUP BY movieId
 ORDER BY avg_rating DESC
 """
 
-with DAG(
-    dag_id="chapter13_azure_usecase",
-    description="DAG demonstrating some Azure hooks and operators.",
-    start_date=dt.datetime(year=2015, month=1, day=1),
-    end_date=dt.datetime(year=2015, month=3, day=1),
-    schedule_interval="@monthly",
-    default_args={"depends_on_past": True},
-) as dag:
 
 def _upload_ratings(wasb_conn_id, container, **context):
     year = context["execution_date"].year
@@ -68,55 +59,66 @@ def _upload_ratings(wasb_conn_id, container, **context):
             tmp_path, container_name=container, blob_name=f"{year}/{month:02d}.csv",
         )
 
+
+def _rank_movies(
+    odbc_conn_id, wasb_conn_id, ratings_container, rankings_container, **context
+):
+    year = context["execution_date"].year
+    month = context["execution_date"].month
+
+    # Determine storage account name, needed for query source URL.
+    blob_account_name = WasbHook.get_connection(wasb_conn_id).login
+
+    query = RANK_QUERY.format(
+        year=year,
+        month=month,
+        blob_account_name=blob_account_name,
+        blob_container=ratings_container,
+    )
+    logging.info(f"Executing query: {query}")
+
+    odbc_hook = OdbcHook(odbc_conn_id, driver="ODBC Driver 17 for SQL Server")
+
+    with odbc_hook.get_conn() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+
+            rows = cursor.fetchall()
+            colnames = [field[0] for field in cursor.description]
+
+    ranking = pd.DataFrame.from_records(rows, columns=colnames)
+    logging.info(f"Retrieved {ranking.shape[0]} rows")
+
+    # Write ranking to temp file.
+    logging.info(f"Writing results to {rankings_container}/{year}/{month:02d}.csv")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = path.join(tmp_dir, "ranking.csv")
+        ranking.to_csv(tmp_path, index=False)
+
+        # Upload file to Azure Blob.
+        wasb_hook = WasbHook(wasb_conn_id)
+        wasb_hook.load_file(
+            tmp_path,
+            container_name=rankings_container,
+            blob_name=f"{year}/{month:02d}.csv",
+        )
+
+
+with DAG(
+    dag_id="chapter13_azure_usecase",
+    description="DAG demonstrating some Azure hooks and operators.",
+    start_date=dt.datetime(year=2015, month=1, day=1),
+    end_date=dt.datetime(year=2015, month=3, day=1),
+    schedule_interval="@monthly",
+    default_args={"depends_on_past": True},
+) as dag:
+
     upload_ratings = PythonOperator(
         task_id="upload_ratings",
         python_callable=_upload_ratings,
         op_kwargs={"wasb_conn_id": "my_wasb_conn", "container": "ratings"},
         provide_context=True,
     )
-
-    def _rank_movies(
-        odbc_conn_id, wasb_conn_id, ratings_container, rankings_container, **context
-    ):
-        year = context["execution_date"].year
-        month = context["execution_date"].month
-
-        # Determine storage account name, needed for query source URL.
-        blob_account_name = WasbHook.get_connection(wasb_conn_id).login
-
-        query = RANK_QUERY.format(
-            year=year,
-            month=month,
-            blob_account_name=blob_account_name,
-            blob_container=ratings_container,
-        )
-        logging.info(f"Executing query: {query}")
-
-        odbc_hook = OdbcHook(odbc_conn_id, driver="ODBC Driver 17 for SQL Server")
-
-        with odbc_hook.get_conn() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query)
-
-                rows = cursor.fetchall()
-                colnames = [field[0] for field in cursor.description]
-
-        ranking = pd.DataFrame.from_records(rows, columns=colnames)
-        logging.info(f"Retrieved {ranking.shape[0]} rows")
-
-        # Write ranking to temp file.
-        logging.info(f"Writing results to {rankings_container}/{year}/{month:02d}.csv")
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp_path = path.join(tmp_dir, "ranking.csv")
-            ranking.to_csv(tmp_path, index=False)
-
-            # Upload file to Azure Blob.
-            wasb_hook = WasbHook(wasb_conn_id)
-            wasb_hook.load_file(
-                tmp_path,
-                container_name=rankings_container,
-                blob_name=f"{year}/{month:02d}.csv",
-            )
 
     rank_movies = PythonOperator(
         task_id="rank_movies",
