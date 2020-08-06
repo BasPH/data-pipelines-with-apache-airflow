@@ -11,10 +11,13 @@ from flask import Flask, jsonify, request
 def _generate_events(end_date):
     """Generates a fake dataset with events for 30 days before end date."""
 
-    events = pd.concat([
-        _generate_events_for_day(date=end_date - timedelta(days=(30 - i)))
-        for i in range(30)
-    ], axis=0)
+    events = pd.concat(
+        [
+            _generate_events_for_day(date=end_date - timedelta(days=(30 - i)))
+            for i in range(30)
+        ],
+        axis=0,
+    )
 
     return events
 
@@ -36,10 +39,12 @@ def _generate_events_for_day(date):
     fake = Faker()
     users = [fake.ipv4() for _ in range(n_users)]
 
-    return pd.DataFrame({
-        "user": random_state.choice(users, size=n_events, replace=True),
-        "date": pd.to_datetime(date),
-    })
+    return pd.DataFrame(
+        {
+            "user": random_state.choice(users, size=n_events, replace=True),
+            "date": pd.to_datetime(date),
+        }
+    )
 
 
 app = Flask(__name__)
