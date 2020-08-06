@@ -7,5 +7,5 @@ airflow-start:
 	docker-compose up -d --build
 
 .PHONY: airflow-stop
-airflow-stop
+airflow-stop:
 	docker-compose down
