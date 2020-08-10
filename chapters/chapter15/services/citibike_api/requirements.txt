@@ -1,0 +1,3 @@
+Flask-HTTPAuth==4.1.0
+Flask==1.1.2
+psycopg2==2.8.5

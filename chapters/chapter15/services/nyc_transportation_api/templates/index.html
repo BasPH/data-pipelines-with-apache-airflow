@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>NYC Transportation</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xl">
+          <table class="table table-bordered table-hover table-condensed">
+            <thead>
+              <tr>
+                <th scope="col">Start location</th>
+                <th scope="col">End location</th>
+                <th scope="col">Weekday</th>
+                <th scope="col">Time group</th>
+                <th scope="col">Avg time Citi Bike</th>
+                <th scope="col">Avg time Taxi</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for row in data %}
+              <tr>
+                 <td>{{ row[0] }}</td>
+                 <td>{{ row[1] }}</td>
+                 <td>{{ row[2] }}</td>
+                 <td>{{ row[3] }}</td>
+                 <td{% if row[4] < row[5] %} class="table-success"{% endif %}>{{ row[4] }}</td>
+                 <td{% if row[5] < row[4] %} class="table-success"{% endif %}>{{ row[5] }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  </body>
+</html>
