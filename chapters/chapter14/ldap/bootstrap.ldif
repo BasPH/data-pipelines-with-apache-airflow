@@ -1,0 +1,23 @@
+# Create group
+dn: cn=engineers,dc=apacheairflow,dc=com
+cn: engineers
+gidnumber: 500
+objectclass: posixGroup
+objectclass: top
+
+# Create users
+# Entry 1: cn=bob smith,dc=apacheairflow,dc=com
+dn: cn=bob smith,dc=apacheairflow,dc=com
+cn: bob smith
+gidnumber: 500
+givenname: bob
+homedirectory: /home/users/bsmith
+loginshell: /bin/bash
+mail: bobsmith@apacheairflow.com
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: smith
+uid: bsmith
+uidnumber: 1000
+userpassword: test
