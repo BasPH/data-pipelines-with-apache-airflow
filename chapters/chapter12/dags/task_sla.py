@@ -11,5 +11,8 @@ dag = DAG(
 )
 
 sleeptask = BashOperator(
-    task_id="sleeptask", bash_command="sleep 5", sla=datetime.timedelta(seconds=1), dag=dag
+    task_id="sleeptask",
+    bash_command="sleep 5",
+    sla=datetime.timedelta(seconds=1),
+    dag=dag,
 )
