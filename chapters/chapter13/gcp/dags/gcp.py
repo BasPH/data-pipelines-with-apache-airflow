@@ -29,7 +29,9 @@ upload_ratings_to_gcs = FileToGoogleCloudStorageOperator(
 import_in_bigquery = GoogleCloudStorageToBigQueryOperator(
     task_id="import_in_bigquery",
     bucket=os.environ["RATINGS_BUCKET"],
-    source_objects=["ratings/{{ execution_date.year }}/{{ execution_date.strftime('%m') }}.csv"],
+    source_objects=[
+        "ratings/{{ execution_date.year }}/{{ execution_date.strftime('%m') }}.csv"
+    ],
     source_format="CSV",
     create_disposition="CREATE_IF_NEEDED",
     write_disposition="WRITE_TRUNCATE",
