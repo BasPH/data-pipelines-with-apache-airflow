@@ -1,0 +1,127 @@
+version: '3.7'
+
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/1
+  - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__STORE_DAG_CODE=True
+  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
+  - AIRFLOW__SCHEDULER__STATSD_HOST=statsd_exporter
+  - AIRFLOW__SCHEDULER__STATSD_ON=True
+  - AIRFLOW__SCHEDULER__STATSD_PORT=9125
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  - AIRFLOW__WEBSERVER__RBAC=True
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+
+  initdb_adduser:
+    image: apache/airflow:1.10.11-python3.7
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    # The webserver initializes permissions, so sleep for that to (approximately) be finished
+    # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
+    command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+
+  webserver:
+    image: apache/airflow:1.10.11-python3.7
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler:
+    image: apache/airflow:1.10.11-python3.7
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - ./hello_airflow.py:/opt/airflow/dags/hello_airflow.py
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: scheduler
+
+  # docker-compose -f docker-compose-celeryexecutor.yml up --scale worker=3 -d
+  worker:
+    image: apache/airflow:1.10.11-python3.7
+    restart: always
+    depends_on:
+      - scheduler
+    volumes:
+      - ./hello_airflow.py:/opt/airflow/dags/hello_airflow.py
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: worker
+
+  flower:
+    image: apache/airflow:1.10.11-python3.7
+    restart: always
+    depends_on:
+      - worker
+    ports:
+      - "5555:5555"
+    environment: *airflow_environment
+    command: flower
+
+  statsd_exporter:
+    image: prom/statsd-exporter
+    restart: always
+    volumes:
+      - ./statsd_mapping.yml:/tmp/statsd_mapping.yml
+    ports:
+      - "9102:9102"
+      - "9125:9125/udp"
+    command: --statsd.mapping-config=/tmp/statsd_mapping.yml
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    command:
+      - --web.enable-admin-api
+      - --web.enable-lifecycle
+      # Flags below are defaults, but must be added explicitly, otherwise would be overridden by flags above
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: redis:5-alpine
+
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.5.2-alpine
+    ports:
+      - "9121:9121"
+    command: --redis.addr=redis://redis:6379
+
+volumes:
+  logs:
