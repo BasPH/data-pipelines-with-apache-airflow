@@ -47,15 +47,21 @@ class MinioPandasToPostgres(BaseOperator):
         )
 
         logging.info("Reading object: %s/%s.", self._minio_bucket, self._minio_key)
-        obj = minio_client.get_object(bucket_name=self._minio_bucket, object_name=self._minio_key)
+        obj = minio_client.get_object(
+            bucket_name=self._minio_bucket, object_name=self._minio_key
+        )
         if self._pre_read_transform:
             obj = self._pre_read_transform(obj)
 
         df = self._pandas_read_callable(obj, **self._read_callable_kwargs)
-        df["airflow_execution_date"] = pd.Timestamp(context["execution_date"].timestamp(), unit="s")
+        df["airflow_execution_date"] = pd.Timestamp(
+            context["execution_date"].timestamp(), unit="s"
+        )
         logging.info("Read DataFrame with shape: %s.", df.shape)
 
-        engine = create_engine(BaseHook.get_connection(self._postgres_conn_id).get_uri())
+        engine = create_engine(
+            BaseHook.get_connection(self._postgres_conn_id).get_uri()
+        )
         with engine.begin() as conn:
             conn.execute(
                 f"DELETE FROM {self._postgres_table} "

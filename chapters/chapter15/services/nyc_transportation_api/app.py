@@ -295,7 +295,7 @@ CASE WHEN extract(hour from stoptime) >= 8 and extract(hour from stoptime) < 11 
      AS time_group,
 cast(avg(tripduration) as float) as avg_seconds
 from citi_bike_rides
-where start_location_id != end_location_id 
+where start_location_id != end_location_id
 group by start_location_id, end_location_id, weekday, time_group
 ),
 taxi as (
@@ -311,7 +311,7 @@ CASE WHEN extract(hour from stoptime) >= 8 and extract(hour from stoptime) < 11 
      AS time_group,
 cast(avg(tripduration) as float) as avg_seconds
 from taxi_rides
-where start_location_id != end_location_id 
+where start_location_id != end_location_id
 group by start_location_id, end_location_id, weekday, time_group
 )
 select

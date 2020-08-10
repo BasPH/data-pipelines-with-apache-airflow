@@ -15,7 +15,9 @@ def test_dag_integrity(dag_path):
     module = _import_file(dag_name, dag_path)
 
     # Validate if there is at least 1 DAG object in the file
-    dag_objects = [var for var in vars(module).values() if isinstance(var, airflow_models.DAG)]
+    dag_objects = [
+        var for var in vars(module).values() if isinstance(var, airflow_models.DAG)
+    ]
     assert dag_objects
 
     # For every DAG object, test for cycles

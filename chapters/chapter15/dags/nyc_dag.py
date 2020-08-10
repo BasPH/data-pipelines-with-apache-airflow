@@ -27,17 +27,24 @@ def _download_citi_bike_data(ts_nodash, **_):
     citibike_conn = BaseHook.get_connection(conn_id="citibike")
 
     url = f"http://{citibike_conn.host}:{citibike_conn.port}/recent/minute/15"
-    response = requests.get(url, auth=HTTPBasicAuth(citibike_conn.login, citibike_conn.password))
+    response = requests.get(
+        url, auth=HTTPBasicAuth(citibike_conn.login, citibike_conn.password)
+    )
     data = response.json()
 
     s3_hook = S3Hook(aws_conn_id="s3")
     s3_hook.load_string(
-        string_data=json.dumps(data), key=f"raw/citibike/{ts_nodash}.json", bucket_name="datalake"
+        string_data=json.dumps(data),
+        key=f"raw/citibike/{ts_nodash}.json",
+        bucket_name="datalake",
     )
 
 
 download_citi_bike_data = PythonOperator(
-    task_id="download_citi_bike_data", python_callable=_download_citi_bike_data, provide_context=True, dag=dag
+    task_id="download_citi_bike_data",
+    python_callable=_download_citi_bike_data,
+    provide_context=True,
+    dag=dag,
 )
 
 
@@ -54,7 +61,9 @@ def _download_taxi_data():
         response = requests.get(f"{url}/{filename}")
         s3_key = f"raw/taxi/{filename}"
         try:
-            s3_hook.load_string(string_data=response.text, key=s3_key, bucket_name="datalake")
+            s3_hook.load_string(
+                string_data=response.text, key=s3_key, bucket_name="datalake"
+            )
             print(f"Uploaded {s3_key} to MinIO.")
             exported_files.append(s3_key)
         except ValueError:
@@ -68,7 +77,9 @@ download_taxi_data = PythonOperator(
 )
 
 
-def get_minio_object(pandas_read_callable, bucket, paths, pandas_read_callable_kwargs=None):
+def get_minio_object(
+    pandas_read_callable, bucket, paths, pandas_read_callable_kwargs=None
+):
     s3_conn = BaseHook.get_connection(conn_id="s3")
     minio_client = Minio(
         s3_conn.extra_dejson["host"].split("://")[1],
@@ -96,28 +107,42 @@ def get_minio_object(pandas_read_callable, bucket, paths, pandas_read_callable_k
 
 def transform_citi_bike_data(df):
     # Map citi bike lat,lon coordinates to taxi zone ids
-    taxi_zones = geopandas.read_file("https://s3.amazonaws.com/nyc-tlc/misc/taxi_zones.zip").to_crs(
-        "EPSG:4326"
-    )
+    taxi_zones = geopandas.read_file(
+        "https://s3.amazonaws.com/nyc-tlc/misc/taxi_zones.zip"
+    ).to_crs("EPSG:4326")
     start_gdf = geopandas.GeoDataFrame(
         df,
         crs="EPSG:4326",
-        geometry=geopandas.points_from_xy(df["start_station_longitude"], df["start_station_latitude"]),
+        geometry=geopandas.points_from_xy(
+            df["start_station_longitude"], df["start_station_latitude"]
+        ),
     )
     end_gdf = geopandas.GeoDataFrame(
         df,
         crs="EPSG:4326",
-        geometry=geopandas.points_from_xy(df["end_station_longitude"], df["end_station_latitude"]),
+        geometry=geopandas.points_from_xy(
+            df["end_station_longitude"], df["end_station_latitude"]
+        ),
     )
-    df_with_zones = geopandas.sjoin(start_gdf, taxi_zones, how="left", op="within").rename(
-        columns={"LocationID": "start_location_id"}
-    )
+    df_with_zones = geopandas.sjoin(
+        start_gdf, taxi_zones, how="left", op="within"
+    ).rename(columns={"LocationID": "start_location_id"})
     end_zones = geopandas.sjoin(end_gdf, taxi_zones, how="left", op="within")
     df_with_zones["end_location_id"] = end_zones["LocationID"]
-    return df_with_zones[["tripduration", "starttime", "start_location_id", "stoptime", "end_location_id"]]
+    return df_with_zones[
+        [
+            "tripduration",
+            "starttime",
+            "start_location_id",
+            "stoptime",
+            "end_location_id",
+        ]
+    ]
 
 
-def write_minio_object(df, pandas_write_callable, bucket, path, pandas_write_callable_kwargs=None):
+def write_minio_object(
+    df, pandas_write_callable, bucket, path, pandas_write_callable_kwargs=None
+):
     s3_conn = BaseHook.get_connection(conn_id="s3")
     minio_client = Minio(
         s3_conn.extra_dejson["host"].split("://")[1],
@@ -130,7 +155,9 @@ def write_minio_object(df, pandas_write_callable, bucket, path, pandas_write_cal
     pandas_write_method(bytes_buffer, **pandas_write_callable_kwargs)
     nbytes = bytes_buffer.tell()
     bytes_buffer.seek(0)
-    minio_client.put_object(bucket_name=bucket, object_name=path, length=nbytes, data=bytes_buffer)
+    minio_client.put_object(
+        bucket_name=bucket, object_name=path, length=nbytes, data=bytes_buffer
+    )
 
 
 process_citi_bike_data = PandasOperator(
@@ -154,10 +181,12 @@ process_citi_bike_data = PandasOperator(
 
 
 def transform_taxi_data(df):
-    df[["pickup_datetime", "dropoff_datetime"]] = df[["pickup_datetime", "dropoff_datetime"]].apply(
-        pd.to_datetime
+    df[["pickup_datetime", "dropoff_datetime"]] = df[
+        ["pickup_datetime", "dropoff_datetime"]
+    ].apply(pd.to_datetime)
+    df["tripduration"] = (
+        (df["dropoff_datetime"] - df["pickup_datetime"]).dt.total_seconds().astype(int)
     )
-    df["tripduration"] = (df["dropoff_datetime"] - df["pickup_datetime"]).dt.total_seconds().astype(int)
     df = df.rename(
         columns={
             "pickup_datetime": "starttime",
