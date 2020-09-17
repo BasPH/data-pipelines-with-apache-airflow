@@ -58,7 +58,9 @@ def _fetch_pageviews(pagenames, ts_nodash, execution_date, **_):
             if domain_code == "en" and page_title in pagenames:
                 result[page_title] = view_counts
 
-    with open(f"/tmp/wikipageviews/{ts_nodash}/postgres_query-{ts_nodash}.sql", "w") as f:
+    with open(
+        f"/tmp/wikipageviews/{ts_nodash}/postgres_query-{ts_nodash}.sql", "w"
+    ) as f:
         for pagename, pageviewcount in result.items():
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
