@@ -1,22 +1,16 @@
-import datetime
-from pprint import pprint
-
+import airflow.utils.dates
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter4_print_context",
-    start_date=datetime.datetime(2018, 12, 10),
+    dag_id="chapter4_listing_4_3",
+    start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 )
 
 
-def _print_context(**context):
-    pprint(context)
-
-
-# Prints e.g.:
-# Start: 2019-07-13T14:00:00+00:00, end: 2019-07-13T15:00:00+00:00
+def _print_context(**kwargs):
+    print(kwargs)
 
 
 print_context = PythonOperator(

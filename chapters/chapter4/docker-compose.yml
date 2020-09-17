@@ -9,6 +9,15 @@ services:
       - airflow
     volumes:
       - ./dags:/root/airflow/dags
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+    - ./other_scripts/listing_4_16.sql:/docker-entrypoint-initdb.d/init.sql
 
 networks:
   airflow:
