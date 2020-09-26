@@ -1,3 +1,4 @@
+import datetime as dt
 import logging
 import json
 import os
@@ -71,9 +72,10 @@ def _get_with_pagination(session, url, params, batch_size=100):
 
 
 with DAG(
-    dag_id="chapter7_movielens_python_operator",
+    dag_id="01_movielens_python_operator",
     description="Fetches ratings from the Movielens API using the Python Operator.",
-    start_date=airflow_utils.dates.days_ago(7),
+    start_date=dt.datetime(2019, 1, 1),
+    end_date=dt.datetime(2019, 1, 10),
     schedule_interval="@daily",
 ) as dag:
 
@@ -117,8 +119,12 @@ with DAG(
         output_path = templates_dict["output_path"]
 
         ratings = pd.read_json(input_path)
-
         ranking = rank_movies_by_rating(ratings, min_ratings=min_ratings)
+
+        # Make sure output directory exists.
+        output_dir = os.path.dirname(output_path)
+        os.makedirs(output_dir, exist_ok=True)
+
         ranking.to_csv(output_path, index=True)
 
     rank_movies = PythonOperator(

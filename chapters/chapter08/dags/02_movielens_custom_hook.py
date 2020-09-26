@@ -1,3 +1,4 @@
+import datetime as dt
 import logging
 import json
 import os
@@ -9,9 +10,10 @@ from custom.hooks import MovielensHook
 
 
 with DAG(
-    dag_id="chapter7_movielens_custom_hook",
+    dag_id="02_movielens_custom_hook",
     description="Fetches ratings from the Movielens API using a custom hook.",
-    start_date=airflow_utils.dates.days_ago(7),
+    start_date=dt.datetime(2019, 1, 1),
+    end_date=dt.datetime(2019, 1, 10),
     schedule_interval="@daily",
 ) as dag:
 
