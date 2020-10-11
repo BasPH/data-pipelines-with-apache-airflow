@@ -1,5 +1,5 @@
 name: manning-airflow
 dependencies:
-  - python==3.8.2
-  - black
-  - flake8==3.7.9
+  - python==3.8.5
+  - black==19.3b0
+  - flake8==3.8.4
