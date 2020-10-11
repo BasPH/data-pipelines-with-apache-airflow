@@ -141,6 +141,11 @@ dmypy.json
 .idea
 .vscode
 
+# Pyenv
+.python-version
+
+# Mac
 .DS_Store
+
 # Data
 data
