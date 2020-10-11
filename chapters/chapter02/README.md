@@ -5,7 +5,7 @@ Code accompanying Chapter 2 of the book [Data Pipelines with Apache Airflow](htt
 ## Contents
 
 This folder contains DAGs from Chapter 2. The filenames and DAG ids follow the listing ids in the book. The
-final DAG is given in `listing_2_10.py`. 
+final DAG is given in `listing_2_10.py`.
 
 ## Usage
 
