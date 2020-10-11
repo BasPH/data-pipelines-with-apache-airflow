@@ -6,13 +6,13 @@ Code accompanying Chapter 5 of the book 'Data pipelines with Apache Airflow'.
 
 This code example contains the following DAGs:
 
-- chapter5_01_start.py - Initial DAG with several tasks.
-- chapter5_02_branch_in_function.py - Branching within a function.
-- chapter5_03_branch_in_dag.py - Branching within the DAG.
-- chapter5_04_branch_in_dag_explicit_join.py - Branching within the DAG with a join.
-- chapter5_05_branch_in_function.py - Condition within a function.
-- chapter5_06_branch_in_dag.py - Condition within the DAG.
-- chapter5_07_trigger_rules.py - DAG illustrating several trigger rules.
+- 01_start.py - Initial DAG with several tasks.
+- 02_branch_in_function.py - Branching within a function.
+- 03_branch_in_dag.py - Branching within the DAG.
+- 04_branch_in_dag_explicit_join.py - Branching within the DAG with a join.
+- 05_branch_in_function.py - Condition within a function.
+- 06_branch_in_dag.py - Condition within the DAG.
+- 07_trigger_rules.py - DAG illustrating several trigger rules.
 
 ## Usage
 
