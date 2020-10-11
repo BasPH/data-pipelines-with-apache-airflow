@@ -17,9 +17,9 @@ RUN apt update && \
     curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get update && \
     ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
-   
+
 # Install other dependencies.
-RUN apt install -y postgresql-client 
+RUN apt install -y postgresql-client
 
 # Install Airflow + Python dependencies.
 RUN conda install -y pytest setproctitle psutil pyodbc && \
@@ -32,7 +32,7 @@ RUN conda install -y pytest setproctitle psutil pyodbc && \
 		apache-airflow-backport-providers-microsoft-azure \
 		apache-airflow-backport-providers-amazon
 
-# Install kubectl. 
+# Install kubectl.
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 RUN chmod +x ./kubectl
 RUN mv ./kubectl /usr/local/bin
