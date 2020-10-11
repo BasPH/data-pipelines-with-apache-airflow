@@ -1,7 +1,7 @@
 # https://help.github.com/en/github/automating-your-workflow-with-github-actions
 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
 
-name: Static Python checks
+name: CI
 
 on: [push]
 #  push:
@@ -9,8 +9,8 @@ on: [push]
 #      - "*.py"
 
 jobs:
-  flake8:
-    name: Flake8
+  precommit:
+    name: Pre-commit
     runs-on: ubuntu-18.04 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#jobsjob_idruns-on
     steps:
       - uses: actions/checkout@v1 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/configuring-a-workflow#using-the-checkout-action
