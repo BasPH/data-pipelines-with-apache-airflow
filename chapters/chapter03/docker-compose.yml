@@ -50,6 +50,6 @@ services:
     command: scheduler
   events_api:
     build: ./api
-    image: manning-airflow-events-api:latest
+    image: manning-airflow/events-api:latest
     ports:
       - "5000:5000"
