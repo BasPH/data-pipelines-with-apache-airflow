@@ -1,12 +1,15 @@
-from airflow import DAG, utils as airflow_utils
+import datetime as dt
+
+from airflow import DAG
 
 from custom.operators import MovielensFetchRatingsOperator
 from custom.sensors import MovielensRatingsSensor
 
 with DAG(
-    dag_id="chapter7_movielens_sensor",
+    dag_id="04_movielens_sensor",
     description="Fetches ratings from the Movielens API, with a custom sensor.",
-    start_date=airflow_utils.dates.days_ago(7),
+    start_date=dt.datetime(2019, 1, 1),
+    end_date=dt.datetime(2019, 1, 10),
     schedule_interval="@daily",
 ) as dag:
     wait_for_ratings = MovielensRatingsSensor(
