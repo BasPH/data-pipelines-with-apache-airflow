@@ -141,6 +141,10 @@ dmypy.json
 .idea
 .vscode
 
+# Data folders
+data
+logs
+
 # Pyenv
 .python-version
 

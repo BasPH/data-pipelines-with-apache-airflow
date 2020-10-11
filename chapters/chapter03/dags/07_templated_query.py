@@ -1,4 +1,5 @@
-from datetime import datetime
+import datetime as dt
+from datetime import timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -7,16 +8,20 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter3_02_daily_schedule",
-    start_date=datetime(2019, 1, 1),
-    schedule_interval="@daily",
+    dag_id="07_templated_query",
+    schedule_interval=timedelta(days=3),
+    start_date=dt.datetime(year=2019, month=1, day=1),
+    end_date=dt.datetime(year=2019, month=1, day=5),
 )
 
 fetch_events = BashOperator(
     task_id="fetch_events",
     bash_command=(
         "mkdir -p /data/events && "
-        "curl -o /data/events.json https://events_api:5000/events"
+        "curl -o /data/events.json "
+        "http://events_api:5000/events?"
+        "start_date={{execution_date.strftime('%Y-%m-%d')}}&"
+        "end_date={{next_execution_date.strftime('%Y-%m-%d')}}"
     ),
     dag=dag,
 )
@@ -35,7 +40,7 @@ def _calculate_stats(input_path, output_path):
 calculate_stats = PythonOperator(
     task_id="calculate_stats",
     python_callable=_calculate_stats,
-    op_kwargs={"input_path": "data/events.json", "output_path": "data/stats.csv"},
+    op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv"},
     dag=dag,
 )
 
