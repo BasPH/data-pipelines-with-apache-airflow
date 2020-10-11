@@ -28,7 +28,7 @@ def _is_latest_run(**context):
 
 
 with DAG(
-    dag_id="chapter5_05_condition_in_function",
+    dag_id="05_condition_in_function",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:

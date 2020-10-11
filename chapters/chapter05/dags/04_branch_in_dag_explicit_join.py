@@ -31,7 +31,7 @@ def _clean_sales_new(**context):
 
 
 with DAG(
-    dag_id="chapter5_03_branch_in_dag",
+    dag_id="04_branch_in_dag_explicit_join",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:
@@ -65,10 +65,12 @@ with DAG(
         provide_context=True,
     )
 
+    join_erp = DummyOperator(task_id="join_erp_branch", trigger_rule="none_failed")
+
     fetch_weather = DummyOperator(task_id="fetch_weather")
     clean_weather = DummyOperator(task_id="clean_weather")
 
-    join_datasets = DummyOperator(task_id="join_datasets", trigger_rule="none_failed")
+    join_datasets = DummyOperator(task_id="join_datasets")
     train_model = DummyOperator(task_id="train_model")
     deploy_model = DummyOperator(task_id="deploy_model")
 
@@ -76,6 +78,7 @@ with DAG(
     pick_erp_system >> [fetch_sales_old, fetch_sales_new]
     fetch_sales_old >> clean_sales_old
     fetch_sales_new >> clean_sales_new
+    [clean_sales_old, clean_sales_new] >> join_erp
     fetch_weather >> clean_weather
-    [clean_sales_old, clean_sales_new, clean_weather] >> join_datasets
+    [join_erp, clean_weather] >> join_datasets
     join_datasets >> train_model >> deploy_model
