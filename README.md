@@ -13,7 +13,7 @@ Overall, this repository is structured as follows:
 ├── README.md             # This readme.
 ├── chapters              # Code examples for each of the Chapters.
 ├── docker                # Supporting Docker image (containing Airflow).
-└── environment.yml
+└── requirements.txt
 ```
 
 The most interesting parts are probably the *docker* directory and the *chapter* directories under *chapters*.

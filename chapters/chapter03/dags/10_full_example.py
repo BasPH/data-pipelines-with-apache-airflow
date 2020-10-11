@@ -8,7 +8,7 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter3_10_full_example",
+    dag_id="10_full_example",
     schedule_interval=timedelta(days=3),
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
