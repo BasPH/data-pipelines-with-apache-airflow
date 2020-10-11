@@ -52,4 +52,3 @@ docker:  ## Build the Airflow Docker image
 .PHONY: flake8
 flake8:
 	flake8 .
-

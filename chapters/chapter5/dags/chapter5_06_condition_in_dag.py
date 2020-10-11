@@ -53,7 +53,7 @@ with DAG(
     train_model = DummyOperator(task_id="train_model")
 
     latest_only = PythonOperator(
-        task_id="latest_only", python_callable=_latest_only, provide_context=True,
+        task_id="latest_only", python_callable=_latest_only, provide_context=True
     )
 
     deploy_model = DummyOperator(task_id="deploy_model")
