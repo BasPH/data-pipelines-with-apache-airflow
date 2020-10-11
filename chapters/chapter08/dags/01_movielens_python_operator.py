@@ -89,7 +89,7 @@ with DAG(
         logger.info(f"Fetching ratings for {start_date} to {end_date}")
         ratings = list(
             _get_ratings(
-                start_date=start_date, end_date=end_date, batch_size=batch_size,
+                start_date=start_date, end_date=end_date, batch_size=batch_size
             )
         )
         logger.info(f"Fetched {len(ratings)} ratings")

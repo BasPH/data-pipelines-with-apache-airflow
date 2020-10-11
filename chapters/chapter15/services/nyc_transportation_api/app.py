@@ -290,7 +290,7 @@ def index():
     )
     cursor = conn.cursor()
     cursor.execute(
-        f"""with citibike as (
+        """with citibike as (
 select
 start_location_id,
 end_location_id,

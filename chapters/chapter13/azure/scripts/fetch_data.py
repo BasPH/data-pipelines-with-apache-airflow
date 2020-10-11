@@ -30,7 +30,7 @@ def fetch_ratings(url):
         with zipfile.ZipFile(tmp_path) as zip_:
             logging.info(f"Downloaded zip file with contents: {zip_.namelist()}")
 
-            logging.info(f"Reading ml-20m/ratings.csv from zip file")
+            logging.info("Reading ml-20m/ratings.csv from zip file")
             with zip_.open("ml-20m/ratings.csv") as file_:
                 ratings = pd.read_csv(file_)
 
