@@ -3,7 +3,7 @@ import logging
 import json
 import os
 
-from airflow import DAG, utils as airflow_utils
+from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 from custom.hooks import MovielensHook

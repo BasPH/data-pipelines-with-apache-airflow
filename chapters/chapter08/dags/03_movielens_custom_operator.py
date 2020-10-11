@@ -1,6 +1,6 @@
 import datetime as dt
 
-from airflow import DAG, utils as airflow_utils
+from airflow import DAG
 
 from custom.operators import MovielensFetchRatingsOperator
 
