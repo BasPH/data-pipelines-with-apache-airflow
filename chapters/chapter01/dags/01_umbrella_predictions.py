@@ -1,11 +1,11 @@
-"""DAG demonstrating structure between tasks with dummy nodes and dependencies."""
+"""DAG demonstrating the umbrella use case with dummy operators."""
 
 import airflow.utils.dates
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 
 dag = DAG(
-    dag_id="chapter01_umbrella_predictions",
+    dag_id="01_umbrella_predictions",
     description="Umbrella example with DummyOperators.",
     start_date=airflow.utils.dates.days_ago(5),
     schedule_interval="@daily",
