@@ -143,6 +143,7 @@ dmypy.json
 
 # Data folders
 data
+logs
 
 # Pyenv
 .python-version
