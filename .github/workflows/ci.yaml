@@ -1,7 +1,7 @@
 # https://help.github.com/en/github/automating-your-workflow-with-github-actions
 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
 
-name: Static Python checks
+name: CI
 
 on: [push]
 #  push:
@@ -9,8 +9,8 @@ on: [push]
 #      - "*.py"
 
 jobs:
-  flake8:
-    name: Flake8
+  precommit:
+    name: Pre-commit
     runs-on: ubuntu-18.04 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#jobsjob_idruns-on
     steps:
       - uses: actions/checkout@v1 # https://help.github.com/en/github/automating-your-workflow-with-github-actions/configuring-a-workflow#using-the-checkout-action
@@ -20,17 +20,7 @@ jobs:
           python-version: 3.7
           architecture: x64
 
-      - name: Install Flake8
-        run: pip install flake8==3.7.9
-      - name: Run Flake8
-        run: flake8
-
-      # - name: Install Pylint
-      #   run: pip install pylint
-      # - name: Run Pylint
-      #   run: find . -name "*.py" | xargs pylint --output-format=colorized
-
-      - name: Install Black
-        run: pip install black
-      - name: Run Black
-        run: find . -name "*.py" | xargs black --check
+      - name: Install pre-commit
+        run: pip install pre-commit==2.7.1
+      - name: Run pre-commit
+        run: pre-commit run --all

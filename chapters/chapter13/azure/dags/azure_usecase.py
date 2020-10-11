@@ -56,7 +56,7 @@ def _upload_ratings(wasb_conn_id, container, **context):
         logging.info(f"Writing results to {container}/{year}/{month:02d}.csv")
         hook = WasbHook(wasb_conn_id)
         hook.load_file(
-            tmp_path, container_name=container, blob_name=f"{year}/{month:02d}.csv",
+            tmp_path, container_name=container, blob_name=f"{year}/{month:02d}.csv"
         )
 
 

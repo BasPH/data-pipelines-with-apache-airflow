@@ -144,4 +144,8 @@ dmypy.json
 # Data folders
 data
 
+# Pyenv
+.python-version
+
+# Mac
 .DS_Store

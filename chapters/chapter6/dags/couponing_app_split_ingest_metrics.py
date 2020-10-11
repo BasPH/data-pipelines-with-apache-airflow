@@ -41,7 +41,7 @@ for supermarket_id in range(1, 5):
     )
     wait >> copy >> process >> trigger_create_metrics_dag
 
-compute_differences = DummyOperator(task_id=f"compute_differences", dag=dag2)
-update_dashboard = DummyOperator(task_id=f"update_dashboard", dag=dag2)
-notify_new_data = DummyOperator(task_id=f"notify_new_data", dag=dag2)
+compute_differences = DummyOperator(task_id="compute_differences", dag=dag2)
+update_dashboard = DummyOperator(task_id="update_dashboard", dag=dag2)
+notify_new_data = DummyOperator(task_id="notify_new_data", dag=dag2)
 compute_differences >> update_dashboard
