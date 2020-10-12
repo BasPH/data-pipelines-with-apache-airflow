@@ -1,22 +1,22 @@
 import json
 import pathlib
 
-import airflow.utils.dates
+import airflow
 import requests
+import requests.exceptions as requests_exceptions
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter2_download_rocket_launches",
-    description="Download rocket pictures of recently launched rockets.",
+    dag_id="listing_2_2",
     start_date=airflow.utils.dates.days_ago(14),
-    schedule_interval="@daily",
+    schedule_interval=None,
 )
 
 download_launches = BashOperator(
     task_id="download_launches",
-    bash_command="curl -o /tmp/launches.json 'https://launchlibrary.net/1.4/launch?next=5&mode=verbose'",
+    bash_command="curl -o /tmp/launches.json 'https://launchlibrary.net/1.4/launch?next=5&mode=verbose'",  # noqa: E501
     dag=dag,
 )
 
@@ -30,12 +30,17 @@ def _get_pictures():
         launches = json.load(f)
         image_urls = [launch["rocket"]["imageURL"] for launch in launches["launches"]]
         for image_url in image_urls:
-            response = requests.get(image_url)
-            image_filename = image_url.split("/")[-1]
-            target_file = f"/tmp/images/{image_filename}"
-            with open(target_file, "wb") as f:
-                f.write(response.content)
-            print(f"Downloaded {image_url} to {target_file}")
+            try:
+                response = requests.get(image_url)
+                image_filename = image_url.split("/")[-1]
+                target_file = f"/tmp/images/{image_filename}"
+                with open(target_file, "wb") as f:
+                    f.write(response.content)
+                print(f"Downloaded {image_url} to {target_file}")
+            except requests_exceptions.MissingSchema:
+                print(f"{image_url} appears to be an invalid URL.")
+            except requests_exceptions.ConnectionError:
+                print(f"Could not connect to {image_url}.")
 
 
 get_pictures = PythonOperator(
