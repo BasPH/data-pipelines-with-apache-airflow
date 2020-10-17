@@ -1,8 +1,6 @@
-import datetime as dt
 import os
 import time
 
-import numpy as np
 import pandas as pd
 
 from flask import Flask, jsonify, request
@@ -12,43 +10,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 DEFAULT_ITEMS_PER_PAGE = 100
 
 
-def _read_ratings(file_path, shift_ts=True):
+def _read_ratings(file_path):
     ratings = pd.read_csv(file_path)
 
     # Subsample dataset.
-    ratings = ratings.sample(n=100000)
+    ratings = ratings.sample(n=100000, random_state=0)
 
     # Sort by ts, user, movie for convenience.
     ratings = ratings.sort_values(by=["timestamp", "userId", "movieId"])
 
-    # Replace timestamps with timestamps from
-    # within the last month.
-    if shift_ts:
-        today = dt.datetime.now().date()
-
-        ratings["timestamp"] = _random_timestamps(
-            start_date=today + dt.timedelta(days=-30),
-            end_date=today,
-            size=ratings.shape[0],
-        )
-
     return ratings
 
 
-def _random_timestamps(start_date=None, end_date=None, size=100):
-    """Generates random timestamps (in seconds) between given start/end dates."""
-
-    def _date_to_datetime(date):
-        return dt.datetime.combine(date, dt.datetime.min.time())
-
-    start_ts = int(_date_to_datetime(start_date).timestamp())
-    end_ts = int(_date_to_datetime(end_date).timestamp())
-
-    return np.random.randint(low=start_ts, high=end_ts, size=size)
-
-
 app = Flask(__name__)
-app.config["ratings"] = _read_ratings("/ratings.csv", shift_ts=True)
+app.config["ratings"] = _read_ratings("/ratings.csv")
 
 auth = HTTPBasicAuth()
 users = {os.environ["API_USER"]: generate_password_hash(os.environ["API_PASSWORD"])}

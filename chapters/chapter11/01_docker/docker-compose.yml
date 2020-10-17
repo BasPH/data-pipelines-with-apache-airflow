@@ -1,3 +1,5 @@
+version: "3.7"
+
 version: '3.7'
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
@@ -12,6 +14,7 @@ x-environment: &airflow_environment
   - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
   - MOVIELENS_USER=airflow
   - MOVIELENS_PASSWORD=airflow
+  - MOVIELENS_HOST=http://movielens:5000
 x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 services:
@@ -23,39 +26,79 @@ services:
       - POSTGRES_DB=airflow
     ports:
       - "5432:5432"
+    networks:
+      - airflow
   init:
-    image: *airflow_image
+    build:
+      context: ../images/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/ch10-airflow-docker
     depends_on:
       - postgres
+    networks:
+      - airflow
     environment: *airflow_environment
     command: upgradedb
   webserver:
-    image: *airflow_image
+    build:
+      context: ../images/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/ch10-airflow-docker
     restart: always
     depends_on:
       - postgres
     ports:
       - "8080:8080"
     volumes:
-      - ./logs:/opt/airflow/logs
+      - logs:/opt/airflow/logs
+    networks:
+      - airflow
     environment: *airflow_environment
     command: webserver
   scheduler:
-    image: *airflow_image
+    build:
+      context: ../images/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/ch10-airflow-docker
     restart: always
     depends_on:
       - postgres
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./data:/data
-      - ./logs:/opt/airflow/logs
+      - logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - airflow
     environment: *airflow_environment
     command: scheduler
   movielens:
-    build: api
-    image: manning-airflow/ch08-movielens-api
+    build: ../images/movielens-api
+    image: manning-airflow/ch10-movielens-api
+    networks:
+      - airflow
     ports:
       - "5000:5000"
     environment:
       API_USER: airflow
       API_PASSWORD: airflow
+
+  # These aren't actual services, but we include them to make sure that the
+  # corresponding images are built by when pulling up docker-compose.
+  movielens-fetch:
+    build: ../images/movielens-fetch
+    image: manning-airflow/ch10-movielens-fetch
+    restart: "no"
+  movielens-rank:
+    build: ../images/movielens-rank
+    image: manning-airflow/ch10-movielens-rank
+    restart: "no"
+
+networks:
+  airflow:
+    name: airflow
+
+volumes:
+  logs:
