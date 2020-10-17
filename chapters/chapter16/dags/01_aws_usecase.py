@@ -1,4 +1,5 @@
 import datetime as dt
+import logging
 import os
 from os import path
 import tempfile
@@ -29,11 +30,15 @@ with DAG(
         month = context["execution_date"].month
 
         # Fetch ratings from our API.
+        logging.info(f"Fetching ratings for {year}/{month:02d}")
+
         api_hook = MovielensHook(conn_id=api_conn_id)
         ratings = pd.DataFrame.from_records(
             api_hook.get_ratings_for_month(year=year, month=month),
             columns=["userId", "movieId", "rating", "timestamp"],
         )
+
+        logging.info(f"Fetched {ratings.shape[0]} rows")
 
         # Write ratings to temp file.
         with tempfile.TemporaryDirectory() as tmp_dir:

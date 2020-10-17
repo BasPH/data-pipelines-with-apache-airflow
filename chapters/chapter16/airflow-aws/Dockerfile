@@ -1,7 +1,6 @@
 ARG AIRFLOW_BASE_IMAGE="apache/airflow:1.10.12-python3.8"
 FROM ${AIRFLOW_BASE_IMAGE}
 
-
 # GCC is needed to build a dependency of the backport package.
 USER root
 RUN apt-get update && \
