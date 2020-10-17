@@ -19,7 +19,8 @@ The Docker images used for running these DAGs can also be found in the `images` 
 
 You can run the wttr example using:
 
-    make run-wttr
+    docker build -t manning-airflow/ch10-wttr-example images/wttr-example
+    docker run manning-airflow/ch10-wttr-example Amsterdam
 
 This should kick off the process of building the wttr image and running a container using this image.
 
