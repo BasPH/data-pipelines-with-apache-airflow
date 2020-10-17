@@ -37,7 +37,7 @@ def generate_tasks(
 
 
 with DAG(
-    dag_id="chapter10_task_factory",
+    dag_id="01_task_factory",
     start_date=airflow.utils.dates.days_ago(5),
     schedule_interval="@daily",
 ) as dag:

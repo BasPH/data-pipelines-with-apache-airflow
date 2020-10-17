@@ -1,14 +1,14 @@
-# Chapter 10
+# Chapter 11
 
-Code accompanying Chapter 10 of the book 'Data pipelines with Apache Airflow'.
+Code accompanying Chapter 11 of the book 'Data pipelines with Apache Airflow'.
 
 ## Contents
 
 This code example contains the following three DAGs:
 
-- task_factory.py - Illustrates how to use a factory method for creating common patterns of tasks.
-- dag_factory.py - Demonstrates how to use a factory method to create multiple instances of similar DAGs.
-- sla_misses.py - Shows how to use Airflow SLA functionality in your DAGs to catch issues with long running tasks.
+- 01_task_factory.py - Illustrates how to use a factory method for creating common patterns of tasks.
+- 02_dag_factory.py - Demonstrates how to use a factory method to create multiple instances of similar DAGs.
+- 03_sla_misses.py - Shows how to use Airflow SLA functionality in your DAGs to catch issues with long running tasks.
 
 ## Usage
 

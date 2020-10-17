@@ -8,7 +8,7 @@ from airflow.operators.bash_operator import BashOperator
 def generate_dag(dataset_name, raw_dir, processed_dir, preprocess_script):
 
     with DAG(
-        dag_id=f"chapter10_dag_factory_{dataset_name}",
+        dag_id=f"02_dag_factory_{dataset_name}",
         start_date=airflow.utils.dates.days_ago(5),
         schedule_interval="@daily",
     ) as dag:
@@ -34,7 +34,7 @@ def generate_dag(dataset_name, raw_dir, processed_dir, preprocess_script):
 
 
 for dataset in ["sales", "customers"]:
-    globals()[f"chapter7_dag_factory_{dataset}"] = generate_dag(
+    globals()[f"02_dag_factory_{dataset}"] = generate_dag(
         dataset_name=dataset,
         raw_dir="/data/raw",
         processed_dir="/data/processed",

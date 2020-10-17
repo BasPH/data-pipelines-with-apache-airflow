@@ -1,6 +1,6 @@
-# Chapter 11
+# Chapter 10
 
-Code accompanying Chapter 11 of the book 'Data pipelines with Apache Airflow'.
+Code accompanying Chapter 10 of the book 'Data pipelines with Apache Airflow'.
 
 ## Contents
 
