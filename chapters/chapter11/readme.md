@@ -27,6 +27,7 @@ This should kick off the process of building the wttr image and running a contai
 
 You can run the Docker example using docker-compose:
 
+    cd 01_docker
     docker-compose up -f docker-compose-docker.yml -d --build
 
 Wait for a few seconds and you should be able to access the examples at http://localhost:8080/.
@@ -41,11 +42,13 @@ For the Kubernetes example, you first need to make sure you have a Kubernetes cl
 
 Once you have this in place, you can start creating the required namespace and resources:
 
+    cd 02_kubernetes
     kubectl create namespace airflow
     kubectl --namespace airflow apply -f resources/data-volume.yml
 
 as well as the recommender API service:
 
+    docker build -t manning-airflow/ch10-movielens-api:latest ../images/movielens-api
     kubectl --namespace airflow apply -f resources/api.yml
 
 You can test if the API is running properly using:
@@ -67,3 +70,8 @@ If you run into issues, you can lookup the status of the different Kubernetes po
 For failing pods, you can examine their status using:
 
     kubectl --namespace describe pod [NAME-OF-POD]
+
+You can tear down any used resources with:
+
+    docker-compose down -v
+    kubectl delete namespace airflow
