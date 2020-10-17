@@ -16,7 +16,7 @@ x-environment: &airflow_environment
   - MOVIELENS_PASSWORD=airflow
   # AWS setttings.
   - AWS_DEFAULT_REGION=eu-west-1
-  - AIRFLOW_CONN_MY_AWS_CONN='s3://?aws_access_key_id=${AWS_ACCESS_KEY}&aws_secret_access_key=${AWS_ACCESS_SECRET}'
+  - AIRFLOW_CONN_MY_AWS_CONN=s3://?aws_access_key_id=${AWS_ACCESS_KEY}&aws_secret_access_key=${AWS_ACCESS_SECRET}
   - RATINGS_BUCKET=${RATINGS_BUCKET}
   - RANKINGS_BUCKET=${RANKINGS_BUCKET}
   - CRAWLER_NAME=${CRAWLER_NAME}
@@ -32,13 +32,21 @@ services:
     ports:
       - "5432:5432"
   init:
-    image: *airflow_image
+    build:
+      context: airflow-aws
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/airflow-aws
     depends_on:
       - postgres
     environment: *airflow_environment
     command: upgradedb
   webserver:
-    image: *airflow_image
+    build:
+      context: airflow-aws
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/airflow-aws
     restart: always
     depends_on:
       - postgres
@@ -49,7 +57,11 @@ services:
     environment: *airflow_environment
     command: webserver
   scheduler:
-    image: *airflow_image
+    build:
+      context: airflow-aws
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/airflow-aws
     restart: always
     depends_on:
       - postgres

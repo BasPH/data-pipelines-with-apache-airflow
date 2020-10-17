@@ -3,31 +3,37 @@ import os
 from os import path
 import tempfile
 
+import pandas as pd
+
 from airflow import DAG
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
 from airflow.operators.python_operator import PythonOperator
 
+from custom.hooks import MovielensHook
 from custom.operators import GlueTriggerCrawlerOperator
-from custom.ratings import fetch_ratings
 
 
 with DAG(
-    dag_id="chapter13_aws_usecase",
+    dag_id="01_aws_usecase",
     description="DAG demonstrating some AWS-specific hooks and operators.",
-    start_date=dt.datetime(year=2015, month=1, day=1),
-    end_date=dt.datetime(year=2015, month=3, day=1),
+    start_date=dt.datetime(year=2019, month=1, day=1),
+    end_date=dt.datetime(year=2019, month=3, day=1),
     schedule_interval="@monthly",
     default_args={"depends_on_past": True},
 ) as dag:
 
-    def _upload_ratings(s3_conn_id, s3_bucket, **context):
+    def _upload_ratings(api_conn_id, s3_conn_id, s3_bucket, **context):
         year = context["execution_date"].year
         month = context["execution_date"].month
 
-        # Fetch ratings from our 'API'.
-        ratings = fetch_ratings(year=year, month=month)
+        # Fetch ratings from our API.
+        api_hook = MovielensHook(conn_id=api_conn_id)
+        ratings = pd.DataFrame.from_records(
+            api_hook.get_ratings_for_month(year=year, month=month),
+            columns=["userId", "movieId", "rating", "timestamp"],
+        )
 
         # Write ratings to temp file.
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -35,8 +41,8 @@ with DAG(
             ratings.to_csv(tmp_path, index=False)
 
             # Upload file to S3.
-            hook = S3Hook(s3_conn_id)
-            hook.load_file(
+            s3_hook = S3Hook(s3_conn_id)
+            s3_hook.load_file(
                 tmp_path,
                 key=f"ratings/{year}/{month}.csv",
                 bucket_name=s3_bucket,
@@ -47,6 +53,7 @@ with DAG(
         task_id="fetch_ratings",
         python_callable=_upload_ratings,
         op_kwargs={
+            "api_conn_id": "movielens",
             "s3_conn_id": "my_aws_conn",
             "s3_bucket": os.environ["RATINGS_BUCKET"],
         },

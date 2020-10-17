@@ -32,8 +32,10 @@ class GlueTriggerCrawlerOperator(BaseOperator):
         self._region_name = region_name
 
     def execute(self, context):
-        hook = AwsBaseHook(self._aws_conn_id)
-        glue_client = hook.get_client_type("glue", region_name=self._region_name)
+        hook = AwsBaseHook(
+            self._aws_conn_id, client_type="glue", region_name=self._region_name
+        )
+        glue_client = hook.get_conn()
 
         self.log.info("Triggering crawler")
         response = glue_client.start_crawler(Name="ratings-crawler")
