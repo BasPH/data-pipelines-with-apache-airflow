@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 
 dag = DAG(
-    dag_id="chapter8_duplicate_task_ids",
+    dag_id="chapter_9_duplicate_task_ids",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval=None,
 )

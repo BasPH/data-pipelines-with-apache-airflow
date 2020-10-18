@@ -3,8 +3,9 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 
 dag = DAG(
-    dag_id="chapter8_dag_cycle",
+    dag_id="chapter_9_dag_cycle",
     start_date=airflow.utils.dates.days_ago(3),
+    description="This DAG is intentionally faulty to demonstrate the DAG integrity test.",
     schedule_interval=None,
 )
 
