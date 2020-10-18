@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter6_print_dag_run_conf",
+    dag_id="listing_6_8",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval=None,
 )

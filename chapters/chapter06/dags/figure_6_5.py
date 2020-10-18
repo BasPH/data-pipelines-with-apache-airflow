@@ -4,7 +4,7 @@ from airflow.contrib.sensors.file_sensor import FileSensor
 from airflow.operators.dummy_operator import DummyOperator
 
 dag = DAG(
-    dag_id="chapter6_couponing_app_filesensor",
+    dag_id="figure_6_5",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data, demonstrating the FileSensor.",

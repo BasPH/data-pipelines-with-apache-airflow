@@ -7,12 +7,12 @@ from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
 
 dag1 = DAG(
-    dag_id="chapter6_ingest_supermarket_data_triggerdagrunoperator",
+    dag_id="listing_6_4_dag1",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="0 16 * * *",
 )
 dag2 = DAG(
-    dag_id="chapter6_ingest_supermarket_data_triggerdagrunoperator_target",
+    dag_id="listing_6_4_dag2",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval=None,
 )
@@ -36,7 +36,7 @@ for supermarket_id in range(1, 5):
     process = DummyOperator(task_id=f"process_supermarket_{supermarket_id}", dag=dag1)
     trigger_create_metrics_dag = TriggerDagRunOperator(
         task_id=f"trigger_create_metrics_dag_supermarket_{supermarket_id}",
-        trigger_dag_id="create_metrics",
+        trigger_dag_id="listing_6_4_dag2",
         dag=dag1,
     )
     wait >> copy >> process >> trigger_create_metrics_dag
