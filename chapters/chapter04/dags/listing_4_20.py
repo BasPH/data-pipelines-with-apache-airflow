@@ -2,31 +2,29 @@
 # Documentation of pageview format: https://wikitech.wikimedia.org/wiki/Analytics/Data_Lake/Traffic/Pageviews
 # """
 
-import pathlib
 from urllib import request
 
-import airflow
+import airflow.utils.dates
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter4_stocksense",
-    start_date=airflow.utils.dates.days_ago(30),
+    dag_id="listing_4_20",
+    start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@hourly",
     template_searchpath="/tmp",
+    max_active_runs=1,
 )
 
 
-def _get_data(year, month, day, hour, ts_nodash, **_):
-    output_dir = f"/tmp/wikipageviews/{ts_nodash}"
-    pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
+def _get_data(year, month, day, hour, output_path, **_):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
         f"{year}/{year}-{month:0>2}/pageviews-{year}{month:0>2}{day:0>2}-{hour:0>2}0000.gz"
     )
-    request.urlretrieve(url, f"{output_dir}/wikipageviews.gz")
+    request.urlretrieve(url, output_path)
 
 
 get_data = PythonOperator(
@@ -38,29 +36,26 @@ get_data = PythonOperator(
         "month": "{{ execution_date.month }}",
         "day": "{{ execution_date.day }}",
         "hour": "{{ execution_date.hour }}",
+        "output_path": "/tmp/wikipageviews.gz",
     },
     dag=dag,
-    depends_on_past=True,
 )
+
 
 extract_gz = BashOperator(
-    task_id="extract_gz",
-    bash_command="gunzip --force /tmp/wikipageviews/{{ ts_nodash }}/wikipageviews.gz",
-    dag=dag,
+    task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz", dag=dag
 )
 
 
-def _fetch_pageviews(pagenames, ts_nodash, execution_date, **_):
+def _fetch_pageviews(pagenames, execution_date, **_):
     result = dict.fromkeys(pagenames, 0)
-    with open(f"/tmp/wikipageviews/{ts_nodash}/wikipageviews", "r") as f:
+    with open("/tmp/wikipageviews", "r") as f:
         for line in f:
             domain_code, page_title, view_counts, _ = line.split(" ")
             if domain_code == "en" and page_title in pagenames:
                 result[page_title] = view_counts
 
-    with open(
-        f"/tmp/wikipageviews/{ts_nodash}/postgres_query-{ts_nodash}.sql", "w"
-    ) as f:
+    with open("/tmp/postgres_query.sql", "w") as f:
         for pagename, pageviewcount in result.items():
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
@@ -80,7 +75,7 @@ fetch_pageviews = PythonOperator(
 write_to_postgres = PostgresOperator(
     task_id="write_to_postgres",
     postgres_conn_id="my_postgres",
-    sql="postgres_query-{{ ts_nodash }}.sql",
+    sql="postgres_query.sql",
     dag=dag,
 )
 
