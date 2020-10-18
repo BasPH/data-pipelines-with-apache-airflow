@@ -1,6 +1,4 @@
 version: "3.7"
-
-version: '3.7'
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
   # Airflow settings.

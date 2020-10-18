@@ -1,6 +1,7 @@
 version: "3.7"
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
+  # Airflow settings.
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
@@ -9,7 +10,11 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   - AIRFLOW__WEBSERVER__RBAC=False
+  # Need to set in_cluster to false, as otherwise Airflow thinks it's running
+  # inside a Kubernetes cluster when it starts looking for pods. Here that's
+  # not the case, as we're running Airflow in Docker, not Kubernetes.
   - AIRFLOW__KUBERNETES__IN_CLUSTER=False
+  # Movielens settings.
   - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
   - MOVIELENS_USER=airflow
   - MOVIELENS_PASSWORD=airflow
