@@ -34,7 +34,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./logs:/opt/airflow/logs
+      - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: webserver
   scheduler:
@@ -44,6 +44,9 @@ services:
       - postgres
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
+      - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: scheduler
+
+volumes:
+  logs:

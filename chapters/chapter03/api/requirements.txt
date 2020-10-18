@@ -1,4 +1,0 @@
-click
-faker
-flask
-pandas

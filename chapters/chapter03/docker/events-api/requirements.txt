@@ -1,0 +1,4 @@
+click==7.1.2
+faker==4.14.0
+flask==1.1.2
+pandas==1.1.3
