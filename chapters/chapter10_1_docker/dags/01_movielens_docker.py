@@ -1,18 +1,21 @@
+import datetime as dt
 import os
 
-from airflow import DAG, utils as airflow_utils
+from airflow import DAG
 from airflow.operators.docker_operator import DockerOperator
 
+
 with DAG(
-    dag_id="chapter11_movielens_docker",
+    dag_id="01_movielens_docker",
     description="Fetches ratings from the Movielens API using Docker.",
-    start_date=airflow_utils.dates.days_ago(3),
+    start_date=dt.datetime(2019, 1, 1),
+    end_date=dt.datetime(2019, 1, 3),
     schedule_interval="@daily",
 ) as dag:
 
     fetch_ratings = DockerOperator(
         task_id="fetch_ratings",
-        image="airflowbook/movielens-fetch",
+        image="manning-airflow/ch10-movielens-fetch",
         command=[
             "fetch-ratings",
             "--start_date",
@@ -28,14 +31,14 @@ with DAG(
             "--host",
             os.environ["MOVIELENS_HOST"],
         ],
-        network_mode="chapter11_airflow",
+        network_mode="airflow",
         # Note: this host path is on the HOST, not in the Airflow docker container.
         volumes=["/tmp/airflow/data:/data"],
     )
 
     rank_movies = DockerOperator(
         task_id="rank_movies",
-        image="airflowbook/movielens-rank",
+        image="manning-airflow/ch10-movielens-rank",
         command=[
             "rank-movies",
             "--input_path",

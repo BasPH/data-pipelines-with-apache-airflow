@@ -1,14 +1,16 @@
+import datetime as dt
 import os
 
-from airflow import DAG, utils as airflow_utils
+from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow.contrib.kubernetes.volume import Volume
 from airflow.contrib.kubernetes.volume_mount import VolumeMount
 
 with DAG(
-    dag_id="chapter11_movielens_kubernetes",
+    dag_id="02_movielens_kubernetes",
     description="Fetches ratings from the Movielens API using kubernetes.",
-    start_date=airflow_utils.dates.days_ago(3),
+    start_date=dt.datetime(2019, 1, 1),
+    end_date=dt.datetime(2019, 1, 3),
     schedule_interval="@daily",
 ) as dag:
 
@@ -21,8 +23,8 @@ with DAG(
 
     fetch_ratings = KubernetesPodOperator(
         task_id="fetch_ratings",
-        image="airflowbook/movielens-fetch",
-        cmds=["fetch_ratings.py"],
+        image="manning-airflow/ch10-movielens-fetch",
+        cmds=["fetch-ratings"],
         arguments=[
             "--start_date",
             "{{ds}}",
@@ -46,8 +48,8 @@ with DAG(
 
     rank_movies = KubernetesPodOperator(
         task_id="rank_movies",
-        image="airflowbook/movielens-rank",
-        cmds=["rank_movies.py"],
+        image="manning-airflow/ch10-movielens-rank",
+        cmds=["rank-movies"],
         arguments=[
             "--input_path",
             "/data/ratings/{{ds}}.json",
