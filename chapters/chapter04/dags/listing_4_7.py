@@ -1,5 +1,3 @@
-from urllib import request
-
 import airflow.utils.dates
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator

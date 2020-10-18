@@ -43,13 +43,13 @@ extract_gz = BashOperator(
 
 def _fetch_pageviews(pagenames, execution_date, **_):
     result = dict.fromkeys(pagenames, 0)
-    with open(f"/tmp/wikipageviews", "r") as f:
+    with open("/tmp/wikipageviews", "r") as f:
         for line in f:
             domain_code, page_title, view_counts, _ = line.split(" ")
             if domain_code == "en" and page_title in pagenames:
                 result[page_title] = view_counts
 
-    with open(f"/tmp/postgres_query.sql", "w") as f:
+    with open("/tmp/postgres_query.sql", "w") as f:
         for pagename, pageviewcount in result.items():
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
