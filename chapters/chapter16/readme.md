@@ -6,9 +6,10 @@ Code accompanying the AWS section of Chapter 13 in the book 'Data pipelines with
 
 This code example contains the following files:
 
+```
 ├── Makefile                     # Makefile for helping run commands.
 ├── dags
-│   ├── 01_aws_usecase.py           # The actual DAG.
+│   ├── 01_aws_usecase.py        # The actual DAG.
 │   └── custom                   # Code supporting the DAG.
 │       ├── __init__.py
 │       ├── operators.py
@@ -19,6 +20,7 @@ This code example contains the following files:
 ├── readme.md                    # This file.
 └── resources
     └── stack.yml                # CloudFormation template for AWS resources required for
+```
 
 ## Usage
 

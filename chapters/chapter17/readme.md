@@ -6,6 +6,7 @@ Code accompanying the Azure section of Chapter 13 in the book 'Data pipelines wi
 
 This code example contains the following files:
 
+```
 ├── dags
 │   ├── 01_azure_usecase.py      # The actual DAG.
 │   └── custom                   # Code supporting the DAG.
@@ -15,6 +16,7 @@ This code example contains the following files:
 │   └── airflow-azure            # Custom Airflow image with the required depedencies.
 ├── docker-compose.yml           # Docker-compose file for Airflow.
 └──  readme.md                   # This file.
+```
 
 ## Usage
 
