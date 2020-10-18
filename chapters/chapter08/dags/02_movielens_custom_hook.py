@@ -4,7 +4,7 @@ import json
 import os
 
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 from custom.hooks import MovielensHook
 
