@@ -72,7 +72,7 @@ services:
     environment: *airflow_environment
     command: scheduler
   movielens:
-    build: ../chapter08/api
+    build: ../chapter08/docker/movielens-api
     image: manning-airflow/movielens-api
     ports:
       - "5000:5000"
