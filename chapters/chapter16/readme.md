@@ -13,6 +13,8 @@ This code example contains the following files:
 │       ├── __init__.py
 │       ├── operators.py
 │       └── hooks.py
+├── docker
+│   └── airflow-aws              # Custom Airflow image with the required depedencies.
 ├── docker-compose.yml           # Docker-compose file for Airflow.
 ├── readme.md                    # This file.
 └── resources

@@ -33,7 +33,7 @@ services:
       - "5432:5432"
   init:
     build:
-      context: airflow-aws
+      context: docker/airflow-aws
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-aws
@@ -43,7 +43,7 @@ services:
     command: upgradedb
   webserver:
     build:
-      context: airflow-aws
+      context: docker/airflow-aws
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-aws
@@ -58,7 +58,7 @@ services:
     command: webserver
   scheduler:
     build:
-      context: airflow-aws
+      context: docker/airflow-aws
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-aws

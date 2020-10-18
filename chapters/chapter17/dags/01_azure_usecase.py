@@ -39,7 +39,7 @@ ORDER BY avg_rating DESC
 """
 
 
-def _upload_ratings(api_conn_id, wasb_conn_id, container, **context):
+def _fetch_ratings(api_conn_id, wasb_conn_id, container, **context):
     year = context["execution_date"].year
     month = context["execution_date"].month
 
@@ -119,9 +119,9 @@ with DAG(
     default_args={"depends_on_past": True},
 ) as dag:
 
-    upload_ratings = PythonOperator(
-        task_id="upload_ratings",
-        python_callable=_upload_ratings,
+    fetch_ratings = PythonOperator(
+        task_id="fetch_ratings",
+        python_callable=_fetch_ratings,
         op_kwargs={
             "api_conn_id": "movielens",
             "wasb_conn_id": "my_wasb_conn",
@@ -142,4 +142,4 @@ with DAG(
         provide_context=True,
     )
 
-    upload_ratings >> rank_movies
+    fetch_ratings >> rank_movies

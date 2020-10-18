@@ -25,7 +25,7 @@ with DAG(
     default_args={"depends_on_past": True},
 ) as dag:
 
-    def _upload_ratings(api_conn_id, s3_conn_id, s3_bucket, **context):
+    def _fetch_ratings(api_conn_id, s3_conn_id, s3_bucket, **context):
         year = context["execution_date"].year
         month = context["execution_date"].month
 
@@ -46,17 +46,18 @@ with DAG(
             ratings.to_csv(tmp_path, index=False)
 
             # Upload file to S3.
+            logging.info(f"Writing results to ratings/{year}/{month:02d}.csv")
             s3_hook = S3Hook(s3_conn_id)
             s3_hook.load_file(
                 tmp_path,
-                key=f"ratings/{year}/{month}.csv",
+                key=f"ratings/{year}/{month:02d}.csv",
                 bucket_name=s3_bucket,
                 replace=True,
             )
 
-    upload_ratings = PythonOperator(
+    fetch_ratings = PythonOperator(
         task_id="fetch_ratings",
-        python_callable=_upload_ratings,
+        python_callable=_fetch_ratings,
         op_kwargs={
             "api_conn_id": "movielens",
             "s3_conn_id": "my_aws_conn",
@@ -88,4 +89,4 @@ with DAG(
         output_location=f"s3://{os.environ['RANKINGS_BUCKET']}/{{{{ds}}}}",
     )
 
-    upload_ratings >> trigger_crawler >> rank_movies
+    fetch_ratings >> trigger_crawler >> rank_movies
