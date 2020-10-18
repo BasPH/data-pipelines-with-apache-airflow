@@ -9,7 +9,7 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   - AIRFLOW__WEBSERVER__RBAC=False
-x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
+x-airflow-image: &airflow_image apache/airflow:master-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 services:
   postgres:
@@ -25,7 +25,8 @@ services:
     depends_on:
       - postgres
     environment: *airflow_environment
-    command: upgradedb
+    entrypoint: /bin/bash
+    command: -c 'airflow db upgrade && sleep 5 && airflow users create --username admin --password admin --firstname John --lastname Smith --role Admin --email admin@example.org'
   webserver:
     image: *airflow_image
     restart: always
