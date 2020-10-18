@@ -16,7 +16,7 @@ from airflow.operators.python_operator import PythonOperator
 from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 dag = DAG(
-    dag_id="listing_7_2",
+    dag_id="chapter_7_aws_handwritten_digit_classifier",
     schedule_interval=None,
     start_date=airflow.utils.dates.days_ago(3),
 )
