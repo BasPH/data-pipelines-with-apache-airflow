@@ -1,6 +1,6 @@
-# Chapter 13 - AWS
+# Chapter 16 - Airflow on AWS
 
-Code accompanying the AWS section of Chapter 13 in the book 'Data pipelines with Apache Airflow'.
+Code accompanying Chapter 16 of the book 'Data pipelines with Apache Airflow'.
 
 ## Contents
 

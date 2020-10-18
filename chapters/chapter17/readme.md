@@ -1,6 +1,6 @@
-# Chapter 13 - Azure
+# Chapter 17 - Airflow on Azure
 
-Code accompanying the Azure section of Chapter 13 in the book 'Data pipelines with Apache Airflow'.
+Code accompanying Chapter 17 of the book 'Data pipelines with Apache Airflow'.
 
 ## Contents
 
