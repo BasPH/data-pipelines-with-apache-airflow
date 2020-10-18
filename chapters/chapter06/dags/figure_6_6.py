@@ -1,16 +1,16 @@
-from datetime import datetime
 from pathlib import Path
 
+import airflow.utils.dates
 from airflow import DAG
 from airflow.contrib.sensors.python_sensor import PythonSensor
 from airflow.operators.dummy_operator import DummyOperator
 
 dag = DAG(
-    dag_id="chapter6_couponing_app_pythonsensor",
-    start_date=datetime(2019, 1, 1),
-    schedule_interval="*/2 * * * *",
-    concurrency=16,
+    dag_id="figure_6_6",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data, demonstrating the PythonSensor.",
+    default_args={"depends_on_past": True},
 )
 
 create_metrics = DummyOperator(task_id="create_metrics", dag=dag)
@@ -29,7 +29,6 @@ for supermarket_id in range(1, 5):
         python_callable=_wait_for_supermarket,
         op_kwargs={"supermarket_id_": f"supermarket{supermarket_id}"},
         timeout=600,
-        mode="reschedule",
         dag=dag,
     )
     copy = DummyOperator(task_id=f"copy_to_raw_supermarket_{supermarket_id}", dag=dag)
