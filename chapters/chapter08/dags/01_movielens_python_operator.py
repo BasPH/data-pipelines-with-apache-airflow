@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 from custom.ranking import rank_movies_by_rating
 

@@ -24,7 +24,7 @@ class MovielensHook(BaseHook):
     DEFAULT_PORT = 5000
 
     def __init__(self, conn_id, retry=3):
-        super().__init__(source=None)
+        super().__init__()
         self._conn_id = conn_id
         self._retry = retry
 
