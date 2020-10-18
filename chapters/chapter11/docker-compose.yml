@@ -1,7 +1,6 @@
-version: '3.7'
+version: "3.7"
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
-  # Airflow settings.
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
@@ -10,10 +9,6 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   - AIRFLOW__WEBSERVER__RBAC=False
-  # Movielens API settings.
-  - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
-  - MOVIELENS_USER=airflow
-  - MOVIELENS_PASSWORD=airflow
 x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 services:
@@ -49,19 +44,9 @@ services:
       - postgres
     volumes:
       - ./dags:/opt/airflow/dags
-      - data:/data
       - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: scheduler
-  movielens:
-    build: docker/movielens-api
-    image: manning-airflow/movielens-api
-    ports:
-      - "5000:5000"
-    environment:
-      API_USER: airflow
-      API_PASSWORD: airflow
 
 volumes:
-  data:
   logs:
