@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pandas as pd
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
 
 dag = DAG(
     dag_id="06_query_with_dates",
