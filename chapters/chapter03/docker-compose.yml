@@ -25,6 +25,7 @@ services:
       context: docker/airflow-data
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/airflow-data
     depends_on:
       - postgres
     environment: *airflow_environment
@@ -35,6 +36,7 @@ services:
       context: docker/airflow-data
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/airflow-data
     restart: always
     depends_on:
       - postgres
@@ -49,6 +51,7 @@ services:
       context: docker/airflow-data
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
+    image: manning-airflow/airflow-data
     restart: always
     depends_on:
       - postgres
