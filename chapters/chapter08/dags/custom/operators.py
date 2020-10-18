@@ -9,7 +9,7 @@ from custom.hooks import MovielensHook
 
 class MovielensFetchRatingsOperator(BaseOperator):
     """
-    Operator that fetches ratings from the Movielens API.
+    Operator that fetches ratings from the Movielens API (introduced in Chapter 8).
 
     Parameters
     ----------

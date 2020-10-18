@@ -11,7 +11,7 @@ from airflow.providers.microsoft.azure.hooks.wasb import WasbHook
 from airflow.providers.odbc.hooks.odbc import OdbcHook
 from airflow.operators.python_operator import PythonOperator
 
-from custom.ratings import fetch_ratings
+from custom.hooks import MovielensHook
 
 
 RANK_QUERY = """
@@ -39,12 +39,18 @@ ORDER BY avg_rating DESC
 """
 
 
-def _upload_ratings(wasb_conn_id, container, **context):
+def _fetch_ratings(api_conn_id, wasb_conn_id, container, **context):
     year = context["execution_date"].year
     month = context["execution_date"].month
 
     logging.info(f"Fetching ratings for {year}/{month:02d}")
-    ratings = fetch_ratings(year=year, month=month)
+
+    api_hook = MovielensHook(conn_id=api_conn_id)
+    ratings = pd.DataFrame.from_records(
+        api_hook.get_ratings_for_month(year=year, month=month),
+        columns=["userId", "movieId", "rating", "timestamp"],
+    )
+
     logging.info(f"Fetched {ratings.shape[0]} rows")
 
     # Write ratings to temp file.
@@ -105,18 +111,22 @@ def _rank_movies(
 
 
 with DAG(
-    dag_id="chapter13_azure_usecase",
+    dag_id="01_azure_usecase",
     description="DAG demonstrating some Azure hooks and operators.",
-    start_date=dt.datetime(year=2015, month=1, day=1),
-    end_date=dt.datetime(year=2015, month=3, day=1),
+    start_date=dt.datetime(year=2019, month=1, day=1),
+    end_date=dt.datetime(year=2019, month=3, day=1),
     schedule_interval="@monthly",
     default_args={"depends_on_past": True},
 ) as dag:
 
-    upload_ratings = PythonOperator(
-        task_id="upload_ratings",
-        python_callable=_upload_ratings,
-        op_kwargs={"wasb_conn_id": "my_wasb_conn", "container": "ratings"},
+    fetch_ratings = PythonOperator(
+        task_id="fetch_ratings",
+        python_callable=_fetch_ratings,
+        op_kwargs={
+            "api_conn_id": "movielens",
+            "wasb_conn_id": "my_wasb_conn",
+            "container": "ratings",
+        },
         provide_context=True,
     )
 
@@ -132,4 +142,4 @@ with DAG(
         provide_context=True,
     )
 
-    upload_ratings >> rank_movies
+    fetch_ratings >> rank_movies
