@@ -1,9 +1,3 @@
-CREATE TABLE pageview_counts (
-    pagename VARCHAR(50) NOT NULL,
-    pageviewcount INT NOT NULL,
-    datetime TIMESTAMP NOT NULL
-);
-
 SELECT x.pagename, x.hr AS "hour", x.average AS "average pageviews"
 FROM (
   SELECT

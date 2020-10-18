@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 
 dag = DAG(
-    dag_id="chapter4_stocksense_bashoperator",
+    dag_id="listing_4_1",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@hourly",
 )

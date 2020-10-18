@@ -1,18 +1,15 @@
 from urllib import request
 
-import airflow
+import airflow.utils.dates
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="chapter4_pythonoperator_args3",
-    start_date=airflow.utils.dates.days_ago(3),
+    dag_id="listing_4_15",
+    start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@hourly",
     max_active_runs=1,
-    default_args={"depends_on_past": True},
-    template_searchpath="/tmp",
 )
 
 
@@ -43,36 +40,23 @@ extract_gz = BashOperator(
 )
 
 
-def _fetch_pageviews(pagenames, execution_date, **_):
+def _fetch_pageviews(pagenames):
     result = dict.fromkeys(pagenames, 0)
-    with open("/tmp/wikipageviews", "r") as f:
+    with open(f"/tmp/wikipageviews", "r") as f:
         for line in f:
             domain_code, page_title, view_counts, _ = line.split(" ")
             if domain_code == "en" and page_title in pagenames:
                 result[page_title] = view_counts
 
-    with open("/tmp/postgres_query.sql", "w") as f:
-        for pagename, pageviewcount in result.items():
-            f.write(
-                "INSERT INTO pageview_counts VALUES ("
-                f"'{pagename}', {pageviewcount}, '{execution_date}'"
-                ");\n"
-            )
+    print(result)
+    # Prints e.g. "{'Facebook': '778', 'Apple': '20', 'Google': '451', 'Amazon': '9', 'Microsoft': '119'}"
 
 
 fetch_pageviews = PythonOperator(
     task_id="fetch_pageviews",
     python_callable=_fetch_pageviews,
     op_kwargs={"pagenames": {"Google", "Amazon", "Apple", "Microsoft", "Facebook"}},
-    provide_context=True,
     dag=dag,
 )
 
-write_to_postgres = PostgresOperator(
-    task_id="write_to_postgres",
-    postgres_conn_id="my_postgres",
-    sql="postgres_query.sql",
-    dag=dag,
-)
-
-get_data >> extract_gz >> fetch_pageviews >> write_to_postgres
+get_data >> extract_gz >> fetch_pageviews
