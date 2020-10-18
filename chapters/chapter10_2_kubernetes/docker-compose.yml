@@ -62,8 +62,8 @@ services:
     environment: *airflow_environment
     command: scheduler
   movielens:
-    build: ../images/movielens-api
-    image: manning-airflow/ch10-movielens-api
+    build: ../chapter08/docker/movielens-api
+    image: manning-airflow/movielens-api
     networks:
       - airflow
     ports:
@@ -75,12 +75,12 @@ services:
   # These aren't actual services, but we include them to make sure that the
   # corresponding images are built by when pulling up docker-compose.
   movielens-fetch:
-    build: ../images/movielens-fetch
-    image: manning-airflow/ch10-movielens-fetch
+    build: ../chapter10_1_docker/docker/movielens-fetch
+    image: manning-airflow/movielens-fetch
     restart: "no"
   movielens-rank:
-    build: ../images/movielens-rank
-    image: manning-airflow/ch10-movielens-rank
+    build: ../chapter10_1_docker/docker/movielens-rank
+    image: manning-airflow/movielens-rank
     restart: "no"
 
 networks:
