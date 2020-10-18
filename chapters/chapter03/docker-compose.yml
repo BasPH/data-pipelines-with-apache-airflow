@@ -34,7 +34,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./logs:/opt/airflow/logs
+      - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: webserver
   scheduler:
@@ -44,12 +44,16 @@ services:
       - postgres
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./data:/data
+      - logs:/opt/airflow/logs
+      - data:/data
     environment: *airflow_environment
     command: scheduler
   events_api:
-    build: ./api
-    image: manning-airflow/events-api:latest
+    build: ./docker/events-api
+    image: manning-airflow/events-api
     ports:
       - "5000:5000"
+
+volumes:
+  data:
+  logs:

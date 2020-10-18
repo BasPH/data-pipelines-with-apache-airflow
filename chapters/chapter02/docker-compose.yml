@@ -13,7 +13,6 @@ x-environment: &airflow_environment
 
 x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
-
 services:
   postgres:
     image: postgres:12-alpine
@@ -23,15 +22,12 @@ services:
       - POSTGRES_DB=airflow
     ports:
       - "5432:5432"
-
   init:
     image: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
-    entrypoint: /bin/bash
-    command: -c 'airflow upgradedb && sleep 5 && airflow create_user --username admin --password admin --firstname John --lastname Smith --role Admin --email admin@example.org'
-
+    command: upgradedb
   webserver:
     image: *airflow_image
     restart: always
@@ -43,7 +39,6 @@ services:
       - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: webserver
-
   scheduler:
     image: *airflow_image
     restart: always
