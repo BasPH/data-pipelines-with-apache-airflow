@@ -17,7 +17,7 @@ def _pick_erp_system(**context):
 
 
 def _latest_only(**context):
-    now = pendulum.now('UTC')
+    now = pendulum.now("UTC")
     left_window = context["dag"].following_schedule(context["execution_date"])
     right_window = context["dag"].following_schedule(left_window)
 

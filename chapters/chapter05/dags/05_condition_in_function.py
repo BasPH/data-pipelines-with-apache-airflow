@@ -21,7 +21,7 @@ def _deploy_model(**context):
 
 
 def _is_latest_run(**context):
-    now = pendulum.now('UTC')
+    now = pendulum.now("UTC")
     left_window = context["dag"].following_schedule(context["execution_date"])
     right_window = context["dag"].following_schedule(left_window)
     return left_window < now <= right_window
