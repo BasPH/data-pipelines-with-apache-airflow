@@ -4,7 +4,7 @@ version: '3.7'
 x-environment: &airflow_environment
   - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/1
   - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@postgres:5432/airflow
-  - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+  - AIRFLOW__CORE__EXECUTOR=LocalExecutor
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
@@ -14,7 +14,9 @@ x-environment: &airflow_environment
   - AIRFLOW__SCHEDULER__STATSD_ON=True
   - AIRFLOW__SCHEDULER__STATSD_PORT=9125
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
-  - AIRFLOW__WEBSERVER__RBAC=True
+  - AIRFLOW__WEBSERVER__RBAC=False
+
+x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -27,53 +29,51 @@ services:
     ports:
       - "5432:5432"
 
-  initdb_adduser:
-    image: apache/airflow:1.10.11-python3.7
+  init:
+    image: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
-    # The webserver initializes permissions, so sleep for that to (approximately) be finished
-    # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+    command: -c 'airflow upgradedb && sleep 5 && airflow create_user --username admin --password admin --firstname John --lastname Smith --role Admin --email admin@example.org'
 
   webserver:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     restart: always
     depends_on:
       - postgres
-    volumes:
-      - logs:/opt/airflow/logs
     ports:
       - "8080:8080"
+    volumes:
+      - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: webserver
 
   scheduler:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     restart: always
     depends_on:
       - postgres
     volumes:
-      - ./hello_airflow.py:/opt/airflow/dags/hello_airflow.py
       - logs:/opt/airflow/logs
+      - ./dags:/opt/airflow/dags
     environment: *airflow_environment
     command: scheduler
 
   # docker-compose -f docker-compose-celeryexecutor.yml up --scale worker=3 -d
   worker:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     restart: always
     depends_on:
       - scheduler
     volumes:
-      - ./hello_airflow.py:/opt/airflow/dags/hello_airflow.py
       - logs:/opt/airflow/logs
+      - ./dags:/opt/airflow/dags
     environment: *airflow_environment
     command: worker
 
   flower:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     restart: always
     depends_on:
       - worker
@@ -83,20 +83,20 @@ services:
     command: flower
 
   statsd_exporter:
-    image: prom/statsd-exporter
+    image: prom/statsd-exporter:v0.18.0
     restart: always
     volumes:
-      - ./statsd_mapping.yml:/tmp/statsd_mapping.yml
+      - ./files/statsd_mapping.yml:/tmp/statsd_mapping.yml
     ports:
       - "9102:9102"
       - "9125:9125/udp"
     command: --statsd.mapping-config=/tmp/statsd_mapping.yml
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.22.0
     restart: always
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./files/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     command:
@@ -109,7 +109,7 @@ services:
       - --web.console.templates=/usr/share/prometheus/consoles
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:7.2.1
     restart: always
     ports:
       - "3000:3000"
