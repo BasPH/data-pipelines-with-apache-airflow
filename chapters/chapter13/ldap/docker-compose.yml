@@ -5,14 +5,13 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
-  - AIRFLOW__CORE__LOGGING_LEVEL=DEBUG
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
-  - AIRFLOW__SECRETS__BACKEND=airflow.contrib.secrets.hashicorp_vault.VaultBackend
-  - AIRFLOW__SECRETS__BACKEND_KWARGS={"url":"http://vault:8200","token":"airflow","connections_path":"connections"}
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   - AIRFLOW__WEBSERVER__RBAC=True
+
+x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -25,52 +24,56 @@ services:
     ports:
       - "5432:5432"
 
-  upgradedb_adduser:
-    build: .
+  upgradedb:
+    image: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
-    entrypoint: /bin/bash
-    # The webserver initializes permissions, so sleep for that to (approximately) be finished
-    # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow upgradedb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+    command: upgradedb
 
   webserver:
     build: .
     restart: always
     depends_on:
       - postgres
+    volumes:
+      - ./webserver_config.py:/opt/airflow/webserver_config.py
     ports:
       - "8080:8080"
-    volumes:
-      - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: webserver
 
   scheduler:
-    build: .
+    image: *airflow_image
     restart: always
     depends_on:
       - postgres
     volumes:
-      - ./dag.py:/opt/airflow/dags/dag.py
-      - logs:/opt/airflow/logs
+      - ./dags:/opt/airflow/dags
     environment: *airflow_environment
     command: scheduler
 
-  vault:
-    image: vault:1.4.1
-    ports:
-      - "8200:8200"
+  openldap:
+    image: osixia/openldap:1.3.0
     environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=airflow
-    cap_add:
-      - IPC_LOCK
+      # Login DN is cn=admin,dc=apacheairflow,dc=com / password admin
+      #          or cn=readonly,dc=apacheairflow,dc=com / password readonly
+      - LDAP_ORGANISATION="Apache Airflow"
+      - LDAP_DOMAIN=apacheairflow.com
+      - LDAP_ADMIN_PASSWORD=admin
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=readonly
+      - LDAP_READONLY_USER_PASSWORD=readonly
+    volumes:
+      - ./bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/bootstrap.ldif
+    command: --copy-service
 
-  secure_api:
-    build: ./secure_api
+  openldap_ui:
+    image: osixia/phpldapadmin:0.9.0
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+      - PHPLDAPADMIN_HTTPS=false  # This makes phpldapadmin serve traffic on port 80
     ports:
-      - "5000:5000"
-
-volumes:
-  logs:
+      - "8081:80"
+    depends_on:
+      - openldap

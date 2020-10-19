@@ -3,15 +3,18 @@ version: '3.7'
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-  - AIRFLOW__CORE__FERNET_KEY=YlCImzjge_TeZc7jPJ7Jz2pgOtb4yTssA1pVyqIADWg=
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
   - AIRFLOW__CORE__LOGGING_LEVEL=DEBUG
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
+  - AIRFLOW__SECRETS__BACKEND=airflow.contrib.secrets.hashicorp_vault.VaultBackend
+  - AIRFLOW__SECRETS__BACKEND_KWARGS={"url":"http://vault:8200","token":"airflow","connections_path":"connections"}
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   - AIRFLOW__WEBSERVER__RBAC=True
+
+x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -24,38 +27,52 @@ services:
     ports:
       - "5432:5432"
 
-  initdb_adduser:
-    image: apache/airflow:1.10.11-python3.7
+  upgradedb_adduser:
+    build: .
     depends_on:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
     # The webserver initializes permissions, so sleep for that to (approximately) be finished
     # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+    command: -c 'airflow upgradedb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
 
   webserver:
-    image: apache/airflow:1.10.11-python3.7
+    build: .
     restart: always
     depends_on:
       - postgres
-    volumes:
-      - logs:/opt/airflow/logs
     ports:
       - "8080:8080"
+    volumes:
+      - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: webserver
 
   scheduler:
-    image: apache/airflow:1.10.11-python3.7
+    build: .
     restart: always
     depends_on:
       - postgres
     volumes:
-      - ./dags:/opt/airflow/dags
+      - ./dag.py:/opt/airflow/dags/dag.py
       - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: scheduler
+
+  vault:
+    image: vault:1.4.1
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=airflow
+    cap_add:
+      - IPC_LOCK
+
+  secure_api:
+    build: ./secure_api
+    ports:
+      - "5000:5000"
 
 volumes:
   logs:
