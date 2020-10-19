@@ -1,8 +1,18 @@
-# Airflow use case
+# Chapter 14
 
-Much of this assignment was based on the ideas in https://toddwschneider.com/posts/taxi-vs-citi-bike-nyc. We
-will productionize it into an Airflow workflow, loading "real-time" data, feeding two services a tiny website
-displaying which transportation method is fastest between two NYC neighbourhoods.
+Code accompanying Chapter 14 of the book [Data Pipelines with Apache Airflow](https://www.manning.com/books/data-pipelines-with-apache-airflow).
+
+Much of this use case was based on the ideas in https://toddwschneider.com/posts/taxi-vs-citi-bike-nyc, where
+the fastest method of transportation (Citi Bikes or Yellow Taxis) between two NYC neighborhoods at given times
+and days is determines. We will productionize this use case into an Airflow workflow. Two (mocked) real-time
+services are created for this purpose:
+
+1. A service providing Citi Bike rides
+2. A service providing NYC Yellow Taxi rides
+
+An Airflow DAG will periodically scrape these services, wrangle the data, and send the results into a Postgres
+database serving a tiny website, displaying which transportation method is fastest between two NYC
+neighborhoods.
 
 The real data is only available in batches of months/years. Therefore we provide two APIs to mimic "live"
 systems. The system can be brought online with the `docker-compose.yml` provided with this repository:
@@ -10,6 +20,8 @@ systems. The system can be brought online with the `docker-compose.yml` provided
 ```bash
 docker-compose up -d
 ```
+
+If all processing goes well, the final result is visible on http://localhost:8083.
 
 Ports on which services are available:
 
