@@ -20,18 +20,28 @@ This code example contains the following files:
 
 To get started with the code example, first make sure to fetch the required dataset:
 
-    make data/ratings
+```bash
+make data/ratings
+```
 
-Next, use the GCP console (or other tool of choice) to create the following resources for the DAG:
+This will download the MovieLens 20M dataset (190MB), extract it, and write partitioned data into the folder
+`data/`, partitioned as `yyyy/mm.csv`, for example `data/1996/01.csv`. We will use this data throughout the
+example on GCP. Next, use the GCP console (or other tool of choice) to create the following resources for the
+DAG:
 
 * GCS bucket
 
-How to create these resources (+ what settings to used) is described in the Chapter.
+How to create these resources (+ what settings to used) is described in the chapter. Once the required
+resources have been created, you can start Airflow to run the DAG:
 
-Once the required resources have been created, you can start Airflow to run the DAG:
+```bash
+make airflow-start
+```
 
-    make airflow-start
+The `data/` directory is mounted to the Airflow scheduler container.    
 
-You can tear down the Airflow resources using
+You can tear down all resources using:
 
-    make airflow-stop
+```bash
+make airflow-stop
+```
