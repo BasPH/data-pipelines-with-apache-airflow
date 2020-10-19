@@ -1,11 +1,12 @@
-# Chapter 13 - GCP
+# Chapter 18 - GCP
 
-Code accompanying the GCP section of Chapter 13 in the book 'Data pipelines with Apache Airflow'.
+Code accompanying Chapter 18 (Airflow on GCP) of the book [Data Pipelines with Apache Airflow](https://www.manning.com/books/data-pipelines-with-apache-airflow).
 
 ## Contents
 
 This code example contains the following files:
 
+```
 ├── Makefile            # Makefile for helping run commands.
 ├── dags
 │   └── gcp.py          # The actual DAG.
@@ -13,6 +14,7 @@ This code example contains the following files:
 ├── README.md           # This file.
 └── scripts
     └── fetch_data.py   # Helper script for fetching data.
+```
 
 ## Usage
 
