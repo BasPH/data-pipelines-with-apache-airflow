@@ -15,6 +15,8 @@ x-environment: &airflow_environment
   - GCP_PROJECT=${GCP_PROJECT}
   - RATINGS_BUCKET=${RATINGS_BUCKET}
   - RESULT_BUCKET=${RESULT_BUCKET}
+
+x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -28,7 +30,7 @@ services:
       - "5432:5432"
 
   initdb_adduser:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
@@ -38,7 +40,7 @@ services:
     command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
 
   webserver:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -50,7 +52,7 @@ services:
     command: webserver
 
   scheduler:
-    image: apache/airflow:1.10.11-python3.7
+    image: *airflow_image
     restart: always
     depends_on:
       - postgres
