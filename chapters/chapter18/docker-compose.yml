@@ -63,5 +63,13 @@ services:
     environment: *airflow_environment
     command: scheduler
 
+  movielens:
+    build: ../chapter08/docker/movielens-api
+    ports:
+      - "5000:5000"
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
+
 volumes:
   logs:
