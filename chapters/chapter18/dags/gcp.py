@@ -12,8 +12,12 @@ from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryExecuteQueryOperator,
     BigQueryDeleteTableOperator,
 )
-from airflow.providers.google.cloud.transfers.bigquery_to_gcs import BigQueryToGCSOperator
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.google.cloud.transfers.bigquery_to_gcs import (
+    BigQueryToGCSOperator,
+)
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import (
+    GCSToBigQueryOperator,
+)
 from custom.hooks import MovielensHook
 
 dag = DAG(
@@ -49,14 +53,20 @@ def _fetch_ratings(api_conn_id, gcp_conn_id, gcs_bucket, **context):
         logging.info(f"Writing results to ratings/{year}/{month:02d}.csv")
         gcs_hook = GCSHook(gcp_conn_id)
         gcs_hook.upload(
-            bucket_name=gcs_bucket, object_name=f"ratings/{year}/{month:02d}.csv", filename=tmp_path
+            bucket_name=gcs_bucket,
+            object_name=f"ratings/{year}/{month:02d}.csv",
+            filename=tmp_path,
         )
 
 
 fetch_ratings = PythonOperator(
     task_id="fetch_ratings",
     python_callable=_fetch_ratings,
-    op_kwargs={"api_conn_id": "movielens", "gcp_conn_id": "gcp", "gcs_bucket": os.environ["RATINGS_BUCKET"]},
+    op_kwargs={
+        "api_conn_id": "movielens",
+        "gcp_conn_id": "gcp",
+        "gcs_bucket": os.environ["RATINGS_BUCKET"],
+    },
     provide_context=True,
 )
 
@@ -64,7 +74,9 @@ fetch_ratings = PythonOperator(
 import_in_bigquery = GCSToBigQueryOperator(
     task_id="import_in_bigquery",
     bucket=os.environ["RATINGS_BUCKET"],
-    source_objects=["ratings/{{ execution_date.year }}/{{ execution_date.strftime('%m') }}.csv"],
+    source_objects=[
+        "ratings/{{ execution_date.year }}/{{ execution_date.strftime('%m') }}.csv"
+    ],
     source_format="CSV",
     create_disposition="CREATE_IF_NEEDED",
     write_disposition="WRITE_TRUNCATE",
@@ -77,7 +89,11 @@ import_in_bigquery = GCSToBigQueryOperator(
         {"name": "timestamp", "type": "TIMESTAMP"},
     ],
     destination_project_dataset_table=(
-        os.environ["GCP_PROJECT"] + ":" + os.environ["BIGQUERY_DATASET"] + "." + "ratings${{ ds_nodash }}"
+        os.environ["GCP_PROJECT"]
+        + ":"
+        + os.environ["BIGQUERY_DATASET"]
+        + "."
+        + "ratings${{ ds_nodash }}"
     ),
     dag=dag,
 )
@@ -113,7 +129,9 @@ extract_top_ratings = BigQueryToGCSOperator(
         + "."
         + "rating_results_{{ ds_nodash }}"
     ),
-    destination_cloud_storage_uris=["gs://" + os.environ["RESULT_BUCKET"] + "/{{ ds_nodash }}.csv"],
+    destination_cloud_storage_uris=[
+        "gs://" + os.environ["RESULT_BUCKET"] + "/{{ ds_nodash }}.csv"
+    ],
     export_format="CSV",
     bigquery_conn_id="gcp",
     dag=dag,

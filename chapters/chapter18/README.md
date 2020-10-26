@@ -58,7 +58,7 @@ resources have been created, you can start Airflow to run the DAG:
 make airflow-start
 ```
 
-The `data/` directory is mounted to the Airflow scheduler container.    
+The `data/` directory is mounted to the Airflow scheduler container.
 
 You can tear down all resources using:
 
