@@ -45,6 +45,8 @@ the DAG:
 make airflow-start
 ```
 
+The username/password for the Airflow UI are `airflow`/`airflow`.
+
 You can tear down all resources using:
 
 ```bash
