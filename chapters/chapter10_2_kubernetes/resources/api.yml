@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: movielens
-        image: manning-airflow/ch10-movielens-api:latest
+        image: manning-airflow/movielens-api:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 5000
