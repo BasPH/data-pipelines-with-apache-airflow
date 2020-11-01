@@ -15,7 +15,7 @@ with DAG(
 
     fetch_ratings = DockerOperator(
         task_id="fetch_ratings",
-        image="manning-airflow/ch10-movielens-fetch",
+        image="manning-airflow/movielens-fetch",
         command=[
             "fetch-ratings",
             "--start_date",
@@ -38,7 +38,7 @@ with DAG(
 
     rank_movies = DockerOperator(
         task_id="rank_movies",
-        image="manning-airflow/ch10-movielens-rank",
+        image="manning-airflow/movielens-rank",
         command=[
             "rank-movies",
             "--input_path",

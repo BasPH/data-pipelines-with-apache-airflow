@@ -14,7 +14,7 @@ x-environment: &airflow_environment
   - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
   - MOVIELENS_USER=airflow
   - MOVIELENS_PASSWORD=airflow
-x-airflow-image: &airflow_image apache/airflow:master-python3.8
+x-airflow-image: &airflow_image basph/airflow:2.0.0a2-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 services:
   postgres:
