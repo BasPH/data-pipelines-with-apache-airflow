@@ -2,7 +2,7 @@ import time
 
 from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
 from airflow.models import BaseOperator
-from airflow.utils import apply_defaults
+from airflow.utils.decorators import apply_defaults
 
 
 class GlueTriggerCrawlerOperator(BaseOperator):
@@ -38,7 +38,7 @@ class GlueTriggerCrawlerOperator(BaseOperator):
         glue_client = hook.get_conn()
 
         self.log.info("Triggering crawler")
-        response = glue_client.start_crawler(Name="ratings-crawler")
+        response = glue_client.start_crawler(Name=self._crawler_name)
 
         if response["ResponseMetadata"]["HTTPStatusCode"] != 200:
             raise RuntimeError(

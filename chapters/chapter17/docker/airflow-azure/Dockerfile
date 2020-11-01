@@ -17,5 +17,5 @@ RUN apt-get update && \
 # Install Azure backport package.
 USER airflow
 RUN pip install --user --no-cache-dir \
-    apache-airflow-backport-providers-odbc==2020.10.5 \
-    apache-airflow-backport-providers-microsoft-azure==2020.10.5
+    https://dist.apache.org/repos/dist/dev/airflow/providers/0.0.2a1/apache_airflow_providers_odbc-0.0.2a1-py3-none-any.whl \
+    https://dist.apache.org/repos/dist/dev/airflow/providers/0.0.2a1/apache_airflow_providers_microsoft_azure-0.0.2a1-py3-none-any.whl
