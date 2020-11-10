@@ -20,7 +20,7 @@ x-environment: &airflow_environment
   - RATINGS_BUCKET=${RATINGS_BUCKET}
   - RANKINGS_BUCKET=${RANKINGS_BUCKET}
   - CRAWLER_NAME=${CRAWLER_NAME}
-x-airflow-image: &airflow_image basph/airflow:2.0.0a2-python3.8
+x-airflow-image: &airflow_image apache/airflow:2.0.0b2-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 services:
   postgres:
