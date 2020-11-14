@@ -41,7 +41,7 @@ services:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
-    command: -c 'airflow db upgrade && sleep 5 && airflow users create --username admin --password admin --firstname John --lastname Smith --role Admin --email admin@example.org'
+    command: -c 'airflow db upgrade && sleep 5 && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
   webserver:
     build:
       context: docker/airflow-aws

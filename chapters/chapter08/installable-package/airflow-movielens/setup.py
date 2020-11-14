@@ -9,8 +9,8 @@ extra_requirements = {"dev": ["pytest"]}
 setuptools.setup(
     name="airflow_movielens",
     version="0.1.0",
-    author="John Smith",
-    author_email="john.smith@example.com",
+    author="Anonymous",
+    author_email="anonymous@example.com",
     description="Hooks, sensors and operators for the Movielens API.",
     install_requires=requirements,
     extras_require=extra_requirements,
