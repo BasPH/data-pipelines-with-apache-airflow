@@ -20,7 +20,7 @@ with DAG(
     start_date=date_utils.days_ago(2),
     schedule_interval="@daily",
     default_args=default_args,
-    # email=['john@example.com'],
+    # email=['anonymous@example.com'],
     sla_miss_callback=sla_miss_callback,
 ) as dag:
 
