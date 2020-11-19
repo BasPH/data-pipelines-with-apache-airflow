@@ -14,7 +14,6 @@ RUN apt-get update && \
     ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Azure backport package.
 USER airflow
 RUN pip install --user --no-cache-dir \
     apache-airflow-providers-odbc==1.0.0b2 \
