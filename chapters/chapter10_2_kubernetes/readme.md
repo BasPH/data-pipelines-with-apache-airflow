@@ -28,7 +28,7 @@ and opening http://localhost:8080 in the browser (this should show a hello world
 
 Once this initial setup is complete, you should be able to run the Kubernetes DAG from within Airflow using docker-compose:
 
-    docker-compose up -f docker-compose-docker.yml -d --build
+    docker-compose up -f docker-compose.yml -d --build
 
 Note that docker-compose is only used to run the Airflow webserver and scheduler/workers, the jobs themselves will be executed in Kubernetes.
 
