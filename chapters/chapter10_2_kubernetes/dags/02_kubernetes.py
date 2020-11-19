@@ -9,7 +9,7 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import (
 )
 
 with DAG(
-    dag_id="02_movielens_kubernetes",
+    dag_id="02_kubernetes",
     description="Fetches ratings from the Movielens API using kubernetes.",
     start_date=dt.datetime(2019, 1, 1),
     end_date=dt.datetime(2019, 1, 3),
