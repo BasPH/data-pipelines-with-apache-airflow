@@ -6,7 +6,7 @@ from airflow.operators.docker_operator import DockerOperator
 
 
 with DAG(
-    dag_id="01_movielens_docker",
+    dag_id="01_docker",
     description="Fetches ratings from the Movielens API using Docker.",
     start_date=dt.datetime(2019, 1, 1),
     end_date=dt.datetime(2019, 1, 3),
