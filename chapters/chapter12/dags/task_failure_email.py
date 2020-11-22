@@ -1,6 +1,6 @@
 import airflow.utils.dates
 from airflow.models import DAG
-from airflow.operators.bash_operator import BashOperator
+from airflow.operators.bash import BashOperator
 
 dag = DAG(
     dag_id="chapter12_task_failure_email",
