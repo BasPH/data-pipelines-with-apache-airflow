@@ -6,9 +6,9 @@ from urllib import request
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
-from airflow.operators.postgres_operator import PostgresOperator
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 dag = DAG(
     dag_id="listing_4_20",
