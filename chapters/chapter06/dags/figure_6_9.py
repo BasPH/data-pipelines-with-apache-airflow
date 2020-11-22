@@ -2,8 +2,8 @@ from pathlib import Path
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.contrib.sensors.python_sensor import PythonSensor
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.sensors.python import PythonSensor
 
 dag = DAG(
     dag_id="figure_6_9",

@@ -1,7 +1,7 @@
 import airflow.utils.dates
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from airflow.sensors.external_task_sensor import ExternalTaskSensor
 from airflow.utils.state import State
 
@@ -35,20 +35,20 @@ DummyOperator(task_id="etl", dag=dag3)
         external_dag_id="figure_6_19_dag_1",
         external_task_id="etl",
         dag=dag4,
-        allowed_states=State.task_states,
+        allowed_states=[State.task_states],
     ),
     ExternalTaskSensor(
         task_id="wait_for_etl_dag2",
         external_dag_id="figure_6_19_dag_2",
         external_task_id="etl",
         dag=dag4,
-        allowed_states=State.task_states,
+        allowed_states=[State.task_states],
     ),
     ExternalTaskSensor(
         task_id="wait_for_etl_dag3",
         external_dag_id="figure_6_19_dag_3",
         external_task_id="etl",
         dag=dag4,
-        allowed_states=State.task_states,
+        allowed_states=[State.task_states],
     ),
 ] >> PythonOperator(task_id="report", dag=dag4, python_callable=lambda: print("hello"))

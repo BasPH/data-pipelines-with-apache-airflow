@@ -2,8 +2,8 @@ from pathlib import Path
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.contrib.sensors.python_sensor import PythonSensor
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.sensors.python import PythonSensor
 
 dag = DAG(
     dag_id="figure_6_12",
@@ -26,7 +26,6 @@ for supermarket_id in [1, 2, 3, 4]:
         task_id=f"wait_for_supermarket_{supermarket_id}",
         python_callable=_wait_for_supermarket,
         op_kwargs={"supermarket_id": f"supermarket{supermarket_id}"},
-        provide_context=True,
         dag=dag,
     )
     copy = DummyOperator(task_id=f"copy_to_raw_supermarket_{supermarket_id}", dag=dag)

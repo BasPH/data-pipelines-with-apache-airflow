@@ -2,9 +2,9 @@ from pathlib import Path
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.contrib.sensors.python_sensor import PythonSensor
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.sensors.python import PythonSensor
 
 dag1 = DAG(
     dag_id="listing_6_4_dag1",

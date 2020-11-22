@@ -1,6 +1,6 @@
 import airflow.utils.dates
 from airflow import DAG
-from airflow.contrib.sensors.file_sensor import FileSensor
+from airflow.sensors.filesystem import FileSensor
 
 dag = DAG(
     dag_id="listing_6_1",

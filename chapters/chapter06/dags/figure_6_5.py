@@ -1,7 +1,7 @@
 import airflow.utils.dates
 from airflow import DAG
-from airflow.contrib.sensors.file_sensor import FileSensor
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.sensors.filesystem import FileSensor
 
 dag = DAG(
     dag_id="figure_6_5",
