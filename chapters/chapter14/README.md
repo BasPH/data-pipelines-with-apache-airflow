@@ -25,15 +25,15 @@ If all processing goes well, the final result is visible on http://localhost:808
 
 Ports on which services are available:
 
-- 5432: Airflow Postgres DB (`airflow`/`airflow`)
-- 5433: NYC Taxi Postgres DB (`taxi`/`ridetlc`)
-- 5434: Citi Bike Postgres DB (`citi`/`cycling`)
-- 5435: NYC Transportation results Postgres DB (`nyc`/`tr4N5p0RT4TI0N`)
-- 8080: Airflow webserver (`airflow`/`airflow`)
-- 8081: NYC Taxi static file server
-- 8082: Citi Bike API (`citibike`/`cycling`)
-- 8083: NYC Transportation API
-- 9000: MinIO (`AKIAIOSFODNN7EXAMPLE`/`wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`)
+- http://localhost:5432: Airflow Postgres DB (`airflow`/`airflow`)
+- http://localhost:5433: NYC Taxi Postgres DB (`taxi`/`ridetlc`)
+- http://localhost:5434: Citi Bike Postgres DB (`citi`/`cycling`)
+- http://localhost:5435: NYC Transportation results Postgres DB (`nyc`/`tr4N5p0RT4TI0N`)
+- http://localhost:8080: Airflow webserver (`airflow`/`airflow`)
+- http://localhost:8081: NYC Taxi static file server
+- http://localhost:8082: Citi Bike API (`citibike`/`cycling`)
+- http://localhost:8083: NYC Transportation API
+- http://localhost:9000: MinIO (`AKIAIOSFODNN7EXAMPLE`/`wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`)
 
 ## More information
 
