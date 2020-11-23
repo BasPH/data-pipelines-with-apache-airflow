@@ -2,6 +2,7 @@ version: '3.7'
 
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
+  - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=False
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
   - AIRFLOW__CORE__FERNET_KEY=hCRoPUYBO27QiEg1MRu5hSjLG7yNd8y8XKlm-8kRlkQ=
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
@@ -9,8 +10,8 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
-  - AIRFLOW__WEBSERVER__RBAC=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  - AIRFLOW__WEBSERVER__RBAC=True
   - AIRFLOW_CONN_S3=s3://@?host=http://minio:9000&aws_access_key_id=AKIAIOSFODNN7EXAMPLE&aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   - AIRFLOW_CONN_CITIBIKE=http://citibike:cycling@citibike_api:5000
   - AIRFLOW_CONN_TAXI=http://taxi_fileserver
