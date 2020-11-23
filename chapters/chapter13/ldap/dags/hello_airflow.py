@@ -1,7 +1,7 @@
 import airflow.utils.dates
 from airflow.models import DAG
-from airflow.operators.bash_operator import BashOperator
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
 
 dag = DAG(
     dag_id="hello_airflow",
