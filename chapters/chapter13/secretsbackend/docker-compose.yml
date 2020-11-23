@@ -12,9 +12,8 @@ x-environment: &airflow_environment
   - AIRFLOW__SECRETS__BACKEND=airflow.contrib.secrets.hashicorp_vault.VaultBackend
   - AIRFLOW__SECRETS__BACKEND_KWARGS={"url":"http://vault:8200","token":"airflow","connections_path":"connections"}
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
-  - AIRFLOW__WEBSERVER__RBAC=True
 
-x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
+x-airflow-image: &airflow_image apache/airflow:2.0.0b3-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -27,18 +26,24 @@ services:
     ports:
       - "5432:5432"
 
-  upgradedb_adduser:
-    build: .
+  init:
+    build:
+      context: .
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
     # The webserver initializes permissions, so sleep for that to (approximately) be finished
     # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow upgradedb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+    command: -c 'airflow db init && sleep 10 && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
 
   webserver:
-    build: .
+    build:
+      context: .
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -50,7 +55,10 @@ services:
     command: webserver
 
   scheduler:
-    build: .
+    build:
+      context: .
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres

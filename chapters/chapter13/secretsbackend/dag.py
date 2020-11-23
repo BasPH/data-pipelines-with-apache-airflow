@@ -1,6 +1,6 @@
 import airflow.utils.dates
 from airflow.models import DAG
-from airflow.operators.http_operator import SimpleHttpOperator
+from airflow.providers.http.operators.http import SimpleHttpOperator
 
 dag = DAG(
     dag_id="secretsbackend_with_vault",

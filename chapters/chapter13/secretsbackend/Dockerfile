@@ -1,2 +1,6 @@
-FROM apache/airflow:1.10.12-python3.8
-RUN pip install --user hvac~=0.10
+ARG AIRFLOW_BASE_IMAGE="apache/airflow:2.0.0b3-python3.8"
+FROM ${AIRFLOW_BASE_IMAGE}
+
+RUN pip install --user --no-cache-dir \
+    hvac~=0.10 \
+    apache-airflow-providers-http~=1.0.0b2
