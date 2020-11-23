@@ -29,17 +29,17 @@ services:
       - "5432:5432"
 
   initdb_adduser:
-    image: airflowbook/chapter15_airflow
+    image: airflowbook/chapter14_airflow
     depends_on:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
     # The webserver initializes permissions, so sleep for that to (approximately) be finished
     # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+    command: -c 'airflow db init && sleep 10 && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
 
   webserver:
-    image: airflowbook/chapter15_airflow
+    image: airflowbook/chapter14_airflow
     restart: always
     depends_on:
       - postgres
@@ -51,7 +51,7 @@ services:
     command: webserver
 
   scheduler:
-    image: airflowbook/chapter15_airflow
+    image: airflowbook/chapter14_airflow
     restart: always
     depends_on:
       - postgres
@@ -65,7 +65,7 @@ services:
     command: ["-c", "pip install --user -e /opt/airflow/nyctransport && airflow scheduler"]
 
   taxi_fileserver:
-    image: airflowbook/chapter15_taxi_fileserver
+    image: airflowbook/chapter14_taxi_fileserver
     environment:
       - POSTGRES_HOST=taxi_db
       - POSTGRES_PORT=5433
@@ -79,12 +79,12 @@ services:
       - "8081:80"
 
   taxi_db:
-    image: airflowbook/chapter15_taxi_db
+    image: airflowbook/chapter14_taxi_db
     ports:
       - "5433:5432"
 
   citibike_api:
-    image: airflowbook/chapter15_citibike_api
+    image: airflowbook/chapter14_citibike_api
     environment:
       - POSTGRES_HOST=citibike_db
       - POSTGRES_PORT=5434
@@ -139,7 +139,7 @@ services:
       - "5435:5432"
 
   nyc_transportation_api:
-    image: airflowbook/chapter15_nyc_transportation_api
+    image: airflowbook/chapter14_nyc_transportation_api
     environment:
       - POSTGRES_HOST=result_db
       - POSTGRES_PORT=5432

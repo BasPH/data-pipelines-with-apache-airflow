@@ -7,33 +7,33 @@ help:
 
 .PHONY: build_citibike_api
 build_citibike_api: ## Build the Citi Bike API Docker image
-	docker build -t airflowbook/chapter15_citibike_api services/citibike_api
+	docker build -t airflowbook/chapter14_citibike_api services/citibike_api
 
 .PHONY: build_citibike_db
 build_citibike_db: ## Build the Citi Bike DB Docker image
-	docker build -t airflowbook/chapter15_citibike_db services/citibike_db
+	docker build -t airflowbook/chapter14_citibike_db services/citibike_db
 
 .PHONY: build_citibike
 build_citibike: build_citibike_api build_citibike_db ## Build the Citi Bike API & DB Docker images
 
 .PHONY: build_taxi_fileserver
 build_taxi_fileserver: ## Build the NYC Yellow Taxi fileserver Docker image
-	docker build -t airflowbook/chapter15_taxi_fileserver services/taxi_fileserver
+	docker build -t airflowbook/chapter14_taxi_fileserver services/taxi_fileserver
 
 .PHONY: build_taxi_db
 build_taxi_db: ## Build the NYC Yellow Taxi DB Docker image
-	docker build -t airflowbook/chapter15_taxi_db services/taxi_db
+	docker build -t airflowbook/chapter14_taxi_db services/taxi_db
 
 .PHONY: build_taxi
 build_taxi: build_taxi_fileserver build_taxi_db ## Build the NYC Yellow Taxi fileserver & DB Docker images
 
 .PHONY: build_airflow
 build_airflow: ## Build Airflow with additional dependencies
-	docker build -t airflowbook/chapter15_airflow services/airflow
+	docker build -t airflowbook/chapter14_airflow services/airflow
 
 .PHONY: build_nyc_transportation_api
-build_nyc_transportation_api: ## Build NYC transportation API
-	docker build -t airflowbook/chapter15_nyc_transportation_api services/nyc_transportation_api
+build_nyc_transportation_api: ## Build NYC Transportation API
+	docker build -t airflowbook/chapter14_nyc_transportation_api services/nyc_transportation_api
 
 .PHONY: build_all
 build_all: build_citibike build_taxi build_airflow build_nyc_transportation_api ## Build all Docker images (warning: takes long!)

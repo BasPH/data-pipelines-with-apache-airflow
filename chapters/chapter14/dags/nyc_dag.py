@@ -5,15 +5,14 @@ import airflow.utils.dates
 import geopandas
 import pandas as pd
 import requests
-from airflow.hooks.S3_hook import S3Hook
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from minio import Minio
-from requests.auth import HTTPBasicAuth
-
 from nyctransport.operators.pandas_operator import PandasOperator
 from nyctransport.operators.s3_to_postgres import MinioPandasToPostgres
+from requests.auth import HTTPBasicAuth
 
 dag = DAG(
     dag_id="nyc_dag",
