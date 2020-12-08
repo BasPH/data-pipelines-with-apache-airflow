@@ -9,6 +9,7 @@ from airflow.contrib.operators.bigquery_to_gcs import BigQueryToCloudStorageOper
 from airflow.contrib.operators.file_to_gcs import FileToGoogleCloudStorageOperator
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 from airflow.models import DAG
+from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
 
 dag = DAG(
     "gcp_movie_ranking",
@@ -53,7 +54,7 @@ import_in_bigquery = GoogleCloudStorageToBigQueryOperator(
     dag=dag,
 )
 
-query_top_ratings = BigQueryOperator(
+query_top_ratings = BigQueryExecuteQueryOperator(
     task_id="query_top_ratings",
     destination_dataset_table=(
         os.environ["GCP_PROJECT"]
