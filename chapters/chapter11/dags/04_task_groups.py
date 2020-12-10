@@ -38,12 +38,12 @@ def generate_tasks(
 
 
 with DAG(
-    dag_id="01_task_factory",
+    dag_id="04_task_groups",
     start_date=airflow.utils.dates.days_ago(5),
     schedule_interval="@daily",
 ) as dag:
     for dataset in ["sales", "customers"]:
-        with TaskGroup(dataset):
+        with TaskGroup(dataset, tooltip=f"Tasks for processing {dataset}"):
             generate_tasks(
                 dataset_name=dataset,
                 raw_dir="/data/raw",

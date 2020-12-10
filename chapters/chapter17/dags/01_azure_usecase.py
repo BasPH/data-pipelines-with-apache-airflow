@@ -21,6 +21,7 @@ FROM OPENROWSET(
     BULK 'https://{blob_account_name}.blob.core.windows.net/{blob_container}/*/*.csv',
     FORMAT = 'CSV',
     PARSER_VERSION = '2.0',
+    HEADER_ROW = TRUE,
     FIELDTERMINATOR =',',
     ROWTERMINATOR = '\n'
 )
