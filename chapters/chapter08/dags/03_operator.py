@@ -6,7 +6,7 @@ from custom.operators import MovielensFetchRatingsOperator
 
 
 with DAG(
-    dag_id="03_movielens_custom_operator",
+    dag_id="03_operator",
     description="Fetches ratings from the Movielens API using a custom operator.",
     start_date=dt.datetime(2019, 1, 1),
     end_date=dt.datetime(2019, 1, 10),

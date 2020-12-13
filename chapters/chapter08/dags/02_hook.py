@@ -10,7 +10,7 @@ from custom.hooks import MovielensHook
 
 
 with DAG(
-    dag_id="02_movielens_custom_hook",
+    dag_id="02_hook",
     description="Fetches ratings from the Movielens API using a custom hook.",
     start_date=dt.datetime(2019, 1, 1),
     end_date=dt.datetime(2019, 1, 10),

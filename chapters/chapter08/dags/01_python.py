@@ -72,7 +72,7 @@ def _get_with_pagination(session, url, params, batch_size=100):
 
 
 with DAG(
-    dag_id="01_movielens_python_operator",
+    dag_id="01_python",
     description="Fetches ratings from the Movielens API using the Python Operator.",
     start_date=dt.datetime(2019, 1, 1),
     end_date=dt.datetime(2019, 1, 10),
@@ -109,7 +109,7 @@ with DAG(
         templates_dict={
             "start_date": "{{ds}}",
             "end_date": "{{next_ds}}",
-            "output_path": "/data/python_operator/ratings/{{ds}}.json",
+            "output_path": "/data/python/ratings/{{ds}}.json",
         },
         provide_context=True,
     )
@@ -131,8 +131,8 @@ with DAG(
         task_id="rank_movies",
         python_callable=_rank_movies,
         templates_dict={
-            "input_path": "/data/python_operator/ratings/{{ds}}.json",
-            "output_path": "/data/python_operator/rankings/{{ds}}.csv",
+            "input_path": "/data/python/ratings/{{ds}}.json",
+            "output_path": "/data/python/rankings/{{ds}}.csv",
         },
         provide_context=True,
     )
