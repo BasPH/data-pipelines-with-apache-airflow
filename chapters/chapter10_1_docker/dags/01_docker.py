@@ -2,7 +2,7 @@ import datetime as dt
 import os
 
 from airflow import DAG
-from airflow.operators.docker_operator import DockerOperator
+from airflow.providers.docker.operators.docker import DockerOperator
 
 
 with DAG(
