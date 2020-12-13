@@ -11,7 +11,7 @@ def _fetch_sales(**context):
 
 
 with DAG(
-    dag_id="07_trigger_rules",
+    dag_id="08_trigger_rules",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@daily",
 ) as dag:

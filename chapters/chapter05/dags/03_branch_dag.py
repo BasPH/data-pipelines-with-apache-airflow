@@ -68,6 +68,9 @@ with DAG(
     fetch_weather = DummyOperator(task_id="fetch_weather")
     clean_weather = DummyOperator(task_id="clean_weather")
 
+    # Using the wrong trigger rule ("all_success") results in tasks being skipped downstream.
+    # join_datasets = DummyOperator(task_id="join_datasets")
+
     join_datasets = DummyOperator(task_id="join_datasets", trigger_rule="none_failed")
     train_model = DummyOperator(task_id="train_model")
     deploy_model = DummyOperator(task_id="deploy_model")
