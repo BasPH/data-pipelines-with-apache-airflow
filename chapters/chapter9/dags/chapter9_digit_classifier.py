@@ -4,15 +4,11 @@ import pickle
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.contrib.operators.s3_copy_object_operator import S3CopyObjectOperator
-from airflow.contrib.operators.sagemaker_endpoint_operator import (
-    SageMakerEndpointOperator,
-)
-from airflow.contrib.operators.sagemaker_training_operator import (
-    SageMakerTrainingOperator,
-)
-from airflow.hooks.S3_hook import S3Hook
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from airflow.providers.amazon.aws.operators.s3_copy_object import S3CopyObjectOperator
+from airflow.providers.amazon.aws.operators.sagemaker_endpoint import SageMakerEndpointOperator
+from airflow.providers.amazon.aws.operators.sagemaker_training import SageMakerTrainingOperator
 from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 dag = DAG(

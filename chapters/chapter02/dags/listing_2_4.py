@@ -1,6 +1,6 @@
 import airflow
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
+from airflow.operators.bash import BashOperator
 
 dag = DAG(
     dag_id="listing_2_4",

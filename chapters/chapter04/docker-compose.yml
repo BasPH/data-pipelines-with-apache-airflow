@@ -37,7 +37,10 @@ services:
       - ./scripts/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
 
   init:
-    image: *airflow_image
+    build:
+      context: docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
@@ -45,7 +48,10 @@ services:
     command: -c 'airflow upgradedb && sleep 5 && airflow create_user --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
 
   webserver:
-    image: *airflow_image
+    build:
+      context: docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -57,7 +63,10 @@ services:
     command: webserver
 
   scheduler:
-    image: *airflow_image
+    build:
+      context: docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres

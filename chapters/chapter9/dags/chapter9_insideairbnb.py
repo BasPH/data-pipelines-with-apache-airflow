@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.docker_operator import DockerOperator
+from airflow.providers.docker.operators.docker import DockerOperator
 from custom.postgres_to_s3_operator import PostgresToS3Operator
 
 dag = DAG(

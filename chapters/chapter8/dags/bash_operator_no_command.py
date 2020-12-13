@@ -1,6 +1,6 @@
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
+from airflow.operators.bash import BashOperator
 
 dag = DAG(
     dag_id="chapter8_bash_operator_no_command",

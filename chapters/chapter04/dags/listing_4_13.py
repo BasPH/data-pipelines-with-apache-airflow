@@ -2,7 +2,7 @@ from urllib import request
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 dag = DAG(
     dag_id="listing_4_13",
