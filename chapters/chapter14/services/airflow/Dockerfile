@@ -1,4 +1,4 @@
-ARG AIRFLOW_BASE_IMAGE="apache/airflow:2.0.0b3-python3.8"
+ARG AIRFLOW_BASE_IMAGE="apache/airflow:2.0.0-python3.8"
 FROM ${AIRFLOW_BASE_IMAGE}
 
 # pyarrow required for writing to_parquet() with Pandas

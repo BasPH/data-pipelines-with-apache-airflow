@@ -15,7 +15,7 @@ x-environment: &airflow_environment
   - MOVIELENS_USER=airflow
   - MOVIELENS_PASSWORD=airflow
   - MOVIELENS_HOST=http://movielens:5000
-x-airflow-image: &airflow_image apache/airflow:2.0.0b3-python3.8
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 services:
   postgres:

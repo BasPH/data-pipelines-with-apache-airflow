@@ -12,7 +12,7 @@ x-environment: &airflow_environment
   - AIRFLOW__WEBSERVER__RBAC=False
   - AIRFLOW_CONN_MY_POSTGRES=postgresql://airflow:airflow@wiki_results:5432/airflow
 
-x-airflow-image: &airflow_image apache/airflow:2.0.0b3-python3.8
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
