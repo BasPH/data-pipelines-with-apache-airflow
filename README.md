@@ -7,20 +7,19 @@ Code accompanying the Manning book [Data Pipelines with Apache Airflow](https://
 Overall, this repository is structured as follows:
 
 ```
-├── CHANGELOG.md          # Changelog detailing updates to the code.
-├── LICENSE
-├── Makefile              # Helper commands.
-├── README.md             # This readme.
-├── chapters              # Code examples for each of the Chapters.
-├── docker                # Supporting Docker image (containing Airflow).
-└── requirements.txt
+├── chapter01                # Code examples for Chapter 1.
+├── chapter02                # Code examples for Chapter 2.
+├── ...
+├── .pre-commit-config.yaml  # Pre-commit config for the CI.
+├── CHANGELOG.md             # Changelog detailing updates to the code.
+├── LICENSE                  # Code license.
+├── README.md                # This readme.
+└── requirements.txt         # CI dependencies.
 ```
 
-The most interesting parts are probably the *docker* directory and the *chapter* directories under *chapters*.
+The *chapterXX* directories contain the code examples for each specific Chapter.
 
-The *docker* directory contains a custom Airflow image that will be used through out the book.
-
-The *chapter* directories contain the code examples for each specific Chapter. Code for each Chapter is generally structured something like follows:
+Code for each Chapter is generally structured something like follows:
 
 ```
 ├── dags                  # Airflow DAG examples (+ other code).

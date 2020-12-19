@@ -38,7 +38,9 @@ def _get_pictures():
             print(f"Downloaded {image_url} to {target_file}")
 
 
-get_pictures = PythonOperator(task_id="get_pictures", python_callable=_get_pictures, dag=dag)
+get_pictures = PythonOperator(
+    task_id="get_pictures", python_callable=_get_pictures, dag=dag
+)
 
 notify = BashOperator(
     task_id="notify",
