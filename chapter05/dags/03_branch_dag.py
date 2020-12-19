@@ -1,7 +1,7 @@
 import airflow
 
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator, BranchPythonOperator
 
 ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)

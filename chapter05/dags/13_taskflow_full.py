@@ -4,7 +4,7 @@ import airflow
 
 from airflow import DAG
 from airflow.decorators import task
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
 
 
 with DAG(

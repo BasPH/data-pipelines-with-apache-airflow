@@ -1,6 +1,6 @@
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
 
 dag = DAG(
     dag_id="chapter8_duplicate_task_ids",

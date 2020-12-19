@@ -2,7 +2,7 @@ import datetime
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
 from airflow.sensors.external_task_sensor import ExternalTaskSensor
 
 dag1 = DAG(

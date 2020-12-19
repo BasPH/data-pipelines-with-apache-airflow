@@ -2,7 +2,7 @@ from pathlib import Path
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
 from airflow.sensors.python import PythonSensor
 
 dag = DAG(

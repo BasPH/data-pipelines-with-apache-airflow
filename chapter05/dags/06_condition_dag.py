@@ -3,7 +3,7 @@ import pendulum
 
 from airflow import DAG
 from airflow.exceptions import AirflowSkipException
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator, BranchPythonOperator
 
 ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
