@@ -9,7 +9,7 @@ from airflow import DAG
 
 from airflow.providers.microsoft.azure.hooks.wasb import WasbHook
 from airflow.providers.odbc.hooks.odbc import OdbcHook
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 from custom.hooks import MovielensHook
 

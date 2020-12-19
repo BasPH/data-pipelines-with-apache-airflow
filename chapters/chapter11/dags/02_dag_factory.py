@@ -2,7 +2,7 @@ import os
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.bash_operator import BashOperator
+from airflow.operators.bash import BashOperator
 
 
 def generate_dag(dataset_name, raw_dir, processed_dir, preprocess_script):

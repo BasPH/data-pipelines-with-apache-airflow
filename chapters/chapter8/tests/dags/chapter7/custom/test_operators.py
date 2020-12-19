@@ -1,5 +1,5 @@
 from airflow.models import Connection
-from airflow.operators.bash_operator import BashOperator
+from airflow.operators.bash import BashOperator
 
 from airflowbook.operators.movielens_operator import (
     MovielensPopularityOperator,
