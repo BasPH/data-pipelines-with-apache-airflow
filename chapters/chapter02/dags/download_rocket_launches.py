@@ -28,7 +28,8 @@ def _get_pictures():
     # Download all pictures in launches.json
     with open("/tmp/launches.json") as f:
         launches = json.load(f)
-        image_urls = [launch["rocket"]["imageURL"] for launch in launches["launches"]]
+        # Sometimes Rocket Launch Library returns imageURL "Array", which is not a valid URL, ignore.
+        image_urls = [launch["rocket"]["imageURL"] for launch in launches["launches"] if launch["rocket"]["imageURL"] != "Array"]
         for image_url in image_urls:
             response = requests.get(image_url)
             image_filename = image_url.split("/")[-1]
