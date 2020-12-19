@@ -2,20 +2,14 @@ from pathlib import Path
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.dummy import DummyOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.sensors.python import PythonSensor
 
 dag1 = DAG(
-    dag_id="listing_6_4_dag1",
-    start_date=airflow.utils.dates.days_ago(3),
-    schedule_interval="0 16 * * *",
+    dag_id="listing_6_04_dag01", start_date=airflow.utils.dates.days_ago(3), schedule_interval="0 16 * * *"
 )
-dag2 = DAG(
-    dag_id="listing_6_4_dag2",
-    start_date=airflow.utils.dates.days_ago(3),
-    schedule_interval=None,
-)
+dag2 = DAG(dag_id="listing_6_04_dag02", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None)
 
 
 def _wait_for_supermarket(supermarket_id_):
@@ -36,7 +30,7 @@ for supermarket_id in range(1, 5):
     process = DummyOperator(task_id=f"process_supermarket_{supermarket_id}", dag=dag1)
     trigger_create_metrics_dag = TriggerDagRunOperator(
         task_id=f"trigger_create_metrics_dag_supermarket_{supermarket_id}",
-        trigger_dag_id="listing_6_4_dag2",
+        trigger_dag_id="listing_6_04_dag02",
         dag=dag1,
     )
     wait >> copy >> process >> trigger_create_metrics_dag
