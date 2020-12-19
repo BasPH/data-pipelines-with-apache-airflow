@@ -11,11 +11,12 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
-  - AIRFLOW__WEBSERVER__RBAC=True
   - AIRFLOW_CONN_S3=s3://@?host=http://minio:9000&aws_access_key_id=AKIAIOSFODNN7EXAMPLE&aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   - AIRFLOW_CONN_CITIBIKE=http://citibike:cycling@citibike_api:5000
   - AIRFLOW_CONN_TAXI=http://taxi_fileserver
   - AIRFLOW_CONN_RESULT_DB=postgresql://nyc:tr4N5p0RT4TI0N@result_db:5432/nyctransportation
+
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -29,17 +30,21 @@ services:
       - "5432:5432"
 
   initdb_adduser:
-    image: airflowbook/chapter14_airflow
+    build:
+      context: ./services/airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
-    # The webserver initializes permissions, so sleep for that to (approximately) be finished
-    # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow db init && sleep 10 && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
 
   webserver:
-    image: airflowbook/chapter14_airflow
+    build:
+      context: ./services/airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -51,7 +56,10 @@ services:
     command: webserver
 
   scheduler:
-    image: airflowbook/chapter14_airflow
+    build:
+      context: ./services/airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -65,7 +73,8 @@ services:
     command: ["-c", "pip install --user -e /opt/airflow/nyctransport && airflow scheduler"]
 
   taxi_fileserver:
-    image: airflowbook/chapter14_taxi_fileserver
+    build:
+      context: ./services/taxi_fileserver
     environment:
       - POSTGRES_HOST=taxi_db
       - POSTGRES_PORT=5433
@@ -79,12 +88,14 @@ services:
       - "8081:80"
 
   taxi_db:
-    image: airflowbook/chapter14_taxi_db
+    build:
+      context: ./services/taxi_db
     ports:
       - "5433:5432"
 
   citibike_api:
-    image: airflowbook/chapter14_citibike_api
+    build:
+      context: ./services/citibike_api
     environment:
       - POSTGRES_HOST=citibike_db
       - POSTGRES_PORT=5434
@@ -98,7 +109,8 @@ services:
       - "8082:5000"
 
   citibike_db:
-    image: airflowbook/chapter15_citibike_db
+    build:
+      context: ./services/citibike_db
     ports:
       - "5434:5432"
 
@@ -139,7 +151,8 @@ services:
       - "5435:5432"
 
   nyc_transportation_api:
-    image: airflowbook/chapter14_nyc_transportation_api
+    build:
+      context: ./services/nyc_transportation_api
     environment:
       - POSTGRES_HOST=result_db
       - POSTGRES_PORT=5432

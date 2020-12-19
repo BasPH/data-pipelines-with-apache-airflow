@@ -5,7 +5,7 @@ import airflow.utils.dates
 import geopandas
 import pandas as pd
 import requests
-from airflow.hooks.base_hook import BaseHook
+from airflow.hooks.base import BaseHook
 from airflow.models import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
