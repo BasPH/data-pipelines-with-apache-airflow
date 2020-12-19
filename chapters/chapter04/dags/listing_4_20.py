@@ -19,7 +19,7 @@ dag = DAG(
 )
 
 
-def _get_data(year, month, day, hour, output_path, **_):
+def _get_data(year, month, day, hour, output_path):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
         f"{year}/{year}-{month:0>2}/pageviews-{year}{month:0>2}{day:0>2}-{hour:0>2}0000.gz"
@@ -30,7 +30,6 @@ def _get_data(year, month, day, hour, output_path, **_):
 get_data = PythonOperator(
     task_id="get_data",
     python_callable=_get_data,
-    provide_context=True,
     op_kwargs={
         "year": "{{ execution_date.year }}",
         "month": "{{ execution_date.month }}",
@@ -47,7 +46,7 @@ extract_gz = BashOperator(
 )
 
 
-def _fetch_pageviews(pagenames, execution_date, **_):
+def _fetch_pageviews(pagenames, execution_date):
     result = dict.fromkeys(pagenames, 0)
     with open("/tmp/wikipageviews", "r") as f:
         for line in f:
@@ -68,7 +67,6 @@ fetch_pageviews = PythonOperator(
     task_id="fetch_pageviews",
     python_callable=_fetch_pageviews,
     op_kwargs={"pagenames": {"Google", "Amazon", "Apple", "Microsoft", "Facebook"}},
-    provide_context=True,
     dag=dag,
 )
 

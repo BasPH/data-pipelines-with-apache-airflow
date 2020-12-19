@@ -5,13 +5,13 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 dag = DAG(
-    dag_id="listing_4_5",
+    dag_id="listing_4_05",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@hourly",
 )
 
 
-def _get_data(execution_date, **_):
+def _get_data(execution_date):
     year, month, day, hour, *_ = execution_date.timetuple()
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
