@@ -54,7 +54,6 @@ calculate_stats = PythonOperator(
         "input_path": "/data/events/{{ds}}.json",
         "output_path": "/data/stats/{{ds}}.csv",
     },
-    provide_context=True,
     dag=dag,
 )
 

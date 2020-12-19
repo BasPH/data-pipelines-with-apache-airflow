@@ -38,31 +38,21 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     pick_erp_system = BranchPythonOperator(
-        task_id="pick_erp_system",
-        provide_context=True,
-        python_callable=_pick_erp_system,
+        task_id="pick_erp_system", python_callable=_pick_erp_system
     )
 
     fetch_sales_old = PythonOperator(
-        task_id="fetch_sales_old",
-        python_callable=_fetch_sales_old,
-        provide_context=True,
+        task_id="fetch_sales_old", python_callable=_fetch_sales_old
     )
     clean_sales_old = PythonOperator(
-        task_id="clean_sales_old",
-        python_callable=_clean_sales_old,
-        provide_context=True,
+        task_id="clean_sales_old", python_callable=_clean_sales_old
     )
 
     fetch_sales_new = PythonOperator(
-        task_id="fetch_sales_new",
-        python_callable=_fetch_sales_new,
-        provide_context=True,
+        task_id="fetch_sales_new", python_callable=_fetch_sales_new
     )
     clean_sales_new = PythonOperator(
-        task_id="clean_sales_new",
-        python_callable=_clean_sales_new,
-        provide_context=True,
+        task_id="clean_sales_new", python_callable=_clean_sales_new
     )
 
     fetch_weather = DummyOperator(task_id="fetch_weather")

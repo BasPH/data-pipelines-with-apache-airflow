@@ -23,9 +23,7 @@ with DAG(
     start = DummyOperator(task_id="start")
 
     pick_erp = BranchPythonOperator(
-        task_id="pick_erp_system",
-        provide_context=True,
-        python_callable=_pick_erp_system,
+        task_id="pick_erp_system", python_callable=_pick_erp_system
     )
 
     fetch_sales_old = DummyOperator(task_id="fetch_sales_old")

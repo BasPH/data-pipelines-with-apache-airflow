@@ -128,7 +128,6 @@ with DAG(
             "wasb_conn_id": "my_wasb_conn",
             "container": "ratings",
         },
-        provide_context=True,
     )
 
     rank_movies = PythonOperator(
@@ -140,7 +139,6 @@ with DAG(
             "ratings_container": "ratings",
             "rankings_container": "rankings",
         },
-        provide_context=True,
     )
 
     fetch_ratings >> rank_movies

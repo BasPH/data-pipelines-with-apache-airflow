@@ -32,9 +32,7 @@ with DAG(
 
     join_datasets = DummyOperator(task_id="join_datasets")
 
-    train_model = PythonOperator(
-        task_id="train_model", python_callable=_train_model, provide_context=True
-    )
+    train_model = PythonOperator(task_id="train_model", python_callable=_train_model)
 
     deploy_model = PythonOperator(
         task_id="deploy_model",
@@ -42,7 +40,6 @@ with DAG(
         templates_dict={
             "model_id": "{{task_instance.xcom_pull(task_ids='train_model', key='model_id')}}"
         },
-        provide_context=True,
     )
 
     start >> [fetch_sales, fetch_weather]

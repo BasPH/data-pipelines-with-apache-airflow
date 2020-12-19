@@ -47,7 +47,6 @@ calculate_stats = PythonOperator(
         "input_path": "/data/events/{{ds}}.json",
         "output_path": "/data/stats/{{ds}}.csv",
     },
-    provide_context=True,
     dag=dag,
 )
 
@@ -67,7 +66,6 @@ send_stats = PythonOperator(
     python_callable=_send_stats,
     op_kwargs={"email": "user@example.com"},
     templates_dict={"stats_path": "/data/stats/{{ds}}.csv"},
-    provide_context=True,
     dag=dag,
 )
 

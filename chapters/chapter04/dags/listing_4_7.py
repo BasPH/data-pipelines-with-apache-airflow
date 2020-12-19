@@ -14,8 +14,5 @@ def _print_context(**context):
 
 
 print_context = PythonOperator(
-    task_id="print_context",
-    python_callable=_print_context,
-    provide_context=True,
-    dag=dag,
+    task_id="print_context", python_callable=_print_context, dag=dag
 )

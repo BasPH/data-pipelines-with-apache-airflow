@@ -30,7 +30,6 @@ def _get_data(year, month, day, hour, output_path, **_):
 get_data = PythonOperator(
     task_id="get_data",
     python_callable=_get_data,
-    provide_context=True,
     op_kwargs={
         "year": "{{ execution_date.year }}",
         "month": "{{ execution_date.month }}",
@@ -68,7 +67,6 @@ fetch_pageviews = PythonOperator(
     task_id="fetch_pageviews",
     python_callable=_fetch_pageviews,
     op_kwargs={"pagenames": {"Google", "Amazon", "Apple", "Microsoft", "Facebook"}},
-    provide_context=True,
     dag=dag,
 )
 

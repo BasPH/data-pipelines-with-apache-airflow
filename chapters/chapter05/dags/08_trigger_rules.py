@@ -17,9 +17,7 @@ with DAG(
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    fetch_sales = PythonOperator(
-        task_id="fetch_sales", python_callable=_fetch_sales, provide_context=True
-    )
+    fetch_sales = PythonOperator(task_id="fetch_sales", python_callable=_fetch_sales)
     clean_sales = DummyOperator(task_id="clean_sales")
 
     fetch_weather = DummyOperator(task_id="fetch_weather")

@@ -40,10 +40,7 @@ def _download_citi_bike_data(ts_nodash, **_):
 
 
 download_citi_bike_data = PythonOperator(
-    task_id="download_citi_bike_data",
-    python_callable=_download_citi_bike_data,
-    provide_context=True,
-    dag=dag,
+    task_id="download_citi_bike_data", python_callable=_download_citi_bike_data, dag=dag
 )
 
 

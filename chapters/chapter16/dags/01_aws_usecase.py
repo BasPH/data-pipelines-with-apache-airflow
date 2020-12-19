@@ -8,9 +8,9 @@ import pandas as pd
 
 from airflow import DAG
 
+from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
-from airflow.operators.python_operator import PythonOperator
 
 from custom.hooks import MovielensHook
 from custom.operators import GlueTriggerCrawlerOperator
@@ -63,7 +63,6 @@ with DAG(
             "s3_conn_id": "my_aws_conn",
             "s3_bucket": os.environ["RATINGS_BUCKET"],
         },
-        provide_context=True,
     )
 
     trigger_crawler = GlueTriggerCrawlerOperator(

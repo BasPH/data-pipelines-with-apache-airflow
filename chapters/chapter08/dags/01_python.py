@@ -111,7 +111,6 @@ with DAG(
             "end_date": "{{next_ds}}",
             "output_path": "/data/python/ratings/{{ds}}.json",
         },
-        provide_context=True,
     )
 
     def _rank_movies(templates_dict, min_ratings=2, **_):
@@ -134,7 +133,6 @@ with DAG(
             "input_path": "/data/python/ratings/{{ds}}.json",
             "output_path": "/data/python/rankings/{{ds}}.csv",
         },
-        provide_context=True,
     )
 
     fetch_ratings >> rank_movies

@@ -13,13 +13,9 @@ def print_conf(**context):
     print(context["dag_run"].conf)
 
 
-copy_to_raw = PythonOperator(
-    task_id="copy_to_raw", python_callable=print_conf, provide_context=True, dag=dag
-)
-process = PythonOperator(
-    task_id="process", python_callable=print_conf, provide_context=True, dag=dag
-)
+copy_to_raw = PythonOperator(task_id="copy_to_raw", python_callable=print_conf, dag=dag)
+process = PythonOperator(task_id="process", python_callable=print_conf, dag=dag)
 create_metrics = PythonOperator(
-    task_id="create_metrics", python_callable=print_conf, provide_context=True, dag=dag
+    task_id="create_metrics", python_callable=print_conf, dag=dag
 )
 copy_to_raw >> process >> create_metrics

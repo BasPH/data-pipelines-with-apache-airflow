@@ -51,5 +51,4 @@ with DAG(
             "end_date": "{{next_ds}}",
             "output_path": "/data/custom_hook/{{ds}}.json",
         },
-        provide_context=True,
     )

@@ -21,6 +21,4 @@ def _get_data(execution_date, **_):
     request.urlretrieve(url, output_path)
 
 
-get_data = PythonOperator(
-    task_id="get_data", python_callable=_get_data, provide_context=True, dag=dag
-)
+get_data = PythonOperator(task_id="get_data", python_callable=_get_data, dag=dag)
