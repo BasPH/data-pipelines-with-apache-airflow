@@ -6,10 +6,10 @@ Code accompanying Chapter 8 of the book 'Data pipelines with Apache Airflow'.
 
 This code example contains the following DAGs:
 
-- 01_movielens_python_operator.py - Our initial DAG in which we illustrate the use case using the built-in PythonOperator.
-- 02_movielens_custom_hook.py - Adjusted version of the former DAG, in which we use a custom Airflow hook for connecting to the Movie API.
-- 03_movielens_custom_operator.py - Another version of the same DAG, using a custom operator class instead of the builtin PythonOperator.
-- 04_movielens_custom_sensor.py - Final version of the DAG, in which we also demonstrate how to build a custom sensor class.
+- 01_python.py - Our initial DAG in which we illustrate the use case using the built-in PythonOperator.
+- 02_hook.py - Adjusted version of the former DAG, in which we use a custom Airflow hook for connecting to the Movie API.
+- 03_operator.py - Another version of the same DAG, using a custom operator class instead of the builtin PythonOperator.
+- 04_sensor.py - Final version of the DAG, in which we also demonstrate how to build a custom sensor class.
 
 Besides this, the example also contains the following files:
 
