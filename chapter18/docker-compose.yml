@@ -9,12 +9,13 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
-  - AIRFLOW__WEBSERVER__RBAC=True
   - AIRFLOW_CONN_GCP='google-cloud-platform://?extra__google_cloud_platform__keyfile_dict=${GCP_KEY}'
   - BIGQUERY_DATASET=${BIGQUERY_DATASET}
   - GCP_PROJECT=${GCP_PROJECT}
   - RATINGS_BUCKET=${RATINGS_BUCKET}
   - RESULT_BUCKET=${RESULT_BUCKET}
+
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -28,17 +29,21 @@ services:
       - "5432:5432"
 
   initdb_adduser:
-    image: apache/airflow:1.10.11-python3.7
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
     entrypoint: /bin/bash
-    # The webserver initializes permissions, so sleep for that to (approximately) be finished
-    # No disaster if the webserver isn't finished by then, but create_user will start spitting out errors until the permissions exist
-    command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
 
   webserver:
-    image: apache/airflow:1.10.11-python3.7
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -50,13 +55,15 @@ services:
     command: webserver
 
   scheduler:
-    image: apache/airflow:1.10.11-python3.7
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./data:/data
       - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: scheduler
