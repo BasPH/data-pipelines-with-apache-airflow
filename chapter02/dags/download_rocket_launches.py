@@ -3,6 +3,7 @@ import pathlib
 
 import airflow.utils.dates
 import requests
+import requests.exceptions as requests_exceptions
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -16,7 +17,7 @@ dag = DAG(
 
 download_launches = BashOperator(
     task_id="download_launches",
-    bash_command="curl -o /tmp/launches.json 'https://launchlibrary.net/1.4/launch?next=5&mode=verbose'",
+    bash_command="curl -o /tmp/launches.json -L 'https://ll.thespacedevs.com/2.0.0/launch/upcoming'",  # noqa: E501
     dag=dag,
 )
 
@@ -28,15 +29,19 @@ def _get_pictures():
     # Download all pictures in launches.json
     with open("/tmp/launches.json") as f:
         launches = json.load(f)
-        # Sometimes Rocket Launch Library returns imageURL "Array", which is not a valid URL, ignore.
-        image_urls = [launch["rocket"]["imageURL"] for launch in launches["launches"] if launch["rocket"]["imageURL"] != "Array"]
+        image_urls = [launch["image"] for launch in launches["results"]]
         for image_url in image_urls:
-            response = requests.get(image_url)
-            image_filename = image_url.split("/")[-1]
-            target_file = f"/tmp/images/{image_filename}"
-            with open(target_file, "wb") as f:
-                f.write(response.content)
-            print(f"Downloaded {image_url} to {target_file}")
+            try:
+                response = requests.get(image_url)
+                image_filename = image_url.split("/")[-1]
+                target_file = f"/tmp/images/{image_filename}"
+                with open(target_file, "wb") as f:
+                    f.write(response.content)
+                print(f"Downloaded {image_url} to {target_file}")
+            except requests_exceptions.MissingSchema:
+                print(f"{image_url} appears to be an invalid URL.")
+            except requests_exceptions.ConnectionError:
+                print(f"Could not connect to {image_url}.")
 
 
 get_pictures = PythonOperator(

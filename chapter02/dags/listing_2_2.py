@@ -16,7 +16,7 @@ dag = DAG(
 
 download_launches = BashOperator(
     task_id="download_launches",
-    bash_command="curl -o /tmp/launches.json 'https://launchlibrary.net/1.4/launch?next=5&mode=verbose'",  # noqa: E501
+    bash_command="curl -o /tmp/launches.json -L 'https://ll.thespacedevs.com/2.0.0/launch/upcoming'",  # noqa: E501
     dag=dag,
 )
 
@@ -28,7 +28,7 @@ def _get_pictures():
     # Download all pictures in launches.json
     with open("/tmp/launches.json") as f:
         launches = json.load(f)
-        image_urls = [launch["rocket"]["imageURL"] for launch in launches["launches"]]
+        image_urls = [launch["image"] for launch in launches["results"]]
         for image_url in image_urls:
             try:
                 response = requests.get(image_url)
