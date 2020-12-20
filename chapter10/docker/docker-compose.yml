@@ -20,6 +20,7 @@ x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
 services:
   postgres:
     image: postgres:12-alpine
+    container_name: chapter10_docker_postgres_1
     environment:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
@@ -34,6 +35,7 @@ services:
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-docker
+    container_name: chapter10_docker_init_1
     depends_on:
       - postgres
     networks:
@@ -47,6 +49,7 @@ services:
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-docker
+    container_name: chapter10_docker_webserver_1
     restart: always
     depends_on:
       - postgres
@@ -64,6 +67,7 @@ services:
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-docker
+    container_name: chapter10_docker_scheduler_1
     restart: always
     depends_on:
       - postgres
@@ -78,6 +82,7 @@ services:
   movielens:
     build: ../../chapter08/docker/movielens-api
     image: manning-airflow/movielens-api
+    container_name: chapter10_docker_movielens_1
     networks:
       - airflow
     ports:
@@ -91,10 +96,12 @@ services:
   movielens-fetch:
     build: images/movielens-fetch
     image: manning-airflow/movielens-fetch
+    container_name: chapter10_docker_movielens-fetch_1
     restart: "no"
   movielens-rank:
     build: images/movielens-rank
     image: manning-airflow/movielens-rank
+    container_name: chapter10_docker_movielens-rank_1
     restart: "no"
 
 networks:
@@ -103,3 +110,4 @@ networks:
 
 volumes:
   logs:
+    name: chapter10_docker_logs
