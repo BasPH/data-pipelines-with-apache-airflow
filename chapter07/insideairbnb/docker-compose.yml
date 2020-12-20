@@ -1,0 +1,102 @@
+version: '3'
+
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  # Airflow settings.
+  - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__STORE_DAG_CODE=True
+  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  - AIRFLOW_CONN_INSIDE_AIRBNB=postgres://insideairbnb:insideairbnb@insideairbnb:5432/insideairbnb
+  - AIRFLOW_CONN_LOCALS3=s3://secretaccess:secretkey@?host=locals3:9000
+
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+
+  init:
+    image: *airflow_image
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
+
+  webserver:
+    image: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler:
+    build:
+      context: airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+      - ./dags/custom:/opt/airflow/dags/custom
+      - ./dags/chapter7_insideairbnb_pythonoperator.py:/opt/airflow/dags/chapter7_insideairbnb_pythonoperator.py
+    environment: *airflow_environment
+    command: scheduler
+
+  insideairbnb:
+    build:
+      context: insideairbnb/
+    ports:
+      - "5433:5432"
+
+  locals3:
+    image: minio/minio:RELEASE.2020-01-03T19-12-21Z
+    ports:
+      - "9000:9000"
+    environment:
+      - MINIO_ACCESS_KEY=secretaccess
+      - MINIO_SECRET_KEY=secretkey
+    command: "server /data"
+    volumes:
+      - "locals3-data:/data"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  locals3_init:
+    image: minio/mc:RELEASE.2020-06-20T00-18-43Z
+    depends_on:
+      - locals3
+    entrypoint: >
+      /bin/sh -c "
+      while ! nc -z locals3 9000; do echo 'Waiting 1 sec for MinIO to be healthy...' && sleep 1; done;
+      echo 'MinIO is available.';
+      while ! /usr/bin/mc config host add locals3 http://locals3:9000 secretaccess secretkey; do echo 'MinIO not up and running yet...' && sleep 1; done;
+      echo 'Added mc host config.';
+      /usr/bin/mc mb locals3/inside-airbnb;
+      exit 0;
+      "
+
+volumes:
+  logs:
+  locals3-data:

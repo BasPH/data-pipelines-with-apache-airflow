@@ -3,7 +3,7 @@
 # Inspired by https://github.com/mrts/docker-postgresql-multiple-databases/blob/master/create-multiple-postgresql-databases.sh
 # DB names hardcoded, script is created for demo purposes.
 
-set -eu
+set -euxo pipefail
 
 function create_user_and_database() {
 	local database=$1
@@ -16,16 +16,11 @@ EOSQL
 }
 
 # 1. Create databases
-for dbname in "airflow" "insideairbnb"; do
-  create_user_and_database $dbname
-done
+create_user_and_database "insideairbnb"
 
 # 2. Create table for insideairbnb listings
-# We create two tables, one tmp and one final.
-# The tmp table will hold duplicate ids, and also a "download_date" column.
-# The final table with hold only the latest record per id.
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" insideairbnb <<-EOSQL
-CREATE TABLE IF NOT EXISTS listings_tmp(
+CREATE TABLE IF NOT EXISTS listings(
   id                             INTEGER,
   name                           TEXT,
   host_id                        INTEGER,
@@ -43,25 +38,6 @@ CREATE TABLE IF NOT EXISTS listings_tmp(
   calculated_host_listings_count INTEGER,
   availability_365               INTEGER,
   download_date                  DATE NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS listings(
-  id                             INTEGER,
-  name                           TEXT,
-  host_id                        INTEGER,
-  host_name                      VARCHAR(100),
-  neighbourhood_group            VARCHAR(100),
-  neighbourhood                  VARCHAR(100),
-  latitude                       NUMERIC(18,16),
-  longitude                      NUMERIC(18,16),
-  room_type                      VARCHAR(100),
-  price                          INTEGER,
-  minimum_nights                 INTEGER,
-  number_of_reviews              INTEGER,
-  last_review                    DATE,
-  reviews_per_month              NUMERIC(5,2),
-  calculated_host_listings_count INTEGER,
-  availability_365               INTEGER
 );
 EOSQL
 
@@ -130,21 +106,10 @@ do
   sed -i "2,$ s/$/,$d/" /tmp/insideairbnb/listing-$d.csv
 
   psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" insideairbnb <<-EOSQL
-    COPY listings_tmp
-    FROM '/tmp/insideairbnb/listing-$d.csv' DELIMITER ',' CSV HEADER QUOTE '"';
+    COPY listings FROM '/tmp/insideairbnb/listing-$d.csv' DELIMITER ',' CSV HEADER QUOTE '"';
 EOSQL
 done
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" insideairbnb <<-EOSQL
-INSERT INTO listings
-SELECT DISTINCT ON (id)
-  id, name, host_id, host_name, neighbourhood_group, neighbourhood, latitude, longitude, room_type, price, minimum_nights, number_of_reviews, last_review, reviews_per_month, calculated_host_listings_count, availability_365
-FROM listings_tmp
-ORDER BY id, download_date DESC;
-DROP TABLE listings_tmp;
-EOSQL
-
-# Somehow the database-specific privileges must be set AFTERWARDS
 function grant_all() {
 	local database=$1
 	psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" $database <<-EOSQL
@@ -156,8 +121,7 @@ function grant_all() {
 EOSQL
 }
 
-for dbname in "airflow" "insideairbnb"; do
-  grant_all $dbname
-done
+# Somehow the database-specific privileges must be set AFTERWARDS
+grant_all "insideairbnb"
 
 pg_ctl stop

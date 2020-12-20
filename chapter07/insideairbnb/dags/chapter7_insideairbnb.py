@@ -5,7 +5,7 @@ from airflow.providers.docker.operators.docker import DockerOperator
 from custom.postgres_to_s3_operator import PostgresToS3Operator
 
 dag = DAG(
-    dag_id="chapter9_insideairbnb",
+    dag_id="chapter7_insideairbnb",
     start_date=datetime(2015, 4, 5),
     end_date=datetime(2019, 12, 7),
     schedule_interval="@monthly",
@@ -30,8 +30,8 @@ crunch_numbers = DockerOperator(
     network_mode="host",
     environment={
         "S3_ENDPOINT": "localhost:9000",
-        "S3_ACCESS_KEY": "[insert access key]",
-        "S3_SECRET_KEY": "[insert secret key]",
+        "S3_ACCESS_KEY": "secretaccess",
+        "S3_SECRET_KEY": "secretkey",
     },
     dag=dag,
 )
