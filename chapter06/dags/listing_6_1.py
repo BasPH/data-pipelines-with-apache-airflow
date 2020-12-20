@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.sensors.filesystem import FileSensor
 
 dag = DAG(
-    dag_id="listing_6_1",
+    dag_id="listing_6_01",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data, demonstrating the FileSensor.",

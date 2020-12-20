@@ -5,7 +5,7 @@ from airflow import DAG
 from airflow.sensors.python import PythonSensor
 
 dag = DAG(
-    dag_id="listing_6_2",
+    dag_id="listing_6_02",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data.",

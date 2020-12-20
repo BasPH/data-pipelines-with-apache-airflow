@@ -9,7 +9,8 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
-  - AIRFLOW_CONN_GCP='google-cloud-platform://?extra__google_cloud_platform__keyfile_dict=${GCP_KEY}'
+#  - AIRFLOW_CONN_GCP='google-cloud-platform://?extra__google_cloud_platform__keyfile_dict=${GCP_KEY}'
+  - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
   - BIGQUERY_DATASET=${BIGQUERY_DATASET}
   - GCP_PROJECT=${GCP_PROJECT}
   - RATINGS_BUCKET=${RATINGS_BUCKET}
@@ -67,6 +68,14 @@ services:
       - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: scheduler
+
+  movielens:
+    build: ../chapter08/docker/movielens-api
+    ports:
+      - "5000:5000"
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
 
 volumes:
   logs:
