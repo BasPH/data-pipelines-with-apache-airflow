@@ -36,7 +36,7 @@ services:
       - airflow
   init:
     build:
-      context: docker/airflow-kubernetes
+      context: images/airflow-kubernetes
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-kubernetes
@@ -49,7 +49,7 @@ services:
     command: -c 'airflow db upgrade && sleep 5 && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
   webserver:
     build:
-      context: docker/airflow-kubernetes
+      context: images/airflow-kubernetes
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-kubernetes
@@ -66,7 +66,7 @@ services:
     command: webserver
   scheduler:
     build:
-      context: docker/airflow-kubernetes
+      context: images/airflow-kubernetes
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-kubernetes
@@ -82,7 +82,7 @@ services:
     environment: *airflow_environment
     command: scheduler
   movielens:
-    build: ../chapter08/docker/movielens-api
+    build: ../../chapter08/docker/movielens-api
     image: manning-airflow/movielens-api
     networks:
       - airflow
@@ -95,11 +95,11 @@ services:
   # These aren't actual services, but we include them to make sure that the
   # corresponding images are built by when pulling up docker-compose.
   movielens-fetch:
-    build: ../chapter10_1_docker/docker/movielens-fetch
+    build: ../docker/images/movielens-fetch
     image: manning-airflow/movielens-fetch:k8s
     restart: "no"
   movielens-rank:
-    build: ../chapter10_1_docker/docker/movielens-rank
+    build: ../docker/images/movielens-rank
     image: manning-airflow/movielens-rank:k8s
     restart: "no"
 
