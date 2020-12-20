@@ -7,8 +7,6 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
   - AIRFLOW__LOGGING__LOGGING_LEVEL=DEBUG
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
-  - AIRFLOW__CORE__STORE_DAG_CODE=True
-  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__SECRETS__BACKEND=airflow.contrib.secrets.hashicorp_vault.VaultBackend
   - AIRFLOW__SECRETS__BACKEND_KWARGS={"url":"http://vault:8200","token":"airflow","connections_path":"connections"}
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
