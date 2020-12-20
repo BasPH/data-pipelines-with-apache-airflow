@@ -6,7 +6,7 @@ from os import path
 
 import pandas as pd
 from airflow.models import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryExecuteQueryOperator,
@@ -63,7 +63,7 @@ fetch_ratings = PythonOperator(
         "gcp_conn_id": "gcp",
         "gcs_bucket": os.environ["RATINGS_BUCKET"],
     },
-    provide_context=True,
+    dag=dag
 )
 
 
