@@ -2,7 +2,7 @@ ARG AIRFLOW_BASE_IMAGE="apache/airflow:2.0.0-python3.8"
 FROM ${AIRFLOW_BASE_IMAGE}
 
 RUN pip install --user --no-cache-dir \
-    apache-airflow-providers-docker==1.0.0b2
+    apache-airflow-providers-docker==1.0.0
 
 # Note we need to run Airflow as root in this case, as Airflow needs to
 # have sufficient priviledges to access /var/run/docker.sock.

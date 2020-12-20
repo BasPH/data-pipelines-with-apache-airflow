@@ -26,6 +26,7 @@ x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
 services:
   postgres:
     image: postgres:12-alpine
+    container_name: chapter10_kubernetes_postgres_1
     environment:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
@@ -36,10 +37,11 @@ services:
       - airflow
   init:
     build:
-      context: docker/airflow-kubernetes
+      context: images/airflow-kubernetes
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-kubernetes
+    container_name: chapter10_kubernetes_init_1
     depends_on:
       - postgres
     networks:
@@ -49,10 +51,11 @@ services:
     command: -c 'airflow db upgrade && sleep 5 && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
   webserver:
     build:
-      context: docker/airflow-kubernetes
+      context: images/airflow-kubernetes
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-kubernetes
+    container_name: chapter10_kubernetes_webserver_1
     restart: always
     depends_on:
       - postgres
@@ -66,10 +69,11 @@ services:
     command: webserver
   scheduler:
     build:
-      context: docker/airflow-kubernetes
+      context: images/airflow-kubernetes
       args:
         AIRFLOW_BASE_IMAGE: *airflow_image
     image: manning-airflow/airflow-kubernetes
+    container_name: chapter10_kubernetes_scheduler_1
     restart: always
     depends_on:
       - postgres
@@ -82,8 +86,9 @@ services:
     environment: *airflow_environment
     command: scheduler
   movielens:
-    build: ../chapter08/docker/movielens-api
+    build: ../../chapter08/docker/movielens-api
     image: manning-airflow/movielens-api
+    container_name: chapter10_kubernetes_movielens_1
     networks:
       - airflow
     ports:
@@ -95,12 +100,14 @@ services:
   # These aren't actual services, but we include them to make sure that the
   # corresponding images are built by when pulling up docker-compose.
   movielens-fetch:
-    build: ../chapter10_1_docker/docker/movielens-fetch
+    build: ../docker/images/movielens-fetch
     image: manning-airflow/movielens-fetch:k8s
+    container_name: chapter10_kubernetes_movielens-fetch_1
     restart: "no"
   movielens-rank:
-    build: ../chapter10_1_docker/docker/movielens-rank
+    build: ../docker/images/movielens-rank
     image: manning-airflow/movielens-rank:k8s
+    container_name: chapter10_kubernetes_movielens-rank_1
     restart: "no"
 
 networks:
@@ -109,3 +116,4 @@ networks:
 
 volumes:
   logs:
+    name: chapter10_kubernetes_logs
