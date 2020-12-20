@@ -8,8 +8,6 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
-  - AIRFLOW__CORE__STORE_DAG_CODE=True
-  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__METRICS__STATSD_HOST=statsd_exporter
   - AIRFLOW__METRICS__STATSD_ON=True
   - AIRFLOW__METRICS__STATSD_PORT=9125
