@@ -19,7 +19,7 @@ dag = DAG(
 )
 
 
-def _get_data(year, month, day, hour, output_path, **_):
+def _get_data(year, month, day, hour, output_path):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
         f"{year}/{year}-{month:0>2}/pageviews-{year}{month:0>2}{day:0>2}-{hour:0>2}0000.gz"
@@ -46,7 +46,7 @@ extract_gz = BashOperator(
 )
 
 
-def _fetch_pageviews(pagenames, execution_date, **_):
+def _fetch_pageviews(pagenames, execution_date):
     result = dict.fromkeys(pagenames, 0)
     with open("/tmp/wikipageviews", "r") as f:
         for line in f:

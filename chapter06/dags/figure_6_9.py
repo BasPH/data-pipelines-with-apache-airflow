@@ -6,11 +6,10 @@ from airflow.operators.dummy import DummyOperator
 from airflow.sensors.python import PythonSensor
 
 dag = DAG(
-    dag_id="figure_6_9",
-    start_date=airflow.utils.dates.days_ago(3),
+    dag_id="figure_6_09",
+    start_date=airflow.utils.dates.days_ago(14),
     schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data, demonstrating the PythonSensor.",
-    default_args={"depends_on_past": True},
 )
 
 create_metrics = DummyOperator(task_id="create_metrics", dag=dag)
