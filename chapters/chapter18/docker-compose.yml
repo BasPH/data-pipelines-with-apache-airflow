@@ -3,6 +3,7 @@ version: '3.7'
 # ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
 x-environment: &airflow_environment
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  - AIRFLOW__CORE__FERNET_KEY=y92Y_MlwZQVzK1ip4YantMUXaLBlE9VMURXVLmjOrR4=
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
   - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
@@ -10,11 +11,14 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
   - AIRFLOW__WEBSERVER__RBAC=True
-  - AIRFLOW_CONN_GCP='google-cloud-platform://?extra__google_cloud_platform__keyfile_dict=${GCP_KEY}'
+#  - AIRFLOW_CONN_GCP=google-cloud-platform://?extra__google_cloud_platform__keyfile_dict=${GCP_KEY}
+  - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
   - BIGQUERY_DATASET=${BIGQUERY_DATASET}
   - GCP_PROJECT=${GCP_PROJECT}
   - RATINGS_BUCKET=${RATINGS_BUCKET}
   - RESULT_BUCKET=${RESULT_BUCKET}
+
+x-airflow-image: &airflow_image apache/airflow:1.10.12-python3.8
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
@@ -28,7 +32,10 @@ services:
       - "5432:5432"
 
   initdb_adduser:
-    image: apache/airflow:1.10.11-python3.7
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     depends_on:
       - postgres
     environment: *airflow_environment
@@ -38,7 +45,10 @@ services:
     command: -c 'airflow initdb && sleep 5 && airflow create_user --role Admin --username airflow --password airflow -e airflow@airflow.com -f airflow -l airflow'
 
   webserver:
-    image: apache/airflow:1.10.11-python3.7
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -50,7 +60,10 @@ services:
     command: webserver
 
   scheduler:
-    image: apache/airflow:1.10.11-python3.7
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
     restart: always
     depends_on:
       - postgres
@@ -60,6 +73,14 @@ services:
       - logs:/opt/airflow/logs
     environment: *airflow_environment
     command: scheduler
+
+  movielens:
+    build: ../chapter08/docker/movielens-api
+    ports:
+      - "5000:5000"
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
 
 volumes:
   logs:
