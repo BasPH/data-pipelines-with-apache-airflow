@@ -7,9 +7,15 @@ from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.sensors.python import PythonSensor
 
 dag1 = DAG(
-    dag_id="listing_6_04_dag01", start_date=airflow.utils.dates.days_ago(3), schedule_interval="0 16 * * *"
+    dag_id="listing_6_04_dag01",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval="0 16 * * *",
 )
-dag2 = DAG(dag_id="listing_6_04_dag02", start_date=airflow.utils.dates.days_ago(3), schedule_interval=None)
+dag2 = DAG(
+    dag_id="listing_6_04_dag02",
+    start_date=airflow.utils.dates.days_ago(3),
+    schedule_interval=None,
+)
 
 
 def _wait_for_supermarket(supermarket_id_):

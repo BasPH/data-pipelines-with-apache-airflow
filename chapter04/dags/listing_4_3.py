@@ -14,7 +14,5 @@ def _print_context(**kwargs):
 
 
 print_context = PythonOperator(
-    task_id="print_context",
-    python_callable=_print_context,
-    dag=dag,
+    task_id="print_context", python_callable=_print_context, dag=dag
 )

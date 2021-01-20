@@ -12,8 +12,12 @@ from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryExecuteQueryOperator,
     BigQueryDeleteTableOperator,
 )
-from airflow.providers.google.cloud.transfers.bigquery_to_gcs import BigQueryToGCSOperator
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.google.cloud.transfers.bigquery_to_gcs import (
+    BigQueryToGCSOperator,
+)
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import (
+    GCSToBigQueryOperator,
+)
 from custom.hooks import MovielensHook
 
 dag = DAG(
@@ -63,7 +67,7 @@ fetch_ratings = PythonOperator(
         "gcp_conn_id": "gcp",
         "gcs_bucket": os.environ["RATINGS_BUCKET"],
     },
-    dag=dag
+    dag=dag,
 )
 
 
