@@ -1,0 +1,124 @@
+version: '3.7'
+
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/1
+  - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__METRICS__STATSD_HOST=statsd_exporter
+  - AIRFLOW__METRICS__STATSD_ON=True
+  - AIRFLOW__METRICS__STATSD_PORT=9125
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+
+  init:
+    image: *airflow_image
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
+
+  webserver:
+    image: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler:
+    image: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+      - ./dags:/opt/airflow/dags
+    environment: *airflow_environment
+    command: scheduler
+
+  # docker-compose -f docker-compose-celeryexecutor.yml up --scale worker=3 -d
+  worker:
+    image: *airflow_image
+    restart: always
+    depends_on:
+      - scheduler
+    volumes:
+      - logs:/opt/airflow/logs
+      - ./dags:/opt/airflow/dags
+    environment: *airflow_environment
+    command: celery worker
+
+  flower:
+    image: *airflow_image
+    restart: always
+    depends_on:
+      - worker
+    ports:
+      - "5555:5555"
+    environment: *airflow_environment
+    command: celery flower
+
+  statsd_exporter:
+    image: prom/statsd-exporter:v0.18.0
+    restart: always
+    volumes:
+      - ./files/statsd_mapping.yml:/tmp/statsd_mapping.yml
+    ports:
+      - "9102:9102"
+      - "9125:9125/udp"
+    command: --statsd.mapping-config=/tmp/statsd_mapping.yml
+
+  prometheus:
+    image: prom/prometheus:v2.22.0
+    restart: always
+    volumes:
+      - ./files/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    command:
+      - --web.enable-admin-api
+      - --web.enable-lifecycle
+      # Flags below are defaults, but must be added explicitly, otherwise would be overridden by flags above
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+
+  grafana:
+    image: grafana/grafana:7.2.1
+    restart: always
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: redis:5-alpine
+
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.5.2-alpine
+    ports:
+      - "9121:9121"
+    command: --redis.addr=redis://redis:6379
+
+volumes:
+  logs:

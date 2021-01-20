@@ -1,0 +1,79 @@
+version: '3.7'
+
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+#  - AIRFLOW_CONN_GCP='google-cloud-platform://?extra__google_cloud_platform__keyfile_dict=${GCP_KEY}'
+  - AIRFLOW_CONN_MOVIELENS=http://airflow:airflow@movielens
+  - BIGQUERY_DATASET=${BIGQUERY_DATASET}
+  - GCP_PROJECT=${GCP_PROJECT}
+  - RATINGS_BUCKET=${RATINGS_BUCKET}
+  - RESULT_BUCKET=${RESULT_BUCKET}
+
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+
+  initdb_adduser:
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
+
+  webserver:
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler:
+    build:
+      context: docker/airflow-gcp
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: scheduler
+
+  movielens:
+    build: ../chapter08/docker/movielens-api
+    ports:
+      - "5000:5000"
+    environment:
+      API_USER: airflow
+      API_PASSWORD: airflow
+
+volumes:
+  logs:

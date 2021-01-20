@@ -1,0 +1,167 @@
+version: '3.7'
+
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=False
+  - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  - AIRFLOW__CORE__FERNET_KEY=hCRoPUYBO27QiEg1MRu5hSjLG7yNd8y8XKlm-8kRlkQ=
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__STORE_DAG_CODE=True
+  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  - AIRFLOW_CONN_S3=s3://@?host=http://minio:9000&aws_access_key_id=AKIAIOSFODNN7EXAMPLE&aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  - AIRFLOW_CONN_CITIBIKE=http://citibike:cycling@citibike_api:5000
+  - AIRFLOW_CONN_TAXI=http://taxi_fileserver
+  - AIRFLOW_CONN_RESULT_DB=postgresql://nyc:tr4N5p0RT4TI0N@result_db:5432/nyctransportation
+
+x-airflow-image: &airflow_image apache/airflow:2.0.0-python3.8
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+
+  initdb_adduser:
+    build:
+      context: ./services/airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
+
+  webserver:
+    build:
+      context: ./services/airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler:
+    build:
+      context: ./services/airflow
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/nyctransport/src
+      - ./setup.py:/opt/airflow/nyctransport/setup.py
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    entrypoint: ["/bin/sh"]
+    command: ["-c", "pip install --user -e /opt/airflow/nyctransport && airflow scheduler"]
+
+  taxi_fileserver:
+    build:
+      context: ./services/taxi_fileserver
+    environment:
+      - POSTGRES_HOST=taxi_db
+      - POSTGRES_PORT=5433
+      - POSTGRES_USERNAME=taxi
+      - POSTGRES_PASSWORD=ridetlc
+      - POSTGRES_DATABASE=tlctriprecords
+      - DATA_YEAR=2019
+    depends_on:
+      - taxi_db
+    ports:
+      - "8081:80"
+
+  taxi_db:
+    build:
+      context: ./services/taxi_db
+    ports:
+      - "5433:5432"
+
+  citibike_api:
+    build:
+      context: ./services/citibike_api
+    environment:
+      - POSTGRES_HOST=citibike_db
+      - POSTGRES_PORT=5434
+      - POSTGRES_USERNAME=citi
+      - POSTGRES_PASSWORD=cycling
+      - POSTGRES_DATABASE=citibike
+      - DATA_YEAR=2019
+    depends_on:
+      - citibike_db
+    ports:
+      - "8082:5000"
+
+  citibike_db:
+    build:
+      context: ./services/citibike_db
+    ports:
+      - "5434:5432"
+
+  minio:
+    image: minio/minio:RELEASE.2020-06-22T03-12-50Z
+    volumes:
+      - s3:/data
+    ports:
+      - "9000:9000"
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+  minio_init:
+    image: minio/mc:RELEASE.2020-06-20T00-18-43Z
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      while ! nc -z minio 9000; do echo 'Waiting 1 sec for MinIO to be healthy...' && sleep 1; done;
+      echo 'MinIO is available.';
+      while ! /usr/bin/mc config host add minio http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY; do echo 'MinIO not up and running yet...' && sleep 1; done;
+      echo 'Added mc host config.';
+      /usr/bin/mc mb minio/datalake;
+      exit 0;
+      "
+
+  result_db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=nyc
+      - POSTGRES_PASSWORD=tr4N5p0RT4TI0N
+      - POSTGRES_DB=nyctransportation
+    volumes:
+    - ./services/result_db/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    ports:
+      - "5435:5432"
+
+  nyc_transportation_api:
+    build:
+      context: ./services/nyc_transportation_api
+    environment:
+      - POSTGRES_HOST=result_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=nyc
+      - POSTGRES_PASSWORD=tr4N5p0RT4TI0N
+      - POSTGRES_DATABASE=nyctransportation
+    ports:
+      - "8083:5000"
+
+volumes:
+  logs:
+  s3:
