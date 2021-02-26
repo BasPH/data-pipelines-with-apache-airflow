@@ -1,0 +1,48 @@
+version: '3'
+services:
+  postgres:
+    image: postgres_insideairbnb
+    container_name: postgres
+    ports:
+      - "5432:5432"
+
+  locals3:
+    image: minio/minio:RELEASE.2020-01-03T19-12-21Z
+    container_name: locals3
+    ports:
+      - "9000:9000"
+    environment:
+      - MINIO_ACCESS_KEY=secretaccess
+      - MINIO_SECRET_KEY=secretkey
+    command: "server /data"
+    volumes:
+      - "locals3-data:/data"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  airflow:
+    image: airflowbook/airflow
+    container_name: airflow
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
+      - AIRFLOW__WEBSERVER__DAG_DEFAULT_VIEW=graph
+      - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
+      - AIRFLOW_CONN_INSIDE_AIRBNB=postgres://insideairbnb:insideairbnb@postgres:5432/insideairbnb
+      - AIRFLOW_CONN_LOCALS3=s3://secretaccess:secretkey@?host=http://localhost:9000
+    ports:
+      - "8082:8080"
+    volumes:
+      - ..:/root/airflow/dags
+    working_dir: /root/airflow
+
+volumes:
+  locals3-data:
