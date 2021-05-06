@@ -20,8 +20,8 @@ fetch_events = BashOperator(
         "mkdir -p /data/events && "
         "curl -o /data/events.json "
         "http://events_api:5000/events?"
-        "start_date={{execution_date.strftime('%Y-%m-%d')}}&"
-        "end_date={{next_execution_date.strftime('%Y-%m-%d')}}"
+        "start_date={{execution_date.strftime('%Y-%m-%d')}}&"     # @NOTE Formatted execution_date inserted with Jinja templating
+        "end_date={{next_execution_date.strftime('%Y-%m-%d')}}"   # @NOTE next_execution_date holds the execution date of the next interval.
     ),
     dag=dag,
 )

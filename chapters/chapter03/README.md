@@ -15,7 +15,9 @@ This code example contains the following DAGs:
 - 07_templated_query.py - Replaces hard-coded dates with templated execution dates.
 - 08_templated_query_ds.py - Uses shorthands for the templated execution dates.
 - 09_templated_path.py - Uses templating for the file paths as well.
-- 10_full_example.py - Filly completed example, including 'sending' of statistics.
+- 10_no_cathch_up.py - Disable catchup in DAG
+- 11_non_atomic_send.py - Example of non atomic task
+- 12_atomic_send.py - Example of atomic task
 
 ## Usage
 

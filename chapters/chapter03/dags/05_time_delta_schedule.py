@@ -9,7 +9,9 @@ from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
     dag_id="05_time_delta_schedule",
-    schedule_interval=timedelta(days=3),
+    schedule_interval=timedelta(days=3),                # @NOTE This would result in our DAG being run every 
+                                                        # three days following the start date 
+                                                        # on the 4th, 7th, 10th, and so on of January 2019
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
 )

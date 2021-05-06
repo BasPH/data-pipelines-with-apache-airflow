@@ -1,15 +1,15 @@
 import datetime as dt
-from datetime import timedelta
 from pathlib import Path
 
 import pandas as pd
+
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="10_full_example",
-    schedule_interval=timedelta(days=3),
+    dag_id="11_non_atomic_send",
+    schedule_interval="@daily",
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
     catchup=True,
@@ -39,6 +39,15 @@ def _calculate_stats(**context):
     Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
+    _email_stats(stats, email="user@example.com")                   # @NOTE Sending an email after writing to CSV 
+                                                                    # creates two pieces of work in a single function, 
+                                                                    # which breaks the atomicity of the task.
+
+
+def _email_stats(stats, email):
+    """Send an email..."""
+    print(f"Sending stats to {email}...")
+
 
 calculate_stats = PythonOperator(
     task_id="calculate_stats",
@@ -51,24 +60,4 @@ calculate_stats = PythonOperator(
     dag=dag,
 )
 
-
-def email_stats(stats, email):
-    """Send an email..."""
-    print(f"Sending stats to {email}...")
-
-
-def _send_stats(email, **context):
-    stats = pd.read_csv(context["templates_dict"]["stats_path"])
-    email_stats(stats, email=email)
-
-
-send_stats = PythonOperator(
-    task_id="send_stats",
-    python_callable=_send_stats,
-    op_kwargs={"email": "user@example.com"},
-    templates_dict={"stats_path": "/data/stats/{{ds}}.csv"},
-    provide_context=True,
-    dag=dag,
-)
-
-fetch_events >> calculate_stats >> send_stats
+fetch_events >> calculate_stats

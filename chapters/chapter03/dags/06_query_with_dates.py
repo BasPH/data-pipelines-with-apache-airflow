@@ -21,7 +21,12 @@ fetch_events = BashOperator(
         "curl -o /data/events.json "
         "http://events_api:5000/events?"
         "start_date=2019-01-01&"
-        "end_date=2019-01-02"
+        "end_date=2019-01-02"                  # @NOTE These date parameters indicate the time range 
+                                               # for which we would like to fetch events. 
+                                               # Note that in this example start_date is inclusive, 
+                                               # while end_date is exclusive, meaning we are effectively 
+                                               # fetching events that occur between 
+                                               # 2019-01-01 00:00:00 and 2019-01-01 23:59:59.
     ),
     dag=dag,
 )

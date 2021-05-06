@@ -1,29 +1,28 @@
 import datetime as dt
-from datetime import timedelta
 from pathlib import Path
 
 import pandas as pd
+
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 dag = DAG(
-    dag_id="09_templated_path",
-    schedule_interval=timedelta(days=3),
+    dag_id="10_no_catchup",
+    schedule_interval="@daily",
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
+    catchup=False,                                      # @NOTE Disabling catchup to avoid running past runs
+                                                        # With this setting, the DAG will only be run for 
+                                                        # the most recent schedule interval rather than 
+                                                        # executing all open past interval
 )
 
 fetch_events = BashOperator(
     task_id="fetch_events",
     bash_command=(
         "mkdir -p /data/events && "
-        "curl -o /data/events/{{ds}}.json "   # @NOTE we will have:
-                                              # /data/events/2019-01-01.json
-                                              # /data/events/2019-01-02.json
-                                              # /data/events/2019-01-03.json
-                                              # /data/events/2019-01-04.json
-                                              # ...
+        "curl -o /data/events/{{ds}}.json "
         "http://events_api:5000/events?"
         "start_date={{ds}}&"
         "end_date={{next_ds}}"
@@ -32,9 +31,9 @@ fetch_events = BashOperator(
 )
 
 
-def _calculate_stats(**context):                                       # @NOTE Receive all context variables in this dict
+def _calculate_stats(**context):
     """Calculates event statistics."""
-    input_path = context["templates_dict"]["input_path"]               # @NOTE Retrieve the templated values from the templates_dict object.
+    input_path = context["templates_dict"]["input_path"]
     output_path = context["templates_dict"]["output_path"]
 
     events = pd.read_json(input_path)
@@ -48,7 +47,7 @@ calculate_stats = PythonOperator(
     task_id="calculate_stats",
     python_callable=_calculate_stats,
     templates_dict={
-        "input_path": "/data/events/{{ds}}.json",     # @NOTE Pass the values that we want to be templated.
+        "input_path": "/data/events/{{ds}}.json",
         "output_path": "/data/stats/{{ds}}.csv",
     },
     provide_context=True,

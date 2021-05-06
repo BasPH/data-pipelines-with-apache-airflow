@@ -20,8 +20,8 @@ fetch_events = BashOperator(
         "mkdir -p /data/events && "
         "curl -o /data/events.json "
         "http://events_api:5000/events?"
-        "start_date={{ds}}&"
-        "end_date={{next_ds}}"
+        "start_date={{ds}}&"                  # @NOTE ds provides YYYY- MM-DD formatted execution_date.
+        "end_date={{next_ds}}"                # @NOTE next_ds provides the same for next_ execution_date
     ),
     dag=dag,
 )
