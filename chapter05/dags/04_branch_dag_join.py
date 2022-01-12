@@ -55,7 +55,7 @@ with DAG(
         task_id="clean_sales_new", python_callable=_clean_sales_new
     )
 
-    join_erp = DummyOperator(task_id="join_erp_branch", trigger_rule="none_failed")
+    join_erp_branch = DummyOperator(task_id="join_erp_branch", trigger_rule="none_failed")
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
     clean_weather = DummyOperator(task_id="clean_weather")
@@ -68,7 +68,7 @@ with DAG(
     pick_erp_system >> [fetch_sales_old, fetch_sales_new]
     fetch_sales_old >> clean_sales_old
     fetch_sales_new >> clean_sales_new
-    [clean_sales_old, clean_sales_new] >> join_erp
+    [clean_sales_old, clean_sales_new] >> join_erp_branch
     fetch_weather >> clean_weather
-    [join_erp, clean_weather] >> join_datasets
+    [join_erp_branch, clean_weather] >> join_datasets
     join_datasets >> train_model >> deploy_model
