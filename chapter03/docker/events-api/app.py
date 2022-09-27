@@ -48,7 +48,7 @@ def _generate_events_for_day(date):
 
 
 app = Flask(__name__)
-app.config["events"] = _generate_events(end_date=date(year=2019, month=1, day=5))
+app.config["events"] = _generate_events(end_date=date.today())
 
 
 @app.route("/events")
