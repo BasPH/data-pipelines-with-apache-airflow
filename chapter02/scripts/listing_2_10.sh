@@ -12,7 +12,7 @@ docker run \
 -ti \
 -p 8080:8080 \
 -v ${SCRIPT_DIR}/../dags/download_rocket_launches.py:/opt/airflow/dags/download_rocket_launches.py \
---name airflow
+--name airflow \
 --entrypoint=/bin/bash \
 apache/airflow:2.0.0-python3.8 \
 -c '( \
