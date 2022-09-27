@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
+import airflow
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -9,8 +10,8 @@ from airflow.operators.python import PythonOperator
 dag = DAG(
     dag_id="02_daily_schedule",
     schedule_interval="@daily",
-    start_date=datetime(2019, 1, 1),
-    end_date=datetime(2019, 1, 5),
+    start_date=airflow.utils.dates.days_ago(14),
+    end_date=datetime.now() + timedelta(days=14),
 )
 
 fetch_events = BashOperator(
