@@ -1,26 +1,25 @@
-"""DAG demonstrating the umbrella use case with dummy operators."""
+"""DAG demonstrating the umbrella use case with empty operators."""
 
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
-from airflow.operators.dummy import DummyOperator
+from airflow.operators.empty import EmptyOperator
 
-dag = DAG(
+with DAG(
     dag_id="01_umbrella",
-    description="Umbrella example with DummyOperators.",
-    start_date=airflow.utils.dates.days_ago(5),
-    schedule_interval="@daily",
-)
+    description="Umbrella example with EmptyOperators.",
+    start_date=pendulum.today("UTC").add(days=-5),
+    schedule="@daily",
+):
+    fetch_weather_forecast = EmptyOperator(task_id="fetch_weather_forecast")
+    fetch_sales_data = EmptyOperator(task_id="fetch_sales_data")
+    clean_forecast_data = EmptyOperator(task_id="clean_forecast_data")
+    clean_sales_data = EmptyOperator(task_id="clean_sales_data")
+    join_datasets = EmptyOperator(task_id="join_datasets")
+    train_ml_model = EmptyOperator(task_id="train_ml_model")
+    deploy_ml_model = EmptyOperator(task_id="deploy_ml_model")
 
-fetch_weather_forecast = DummyOperator(task_id="fetch_weather_forecast", dag=dag)
-fetch_sales_data = DummyOperator(task_id="fetch_sales_data", dag=dag)
-clean_forecast_data = DummyOperator(task_id="clean_forecast_data", dag=dag)
-clean_sales_data = DummyOperator(task_id="clean_sales_data", dag=dag)
-join_datasets = DummyOperator(task_id="join_datasets", dag=dag)
-train_ml_model = DummyOperator(task_id="train_ml_model", dag=dag)
-deploy_ml_model = DummyOperator(task_id="deploy_ml_model", dag=dag)
-
-# Set dependencies between all tasks
-fetch_weather_forecast >> clean_forecast_data
-fetch_sales_data >> clean_sales_data
-[clean_forecast_data, clean_sales_data] >> join_datasets
-join_datasets >> train_ml_model >> deploy_ml_model
+    # Set dependencies between all tasks
+    fetch_weather_forecast >> clean_forecast_data
+    fetch_sales_data >> clean_sales_data
+    [clean_forecast_data, clean_sales_data] >> join_datasets
+    join_datasets >> train_ml_model >> deploy_ml_model
