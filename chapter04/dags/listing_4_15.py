@@ -46,8 +46,7 @@ with DAG(
     )
 
     extract_gz = BashOperator(
-        task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz", dag=dag
-    )
+        task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz")
 
 
     fetch_pageviews = PythonOperator(

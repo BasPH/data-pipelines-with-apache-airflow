@@ -14,7 +14,4 @@ with DAG(
     schedule_interval="@hourly"
 ):
 
-
-    print_context = PythonOperator(
-        task_id="print_context", python_callable=_print_context, dag=dag
-    )
+    print_context = PythonOperator(task_id="print_context", python_callable=_print_context)
