@@ -1,14 +1,48 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 'v2.3.0'
+    rev: v3.4.0
     hooks:
-      - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/psf/black
-    rev: '19.3b0'
+      - id: check-json
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+        args: [--unsafe]
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: no-commit-to-branch
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.931
     hooks:
-      - id: black
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: '3.8.4'  # pick a git hash / tag to point to
+      - id: mypy
+        additional_dependencies:
+            - "types-PyYAML>=6.0"
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.12.0
     hooks:
-      - id: flake8
+      - id: isort
+        additional_dependencies: [toml]
+        name: Sort imports using isort
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.1.3'
+    hooks:
+      - id: ruff
+      - id: ruff-format
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.7.4
+    hooks:
+      - id: pyupgrade
+        name: Check for code that can use new Python features
+        args: [--py38-plus]
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.1.3
+    hooks:
+      - id: python-safety-dependencies-check
+        name: Check for vulnerable dependencies
+  - repo: https://github.com/hukkinj1/mdformat
+    rev: 0.7.1
+    hooks:
+      - id: mdformat
+        name: Format Markdown files

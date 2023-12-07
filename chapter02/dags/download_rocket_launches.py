@@ -1,25 +1,12 @@
 import json
 import pathlib
 
-import airflow.utils.dates
+import pendulum
 import requests
 import requests.exceptions as requests_exceptions
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-
-dag = DAG(
-    dag_id="download_rocket_launches",
-    description="Download rocket pictures of recently launched rockets.",
-    start_date=airflow.utils.dates.days_ago(14),
-    schedule_interval="@daily",
-)
-
-download_launches = BashOperator(
-    task_id="download_launches",
-    bash_command="curl -o /tmp/launches.json -L 'https://ll.thespacedevs.com/2.0.0/launch/upcoming'",  # noqa: E501
-    dag=dag,
-)
 
 
 def _get_pictures():
@@ -44,14 +31,22 @@ def _get_pictures():
                 print(f"Could not connect to {image_url}.")
 
 
-get_pictures = PythonOperator(
-    task_id="get_pictures", python_callable=_get_pictures, dag=dag
-)
+with DAG(
+    dag_id="download_rocket_launches",
+    description="Download rocket pictures of recently launched rockets.",
+    start_date=pendulum.today("UTC").add(days=-14),
+    schedule="@daily",
+):
+    download_launches = BashOperator(
+        task_id="download_launches",
+        bash_command="curl -o /tmp/launches.json -L 'https://ll.thespacedevs.com/2.0.0/launch/upcoming'",  # noqa: E501
+    )
 
-notify = BashOperator(
-    task_id="notify",
-    bash_command='echo "There are now $(ls /tmp/images/ | wc -l) images."',
-    dag=dag,
-)
+    get_pictures = PythonOperator(task_id="get_pictures", python_callable=_get_pictures)
 
-download_launches >> get_pictures >> notify
+    notify = BashOperator(
+        task_id="notify",
+        bash_command='echo "There are now $(ls /tmp/images/ | wc -l) images."',
+    )
+
+    download_launches >> get_pictures >> notify

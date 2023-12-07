@@ -1,15 +1,8 @@
 from urllib import request
 
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-
-dag = DAG(
-    dag_id="listing_4_13",
-    start_date=airflow.utils.dates.days_ago(1),
-    schedule_interval="@hourly",
-)
-
 
 def _get_data(year, month, day, hour, output_path, **_):
     url = (
@@ -18,16 +11,19 @@ def _get_data(year, month, day, hour, output_path, **_):
     )
     request.urlretrieve(url, output_path)
 
-
-get_data = PythonOperator(
-    task_id="get_data",
-    python_callable=_get_data,
-    op_kwargs={
-        "year": "{{ execution_date.year }}",
-        "month": "{{ execution_date.month }}",
-        "day": "{{ execution_date.day }}",
-        "hour": "{{ execution_date.hour }}",
-        "output_path": "/tmp/wikipageviews.gz",
-    },
-    dag=dag,
-)
+with DAG(
+    dag_id="listing_4_13",
+    start_date=pendulum.today("UTC").add(days=-1),
+    schedule="@hourly",
+):
+    get_data = PythonOperator(
+        task_id="get_data",
+        python_callable=_get_data,
+        op_kwargs={
+            "year": "{{ execution_date.year }}",
+            "month": "{{ execution_date.month }}",
+            "day": "{{ execution_date.day }}",
+            "hour": "{{ execution_date.hour }}",
+            "output_path": "/tmp/wikipageviews.gz",
+        },
+    )

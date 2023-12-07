@@ -1,5 +1,0 @@
-[flake8]
-max-line-length = 88
-ignore = E203,E501
-per-file-ignores =
-    chapter18/dags/gcp.py:W503

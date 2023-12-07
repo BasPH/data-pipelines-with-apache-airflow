@@ -1,15 +1,8 @@
 from urllib import request
 
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-
-dag = DAG(
-    dag_id="listing_4_05",
-    start_date=airflow.utils.dates.days_ago(1),
-    schedule_interval="@hourly",
-)
-
 
 def _get_data(execution_date):
     year, month, day, hour, *_ = execution_date.timetuple()
@@ -21,4 +14,10 @@ def _get_data(execution_date):
     request.urlretrieve(url, output_path)
 
 
-get_data = PythonOperator(task_id="get_data", python_callable=_get_data, dag=dag)
+with DAG(
+    dag_id="listing_4_05",
+    start_date=pendulum.today("UTC").add(days=-1),
+    schedule_interval="@hourly",
+):
+
+    get_data = PythonOperator(task_id="get_data", python_callable=_get_data)

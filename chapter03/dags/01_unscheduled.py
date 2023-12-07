@@ -6,20 +6,6 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 
-dag = DAG(
-    dag_id="01_unscheduled", start_date=datetime(2019, 1, 1), schedule_interval=None
-)
-
-fetch_events = BashOperator(
-    task_id="fetch_events",
-    bash_command=(
-        "mkdir -p /data/events && "
-        "curl -o /data/events.json http://events_api:5000/events"
-    ),
-    dag=dag,
-)
-
-
 def _calculate_stats(input_path, output_path):
     """Calculates event statistics."""
 
@@ -31,11 +17,23 @@ def _calculate_stats(input_path, output_path):
     stats.to_csv(output_path, index=False)
 
 
-calculate_stats = PythonOperator(
-    task_id="calculate_stats",
-    python_callable=_calculate_stats,
-    op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv"},
-    dag=dag,
-)
+with DAG(
+    dag_id="01_unscheduled", start_date=datetime(2019, 1, 1), schedule=None
+):
 
-fetch_events >> calculate_stats
+    fetch_events = BashOperator(
+        task_id="fetch_events",
+        bash_command=(
+            "mkdir -p /data/events && "
+            "curl -o /data/events.json http://events_api:5000/events"
+        ),
+    )
+
+
+    calculate_stats = PythonOperator(
+        task_id="calculate_stats",
+        python_callable=_calculate_stats,
+        op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv"},
+    )
+
+    fetch_events >> calculate_stats
