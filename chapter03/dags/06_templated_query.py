@@ -21,8 +21,8 @@ def _calculate_stats(input_path, output_path):
 with DAG(
     dag_id="06_templated_query",
     schedule_interval="@daily",
-    start_date=dt.datetime(year=2019, month=1, day=1),
-    end_date=dt.datetime(year=2019, month=1, day=5),
+    start_date=datetime(year=2019, month=1, day=1),
+    end_date=datetime(year=2019, month=1, day=5),
 ):
 
     fetch_events = BashOperator(

@@ -18,7 +18,7 @@ def _calculate_stats(input_path, output_path):
 
 
 with DAG(
-    dag_id="01_unscheduled", start_date=datetime(2019, 1, 1), schedule=None
+    dag_id="01_unscheduled", start_date=datetime(2024, 1, 1), schedule=None
 ):
 
     fetch_events = BashOperator(

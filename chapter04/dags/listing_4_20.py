@@ -8,9 +8,9 @@ import pendulum
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-from airflow.providers.postgres.operators import PostgresOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 
-def _get_data(year, month, day, hour, output_path):
+def _get_data(year, month, day, hour, output_path, **_):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
         f"{year}/{year}-{month:0>2}/pageviews-{year}{month:0>2}{day:0>2}-{hour:0>2}0000.gz"

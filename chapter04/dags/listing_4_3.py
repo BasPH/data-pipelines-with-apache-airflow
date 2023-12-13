@@ -1,12 +1,10 @@
 import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-
+from pprint import pprint
 
 def _print_context(**kwargs):
-    print(kwargs)
-
-
+    pprint(kwargs)
 
 with DAG(
     dag_id="listing_4_03",
