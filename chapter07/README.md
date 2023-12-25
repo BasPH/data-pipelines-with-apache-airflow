@@ -1,4 +1,4 @@
-# Chapter 9
+# Chapter 7
 
 Code accompanying Chapter 9 of the book 'Data pipelines with Apache Airflow'.
 
@@ -6,7 +6,7 @@ Code accompanying Chapter 9 of the book 'Data pipelines with Apache Airflow'.
 
 This code example contains the following DAGs:
 
-- chapter9 - Small DAG illustrating the postgres-to-s3 operator.
+- chapter7 - Small DAG illustrating the postgres-to-s3 operator.
 
 ## Usage
 
