@@ -8,6 +8,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 
 
+
 def _calculate_stats(**context):
     """Calculates event statistics."""
     input_path = context["templates_dict"]["input_path"]
@@ -19,18 +20,21 @@ def _calculate_stats(**context):
     Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
-    _email_stats(stats, email="user@example.com")
 
-
-def _email_stats(stats, email):
+def email_stats(stats, email):
     """Send an email..."""
-    print(f"Sending stats to {email}...")
+    print(f"Sending stats to {email}...{stats}")
+
+
+def _send_stats(email, **context):
+    stats = pd.read_csv(context["templates_dict"]["stats_path"])
+    email_stats(stats, email=email)
 
 
 
 with DAG(
-    dag_id="10_non_atomic_send",
-    schedule="@daily",
+    dag_id="14_atomic_send",
+    schedule_interval="@daily",
     start_date=datetime(year=2019, month=1, day=1),
     end_date=datetime(year=2019, month=1, day=5),
     catchup=True,
@@ -56,4 +60,11 @@ with DAG(
         },
     )
 
-    fetch_events >> calculate_stats
+    send_stats = PythonOperator(
+        task_id="send_stats",
+        python_callable=_send_stats,
+        op_kwargs={"email": "user@example.com"},
+        templates_dict={"stats_path": "/data/stats/{{ds}}.csv"},
+    )
+
+    fetch_events >> calculate_stats >> send_stats

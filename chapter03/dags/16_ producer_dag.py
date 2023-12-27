@@ -39,7 +39,7 @@ def fetch_new_launches():
        raise AirflowSkipException("No new launches")
 
 with DAG(
-    dag_id="01_fetch_launches_producer", 
+    dag_id="16_fetch_launches_producer", 
     schedule="* * * * * ",
     start_date=datetime.now(),
     catchup=False,

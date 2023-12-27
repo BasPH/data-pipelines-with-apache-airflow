@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import timedelta, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -7,10 +7,9 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 
-def _calculate_stats(**context):
+
+def _calculate_stats(input_path, output_path):
     """Calculates event statistics."""
-    input_path = context["templates_dict"]["input_path"]
-    output_path = context["templates_dict"]["output_path"]
 
     events = pd.read_json(input_path)
     stats = events.groupby(["date", "user"]).size().reset_index()
@@ -18,10 +17,9 @@ def _calculate_stats(**context):
     Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
-
-with DAG(
-    dag_id="08_templated_path",
-    schedule="@daily",
+with  DAG(
+    dag_id="08_templated_query_ds",
+    schedule=timedelta(days=3),
     start_date=datetime(year=2019, month=1, day=1),
     end_date=datetime(year=2019, month=1, day=5),
 ):
@@ -30,21 +28,18 @@ with DAG(
         task_id="fetch_events",
         bash_command=(
             "mkdir -p /data/events && "
-            "curl -o /data/events/{{ds}}.json "
+            "curl -o /data/events.json "
             "http://events_api:5000/events?"
             "start_date={{ds}}&"
             "end_date={{next_ds}}"
         ),
     )
 
+
     calculate_stats = PythonOperator(
         task_id="calculate_stats",
         python_callable=_calculate_stats,
-        templates_dict={
-            "input_path": "/data/events/{{ds}}.json",
-            "output_path": "/data/stats/{{ds}}.csv",
-        },
+        op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv"},
     )
-
 
     fetch_events >> calculate_stats

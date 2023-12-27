@@ -20,11 +20,10 @@ def _calculate_stats(**context):
 
 
 with DAG(
-    dag_id="09_no_catchup",
+    dag_id="10_templated_path",
     schedule="@daily",
-    start_date=datetime(2019,1,1),
-    end_date=datetime(2019,1,5),
-    catchup=False,
+    start_date=datetime(year=2019, month=1, day=1),
+    end_date=datetime(year=2019, month=1, day=5),
 ):
 
     fetch_events = BashOperator(

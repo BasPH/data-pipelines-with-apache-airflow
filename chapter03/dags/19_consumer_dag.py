@@ -18,7 +18,7 @@ def print_data():
     print(f"There has been {data['count'].max()} launches")
 
 with DAG(
-    dag_id="02_report_launches_consumer", 
+    dag_id="19_report_launches_consumer", 
     schedule=[target_dataset],
     start_date=datetime(2023, 12, 1),
 ):
