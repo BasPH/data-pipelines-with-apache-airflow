@@ -4,6 +4,7 @@ import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
+
 def _get_data(execution_date):
     year, month, day, hour, *_ = execution_date.timetuple()
     url = (
@@ -19,5 +20,4 @@ with DAG(
     start_date=pendulum.today("UTC").add(days=-1),
     schedule_interval="@hourly",
 ):
-
     get_data = PythonOperator(task_id="get_data", python_callable=_get_data)

@@ -23,5 +23,4 @@ with DAG(
     # email=['anonymous@example.com'],
     sla_miss_callback=sla_miss_callback,
 ) as dag:
-
     sleep_task = BashOperator(task_id="sleep", bash_command="sleep 30")

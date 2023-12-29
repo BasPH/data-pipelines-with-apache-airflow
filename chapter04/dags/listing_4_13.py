@@ -4,12 +4,14 @@ import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
+
 def _get_data(year, month, day, hour, output_path, **_):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
         f"{year}/{year}-{month:0>2}/pageviews-{year}{month:0>2}{day:0>2}-{hour:0>2}0000.gz"
     )
     request.urlretrieve(url, output_path)
+
 
 with DAG(
     dag_id="listing_4_13",

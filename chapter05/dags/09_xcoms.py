@@ -1,7 +1,6 @@
 import uuid
 
 import airflow
-
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -13,9 +12,7 @@ def _train_model(**context):
 
 
 def _deploy_model(**context):
-    model_id = context["task_instance"].xcom_pull(
-        task_ids="train_model", key="model_id"
-    )
+    model_id = context["task_instance"].xcom_pull(task_ids="train_model", key="model_id")
     print(f"Deploying model {model_id}")
 
 

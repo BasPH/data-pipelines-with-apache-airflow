@@ -2,11 +2,9 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-
 
 
 def _calculate_stats(**context):
@@ -31,7 +29,6 @@ def _send_stats(email, **context):
     email_stats(stats, email=email)
 
 
-
 with DAG(
     dag_id="14_atomic_send",
     schedule_interval="@daily",
@@ -39,7 +36,6 @@ with DAG(
     end_date=datetime(year=2019, month=1, day=5),
     catchup=True,
 ):
-
     fetch_events = BashOperator(
         task_id="fetch_events",
         bash_command=(

@@ -7,7 +7,6 @@ with DAG(
     start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@hourly",
 ):
-
     get_data = BashOperator(
         task_id="get_data",
         bash_command=(

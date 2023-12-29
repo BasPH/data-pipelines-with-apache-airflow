@@ -13,5 +13,6 @@ Login in Airflow username/password `bobsmith`/`topsecret`.
 ## Details
 
 Exposed ports on host:
+
 - 5432: PostgreSQL (user=`airflow`, pass=`airflow`)
 - 8080: Airflow webserver

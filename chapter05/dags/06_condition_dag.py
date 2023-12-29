@@ -1,10 +1,9 @@
 import airflow
 import pendulum
-
 from airflow import DAG
 from airflow.exceptions import AirflowSkipException
 from airflow.operators.dummy import DummyOperator
-from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.python import BranchPythonOperator, PythonOperator
 
 ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
 
@@ -32,9 +31,7 @@ with DAG(
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    pick_erp = BranchPythonOperator(
-        task_id="pick_erp_system", python_callable=_pick_erp_system
-    )
+    pick_erp = BranchPythonOperator(task_id="pick_erp_system", python_callable=_pick_erp_system)
 
     fetch_sales_old = DummyOperator(task_id="fetch_sales_old")
     clean_sales_old = DummyOperator(task_id="clean_sales_old")

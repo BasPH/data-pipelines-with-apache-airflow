@@ -1,10 +1,8 @@
 import uuid
 
 import airflow
-
 from airflow import DAG
 from airflow.decorators import task
-
 
 with DAG(
     dag_id="12_taskflow",

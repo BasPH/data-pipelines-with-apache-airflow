@@ -22,9 +22,9 @@ This code example contains the following files:
 
 To get started with the code example, first use the Azure Portal to create the following required resources for the DAG:
 
-* Resource group
-* Synapse workspace
-* Blob storage containers
+- Resource group
+- Synapse workspace
+- Blob storage containers
 
 How to create these resources (+ what settings to used) is described in the Chapter.
 
@@ -32,10 +32,14 @@ Once the required resources have been created, rename the file .env.template to 
 
 Once this is all set up, you can start Airflow using:
 
-    docker-compose up --build
+```
+docker-compose up --build
+```
 
 Once you're done, you can tear down Airflow using:
 
-    docker compose down -v
+```
+docker compose down -v
+```
 
 Don't forget to clean up your Azure resources by deleting the created stack.

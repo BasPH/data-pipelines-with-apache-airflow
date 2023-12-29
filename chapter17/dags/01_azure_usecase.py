@@ -1,18 +1,14 @@
 import datetime as dt
 import logging
-from os import path
 import tempfile
+from os import path
 
 import pandas as pd
-
 from airflow import DAG
-
+from airflow.operators.python import PythonOperator
 from airflow.providers.microsoft.azure.hooks.wasb import WasbHook
 from airflow.providers.odbc.hooks.odbc import OdbcHook
-from airflow.operators.python import PythonOperator
-
 from custom.hooks import MovielensHook
-
 
 RANK_QUERY = """
 SELECT
@@ -62,14 +58,10 @@ def _fetch_ratings(api_conn_id, wasb_conn_id, container, **context):
         # Upload file to Azure Blob.
         logging.info(f"Writing results to {container}/{year}/{month:02d}.csv")
         hook = WasbHook(wasb_conn_id)
-        hook.load_file(
-            tmp_path, container_name=container, blob_name=f"{year}/{month:02d}.csv"
-        )
+        hook.load_file(tmp_path, container_name=container, blob_name=f"{year}/{month:02d}.csv")
 
 
-def _rank_movies(
-    odbc_conn_id, wasb_conn_id, ratings_container, rankings_container, **context
-):
+def _rank_movies(odbc_conn_id, wasb_conn_id, ratings_container, rankings_container, **context):
     year = context["execution_date"].year
     month = context["execution_date"].month
 
@@ -119,7 +111,6 @@ with DAG(
     schedule_interval="@monthly",
     default_args={"depends_on_past": True},
 ) as dag:
-
     fetch_ratings = PythonOperator(
         task_id="fetch_ratings",
         python_callable=_fetch_ratings,

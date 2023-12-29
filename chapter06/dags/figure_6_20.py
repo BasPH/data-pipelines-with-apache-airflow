@@ -16,9 +16,7 @@ dag2 = DAG(
     schedule_interval="0 18 * * *",
 )
 
-DummyOperator(task_id="copy_to_raw", dag=dag1) >> DummyOperator(
-    task_id="process_supermarket", dag=dag1
-)
+DummyOperator(task_id="copy_to_raw", dag=dag1) >> DummyOperator(task_id="process_supermarket", dag=dag1)
 
 wait = ExternalTaskSensor(
     task_id="wait_for_process_supermarket",

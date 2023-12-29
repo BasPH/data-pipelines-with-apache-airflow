@@ -1,21 +1,17 @@
-from datetime import date, datetime, timedelta
 import time
+from datetime import date, datetime, timedelta
 
-from numpy import random
 import pandas as pd
 from faker import Faker
-
 from flask import Flask, jsonify, request
+from numpy import random
 
 
 def _generate_events(end_date):
     """Generates a fake dataset with events for 30 days before end date."""
 
     events = pd.concat(
-        [
-            _generate_events_for_day(date=end_date - timedelta(days=(30 - i)))
-            for i in range(30)
-        ],
+        [_generate_events_for_day(date=end_date - timedelta(days=(30 - i))) for i in range(30)],
         axis=0,
     )
 

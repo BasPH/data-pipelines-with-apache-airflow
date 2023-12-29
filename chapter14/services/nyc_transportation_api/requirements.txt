@@ -1,2 +1,2 @@
-Flask==1.1.2
-psycopg2==2.8.5
+Flask==3.0.0
+psycopg2==2.9.9

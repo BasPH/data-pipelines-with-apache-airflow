@@ -32,22 +32,15 @@ class MovielensRatingsSensor(BaseSensorOperator):
         hook = MovielensHook(self._conn_id)
 
         try:
-            next(
-                hook.get_ratings(
-                    start_date=self._start_date, end_date=self._end_date, batch_size=1
-                )
-            )
+            next(hook.get_ratings(start_date=self._start_date, end_date=self._end_date, batch_size=1))
             # If no StopIteration is raised, the request returned at least one record.
             # This means that there are records for the given period, which we indicate
             # to Airflow by returning True.
-            self.log.info(
-                f"Found ratings for {self._start_date} to {self._end_date}, continuing!"
-            )
+            self.log.info(f"Found ratings for {self._start_date} to {self._end_date}, continuing!")
             return True
         except StopIteration:
             self.log.info(
-                f"Didn't find any ratings for {self._start_date} "
-                f"to {self._end_date}, waiting..."
+                f"Didn't find any ratings for {self._start_date} " f"to {self._end_date}, waiting..."
             )
             # If StopIteration is raised, we know that the request did not find
             # any records. This means that there a no ratings for the time period,

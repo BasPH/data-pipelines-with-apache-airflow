@@ -12,9 +12,7 @@ import pandas as pd
     type=click.Path(dir_okay=False, exists=True, readable=True),
     required=True,
 )
-@click.option(
-    "--output_path", type=click.Path(dir_okay=False, writable=True), required=True
-)
+@click.option("--output_path", type=click.Path(dir_okay=False, writable=True), required=True)
 @click.option("--min_ratings", type=int, default=2)
 def main(input_path, output_path, min_ratings):
     output_path = Path(output_path)

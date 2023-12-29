@@ -1,7 +1,6 @@
 import datetime as dt
 
 import requests
-
 from airflow.hooks.base_hook import BaseHook
 
 
@@ -136,9 +135,7 @@ class MovielensHook(BaseHook):
         offset = 0
         total = None
         while total is None or offset < total:
-            response = session.get(
-                url, params={**params, **{"offset": offset, "limit": batch_size}}
-            )
+            response = session.get(url, params={**params, **{"offset": offset, "limit": batch_size}})
             response.raise_for_status()
             response_json = response.json()
 

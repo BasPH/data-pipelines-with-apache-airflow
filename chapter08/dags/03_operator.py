@@ -1,9 +1,7 @@
 import datetime as dt
 
 from airflow import DAG
-
 from custom.operators import MovielensFetchRatingsOperator
-
 
 with DAG(
     dag_id="03_operator",

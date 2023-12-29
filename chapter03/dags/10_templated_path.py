@@ -2,10 +2,10 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
+
 
 def _calculate_stats(**context):
     """Calculates event statistics."""
@@ -25,7 +25,6 @@ with DAG(
     start_date=datetime(year=2019, month=1, day=1),
     end_date=datetime(year=2019, month=1, day=5),
 ):
-
     fetch_events = BashOperator(
         task_id="fetch_events",
         bash_command=(
@@ -45,6 +44,5 @@ with DAG(
             "output_path": "/data/stats/{{ds}}.csv",
         },
     )
-
 
     fetch_events >> calculate_stats

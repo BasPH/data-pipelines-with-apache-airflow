@@ -11,8 +11,6 @@ dag = DAG(
 )
 
 print_hello = BashOperator(task_id="print_hello", bash_command="echo 'hello'", dag=dag)
-print_airflow = PythonOperator(
-    task_id="print_airflow", python_callable=lambda: print("airflow"), dag=dag
-)
+print_airflow = PythonOperator(task_id="print_airflow", python_callable=lambda: print("airflow"), dag=dag)
 
 print_hello >> print_airflow

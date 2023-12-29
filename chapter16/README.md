@@ -30,10 +30,14 @@ Once the CloudFormation stack has been created, rename the file .env.template to
 
 Once this is all set up, you can start Airflow using:
 
-    docker-compose up --build
+```
+docker-compose up --build
+```
 
 Once you're done, you can tear down Airflow using:
 
-    docker compose down -v
+```
+docker compose down -v
+```
 
 Don't forget to clean up your AWS resources by deleting the created stack.

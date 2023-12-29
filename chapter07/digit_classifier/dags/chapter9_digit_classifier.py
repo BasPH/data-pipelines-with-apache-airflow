@@ -7,12 +7,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.s3_copy_object import S3CopyObjectOperator
-from airflow.providers.amazon.aws.operators.sagemaker_endpoint import (
-    SageMakerEndpointOperator,
-)
-from airflow.providers.amazon.aws.operators.sagemaker_training import (
-    SageMakerTrainingOperator,
-)
+from airflow.providers.amazon.aws.operators.sagemaker_endpoint import SageMakerEndpointOperator
+from airflow.providers.amazon.aws.operators.sagemaker_training import SageMakerTrainingOperator
 from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 dag = DAG(
@@ -44,13 +40,9 @@ def _extract_mnist_data():
     with gzip.GzipFile(fileobj=mnist_buffer, mode="rb") as f:
         train_set, _, _ = pickle.loads(f.read(), encoding="latin1")
         output_buffer = io.BytesIO()
-        write_numpy_to_dense_tensor(
-            file=output_buffer, array=train_set[0], labels=train_set[1]
-        )
+        write_numpy_to_dense_tensor(file=output_buffer, array=train_set[0], labels=train_set[1])
         output_buffer.seek(0)
-        s3hook.load_file_obj(
-            output_buffer, key="mnist_data", bucket_name="your-bucket", replace=True
-        )
+        s3hook.load_file_obj(output_buffer, key="mnist_data", bucket_name="your-bucket", replace=True)
 
 
 extract_mnist_data = PythonOperator(
@@ -85,8 +77,7 @@ sagemaker_train_model = SageMakerTrainingOperator(
             "VolumeSizeInGB": 10,
         },
         "RoleArn": (
-            "arn:aws:iam::297623009465:role/service-role/"
-            "AmazonSageMaker-ExecutionRole-20180905T153196"
+            "arn:aws:iam::297623009465:role/service-role/" "AmazonSageMaker-ExecutionRole-20180905T153196"
         ),
         "StoppingCondition": {"MaxRuntimeInSeconds": 24 * 60 * 60},
     },
@@ -112,8 +103,7 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
                 ),  # this will link the model and the training job
             },
             "ExecutionRoleArn": (
-                "arn:aws:iam::297623009465:role/service-role/"
-                "AmazonSageMaker-ExecutionRole-20180905T153196"
+                "arn:aws:iam::297623009465:role/service-role/" "AmazonSageMaker-ExecutionRole-20180905T153196"
             ),
         },
         "EndpointConfig": {

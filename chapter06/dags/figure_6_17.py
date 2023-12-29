@@ -22,9 +22,7 @@ DummyOperator(task_id="etl", dag=example_1_dag_1) >> TriggerDagRunOperator(
     trigger_dag_id="figure_6_17_example_1_dag_2",
     dag=example_1_dag_1,
 )
-PythonOperator(
-    task_id="report", dag=example_1_dag_2, python_callable=lambda: print("hello")
-)
+PythonOperator(task_id="report", dag=example_1_dag_2, python_callable=lambda: print("hello"))
 
 # ================================================ EXAMPLE 2 =================================================
 
@@ -54,9 +52,7 @@ for dag_ in [example_2_dag_1, example_2_dag_2, example_2_dag_3]:
         task_id="trigger_dag4", trigger_dag_id="figure_6_17_example_2_dag_4", dag=dag_
     )
 
-PythonOperator(
-    task_id="report", dag=example_2_dag_4, python_callable=lambda: print("hello")
-)
+PythonOperator(task_id="report", dag=example_2_dag_4, python_callable=lambda: print("hello"))
 
 # ================================================ EXAMPLE 3 =================================================
 
@@ -98,12 +94,6 @@ DummyOperator(task_id="etl", dag=example_3_dag_1) >> [
         dag=example_3_dag_1,
     ),
 ]
-PythonOperator(
-    task_id="report", dag=example_3_dag_2, python_callable=lambda: print("hello")
-)
-PythonOperator(
-    task_id="report", dag=example_3_dag_3, python_callable=lambda: print("hello")
-)
-PythonOperator(
-    task_id="report", dag=example_3_dag_4, python_callable=lambda: print("hello")
-)
+PythonOperator(task_id="report", dag=example_3_dag_2, python_callable=lambda: print("hello"))
+PythonOperator(task_id="report", dag=example_3_dag_3, python_callable=lambda: print("hello"))
+PythonOperator(task_id="report", dag=example_3_dag_4, python_callable=lambda: print("hello"))

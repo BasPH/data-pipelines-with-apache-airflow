@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
-from pathlib import Path
-
-import logging
 import json
+import logging
+from pathlib import Path
 
 import click
 import requests
-
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,9 +29,7 @@ logging.basicConfig(level=logging.INFO)
     required=True,
     help="Output file path.",
 )
-@click.option(
-    "--host", type=str, default="http://movielens:5000", help="Movielens API URL."
-)
+@click.option("--host", type=str, default="http://movielens:5000", help="Movielens API URL.")
 @click.option(
     "--user",
     type=str,
@@ -48,9 +44,7 @@ logging.basicConfig(level=logging.INFO)
     required=True,
     help="Movielens API password.",
 )
-@click.option(
-    "--batch_size", type=int, default=100, help="Batch size for retrieving records."
-)
+@click.option("--batch_size", type=int, default=100, help="Batch size for retrieving records.")
 def main(start_date, end_date, output_path, host, user, password, batch_size):
     """CLI script for fetching movie ratings from the movielens API."""
 
@@ -104,9 +98,7 @@ def _get_with_pagination(session, url, params, batch_size=100):
     offset = 0
     total = None
     while total is None or offset < total:
-        response = session.get(
-            url, params={**params, **{"offset": offset, "limit": batch_size}}
-        )
+        response = session.get(url, params={**params, **{"offset": offset, "limit": batch_size}})
         response.raise_for_status()
         response_json = response.json()
 

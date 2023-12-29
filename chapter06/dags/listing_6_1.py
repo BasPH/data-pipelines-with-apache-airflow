@@ -10,6 +10,4 @@ dag = DAG(
     default_args={"depends_on_past": True},
 )
 
-wait = FileSensor(
-    task_id="wait_for_supermarket_1", filepath="/data/supermarket1/data.csv", dag=dag
-)
+wait = FileSensor(task_id="wait_for_supermarket_1", filepath="/data/supermarket1/data.csv", dag=dag)

@@ -2,6 +2,7 @@ import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
+
 def _print_context(**context):
     start = context["execution_date"]
     end = context["next_execution_date"]
@@ -15,7 +16,7 @@ with DAG(
     start_date=pendulum.today("UTC").add(days=-3),
     schedule="@daily",
 ):
-
     print_context = PythonOperator(
-        task_id="print_context", python_callable=_print_context,    
+        task_id="print_context",
+        python_callable=_print_context,
     )

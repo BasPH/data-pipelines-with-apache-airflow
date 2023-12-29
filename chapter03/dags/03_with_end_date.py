@@ -23,13 +23,9 @@ with DAG(
     start_date=dt.datetime(year=2019, month=1, day=1),
     end_date=dt.datetime(year=2019, month=1, day=5),
 ):
-
     fetch_events = BashOperator(
         task_id="fetch_events",
-        bash_command=(
-            "mkdir -p /data/events && "
-            "curl -o /data/events.json http://events_api:5000/events"
-        ),
+        bash_command="curl -o /data/events.json http://events_api:5000/events",
     )
 
     calculate_stats = PythonOperator(

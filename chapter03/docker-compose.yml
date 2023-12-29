@@ -81,6 +81,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - airflow-data-volume:/data
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -121,7 +122,7 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8083:8080"
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -252,10 +253,12 @@ services:
         fi
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        chown -R "${AIRFLOW_UID}:0" /data
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
       <<: *airflow-common-env
+      AIRFLOW_UID: ${AIRFLOW_UID:-50000}
       _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-admin}
@@ -264,6 +267,7 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - airflow-data-volume:/data
 
   airflow-cli:
     <<: *airflow-common
@@ -300,5 +304,12 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  events_api:
+    build: ./docker/events-api
+    image: manning-airflow/events-api
+    ports:
+      - "5000:5000"
+
 volumes:
   postgres-db-volume:
+  airflow-data-volume:

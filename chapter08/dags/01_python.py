@@ -1,16 +1,13 @@
 import datetime as dt
-import logging
 import json
+import logging
 import os
 
 import pandas as pd
 import requests
-
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-
 from custom.ranking import rank_movies_by_rating
-
 
 MOVIELENS_HOST = os.environ.get("MOVIELENS_HOST", "movielens")
 MOVIELENS_SCHEMA = os.environ.get("MOVIELENS_SCHEMA", "http")
@@ -59,9 +56,7 @@ def _get_with_pagination(session, url, params, batch_size=100):
     offset = 0
     total = None
     while total is None or offset < total:
-        response = session.get(
-            url, params={**params, **{"offset": offset, "limit": batch_size}}
-        )
+        response = session.get(url, params={**params, **{"offset": offset, "limit": batch_size}})
         response.raise_for_status()
         response_json = response.json()
 
@@ -87,11 +82,7 @@ with DAG(
         output_path = templates_dict["output_path"]
 
         logger.info(f"Fetching ratings for {start_date} to {end_date}")
-        ratings = list(
-            _get_ratings(
-                start_date=start_date, end_date=end_date, batch_size=batch_size
-            )
-        )
+        ratings = list(_get_ratings(start_date=start_date, end_date=end_date, batch_size=batch_size))
         logger.info(f"Fetched {len(ratings)} ratings")
 
         logger.info(f"Writing ratings to {output_path}")

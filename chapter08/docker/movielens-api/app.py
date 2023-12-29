@@ -2,10 +2,9 @@ import os
 import time
 
 import pandas as pd
-
 from flask import Flask, jsonify, request
 from flask_httpauth import HTTPBasicAuth
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 DEFAULT_ITEMS_PER_PAGE = 100
 

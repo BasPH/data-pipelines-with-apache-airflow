@@ -6,6 +6,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 
+
 def _calculate_stats(input_path, output_path):
     """Calculates event statistics."""
 
@@ -17,18 +18,11 @@ def _calculate_stats(input_path, output_path):
     stats.to_csv(output_path, index=False)
 
 
-with DAG(
-    dag_id="01_unscheduled", start_date=datetime(2024, 1, 1), schedule=None
-):
-
+with DAG(dag_id="01_unscheduled", start_date=datetime(2023, 1, 1), schedule=None):
     fetch_events = BashOperator(
         task_id="fetch_events",
-        bash_command=(
-            "mkdir -p /data/events && "
-            "curl -o /data/events.json http://events_api:5000/events"
-        ),
+        bash_command=("curl -o /data/events.json http://events_api:5000/events"),
     )
-
 
     calculate_stats = PythonOperator(
         task_id="calculate_stats",

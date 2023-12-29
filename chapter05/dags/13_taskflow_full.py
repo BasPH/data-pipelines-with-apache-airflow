@@ -1,11 +1,9 @@
 import uuid
 
 import airflow
-
 from airflow import DAG
 from airflow.decorators import task
 from airflow.operators.dummy import DummyOperator
-
 
 with DAG(
     dag_id="13_taskflow_full",

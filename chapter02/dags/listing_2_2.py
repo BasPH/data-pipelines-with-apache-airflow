@@ -30,12 +30,12 @@ def _get_pictures():
             except requests_exceptions.ConnectionError:
                 print(f"Could not connect to {image_url}.")
 
+
 with DAG(
     dag_id="listing_2_02",
     start_date=pendulum.today("UTC").add(days=-14),
     schedule=None,
 ):
-
     download_launches = BashOperator(
         task_id="download_launches",
         bash_command="curl -o /tmp/launches.json -L 'https://ll.thespacedevs.com/2.0.0/launch/upcoming'",  # noqa: E501
@@ -46,7 +46,6 @@ with DAG(
     notify = BashOperator(
         task_id="notify",
         bash_command='echo "There are now $(ls /tmp/images/ | wc -l) images."',
-
     )
 
     download_launches >> get_pictures >> notify

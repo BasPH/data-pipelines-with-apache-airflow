@@ -1,7 +1,6 @@
 import uuid
 
 import airflow
-
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -37,9 +36,7 @@ with DAG(
     deploy_model = PythonOperator(
         task_id="deploy_model",
         python_callable=_deploy_model,
-        templates_dict={
-            "model_id": "{{task_instance.xcom_pull(task_ids='train_model', key='model_id')}}"
-        },
+        templates_dict={"model_id": "{{task_instance.xcom_pull(task_ids='train_model', key='model_id')}}"},
     )
 
     start >> [fetch_sales, fetch_weather]

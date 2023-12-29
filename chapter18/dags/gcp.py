@@ -9,15 +9,11 @@ from airflow.models import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryExecuteQueryOperator,
     BigQueryDeleteTableOperator,
+    BigQueryExecuteQueryOperator,
 )
-from airflow.providers.google.cloud.transfers.bigquery_to_gcs import (
-    BigQueryToGCSOperator,
-)
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import (
-    GCSToBigQueryOperator,
-)
+from airflow.providers.google.cloud.transfers.bigquery_to_gcs import BigQueryToGCSOperator
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from custom.hooks import MovielensHook
 
 dag = DAG(
@@ -74,9 +70,7 @@ fetch_ratings = PythonOperator(
 import_in_bigquery = GCSToBigQueryOperator(
     task_id="import_in_bigquery",
     bucket=os.environ["RATINGS_BUCKET"],
-    source_objects=[
-        "ratings/{{ execution_date.year }}/{{ execution_date.strftime('%m') }}.csv"
-    ],
+    source_objects=["ratings/{{ execution_date.year }}/{{ execution_date.strftime('%m') }}.csv"],
     source_format="CSV",
     create_disposition="CREATE_IF_NEEDED",
     write_disposition="WRITE_TRUNCATE",
@@ -89,11 +83,7 @@ import_in_bigquery = GCSToBigQueryOperator(
         {"name": "timestamp", "type": "TIMESTAMP"},
     ],
     destination_project_dataset_table=(
-        os.environ["GCP_PROJECT"]
-        + ":"
-        + os.environ["BIGQUERY_DATASET"]
-        + "."
-        + "ratings${{ ds_nodash }}"
+        os.environ["GCP_PROJECT"] + ":" + os.environ["BIGQUERY_DATASET"] + "." + "ratings${{ ds_nodash }}"
     ),
     dag=dag,
 )
@@ -129,9 +119,7 @@ extract_top_ratings = BigQueryToGCSOperator(
         + "."
         + "rating_results_{{ ds_nodash }}"
     ),
-    destination_cloud_storage_uris=[
-        "gs://" + os.environ["RESULT_BUCKET"] + "/{{ ds_nodash }}.csv"
-    ],
+    destination_cloud_storage_uris=["gs://" + os.environ["RESULT_BUCKET"] + "/{{ ds_nodash }}.csv"],
     export_format="CSV",
     bigquery_conn_id="gcp",
     dag=dag,

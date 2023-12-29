@@ -36,10 +36,7 @@ def _crunch_numbers():
     )
 
     # Get list of all objects
-    objects = [
-        obj.object_name
-        for obj in client.list_objects(bucket_name="inside-airbnb", prefix="listing")
-    ]
+    objects = [obj.object_name for obj in client.list_objects(bucket_name="inside-airbnb", prefix="listing")]
     df = pd.DataFrame()
     for obj in objects:
         response = client.get_object(bucket_name="inside-airbnb", object_name=obj)
@@ -83,15 +80,11 @@ def _crunch_numbers():
         .drop("download_date", axis=1)
     )
 
-    df_with_max = df_with_max[
-        df_with_max["download_date_max"] != df_with_max["download_date_min"]
-    ]
-    df_with_max["price_diff_per_day"] = (
-        df_with_max["latest_price"] - df_with_max["oldest_price"]
-    ) / ((df_with_max["download_date_max"] - df_with_max["download_date_min"]).dt.days)
-    df_with_max[["price_diff_per_day"]] = df_with_max[["price_diff_per_day"]].apply(
-        pd.to_numeric
+    df_with_max = df_with_max[df_with_max["download_date_max"] != df_with_max["download_date_min"]]
+    df_with_max["price_diff_per_day"] = (df_with_max["latest_price"] - df_with_max["oldest_price"]) / (
+        (df_with_max["download_date_max"] - df_with_max["download_date_min"]).dt.days
     )
+    df_with_max[["price_diff_per_day"]] = df_with_max[["price_diff_per_day"]].apply(pd.to_numeric)
     biggest_increase = df_with_max.nlargest(5, "price_diff_per_day")
     biggest_decrease = df_with_max.nsmallest(5, "price_diff_per_day")
 
@@ -117,9 +110,7 @@ def _crunch_numbers():
     )
 
 
-crunch_numbers = PythonOperator(
-    task_id="crunch_numbers", python_callable=_crunch_numbers, dag=dag
-)
+crunch_numbers = PythonOperator(task_id="crunch_numbers", python_callable=_crunch_numbers, dag=dag)
 
 
 download_from_postgres >> crunch_numbers
