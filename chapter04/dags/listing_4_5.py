@@ -19,5 +19,6 @@ with DAG(
     dag_id="listing_4_05",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule_interval="@hourly",
+    max_active_runs=1,
 ):
     get_data = PythonOperator(task_id="get_data", python_callable=_get_data)

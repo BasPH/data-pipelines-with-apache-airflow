@@ -6,6 +6,7 @@ with DAG(
     dag_id="listing_4_01",
     start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@hourly",
+    max_active_runs=1,
 ):
     get_data = BashOperator(
         task_id="get_data",
