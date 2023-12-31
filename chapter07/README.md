@@ -1,6 +1,6 @@
 # Chapter 7
 
-Code accompanying Chapter 9 of the book 'Data pipelines with Apache Airflow'.
+Code accompanying Chapter 7 of the book 'Data pipelines with Apache Airflow'.
 
 ## Contents
 
@@ -21,5 +21,5 @@ Wait for a few seconds and you should be able to access the examples at http://l
 To stop running the examples, run the following command:
 
 ```
-docker-compose down
+docker-compose down -v
 ```

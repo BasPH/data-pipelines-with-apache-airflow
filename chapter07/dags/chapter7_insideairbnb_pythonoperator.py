@@ -9,7 +9,7 @@ from custom.postgres_to_s3_operator import PostgresToS3Operator
 from minio import Minio
 
 dag = DAG(
-    dag_id="chapter7_insideairbnb",
+    dag_id="chapter7_insideairbnb_python",
     start_date=datetime(2015, 4, 5),
     end_date=datetime(2019, 12, 7),
     schedule_interval="@monthly",

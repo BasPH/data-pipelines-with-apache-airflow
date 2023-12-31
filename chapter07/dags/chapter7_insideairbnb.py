@@ -23,7 +23,7 @@ download_from_postgres = PostgresToS3Operator(
 
 crunch_numbers = DockerOperator(
     task_id="crunch_numbers",
-    image="numbercruncher",
+    image="manning-airflow/numbercruncher",
     api_version="auto",
     auto_remove=True,
     docker_url="unix://var/run/docker.sock",
