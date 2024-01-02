@@ -1,4 +1,0 @@
-click==8.1.7
-faker==21.0.0
-Flask==3.0.0
-pandas==2.0.3
