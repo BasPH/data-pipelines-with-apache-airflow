@@ -30,8 +30,8 @@ with  DAG(
             "mkdir -p /data/events && "
             "curl -o /data/events.json "
             "http://events_api:5000/events?"
-            "start_date={{ds}}&"
-            "end_date={{next_ds}}"
+            "start_date={{data_interval_start | ds}}&"
+            "end_date={{data_interval_end | ds}}"
         ),
     )
 
