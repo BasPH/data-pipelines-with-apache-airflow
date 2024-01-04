@@ -1,7 +1,7 @@
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+import pendulum
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -29,8 +29,8 @@ def _email_stats(stats, email):
 with DAG(
     dag_id="13_non_atomic_send",
     schedule="@daily",
-    start_date=datetime(year=2019, month=1, day=1),
-    end_date=datetime(year=2019, month=1, day=5),
+    start_date=pendulum.today("UTC").add(days=-10),
+    end_date=pendulum.today("UTC").add(days=4),
     catchup=True,
 ):
     fetch_events = BashOperator(

@@ -1,6 +1,6 @@
 import uuid
 
-import airflow
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -18,7 +18,7 @@ def _deploy_model(**context):
 
 with DAG(
     dag_id="10_xcoms",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-10),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")

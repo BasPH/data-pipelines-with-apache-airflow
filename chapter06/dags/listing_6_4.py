@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
@@ -8,12 +8,12 @@ from airflow.sensors.python import PythonSensor
 
 dag1 = DAG(
     dag_id="listing_6_04_dag01",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="0 16 * * *",
 )
 dag2 = DAG(
     dag_id="listing_6_04_dag02",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval=None,
 )
 

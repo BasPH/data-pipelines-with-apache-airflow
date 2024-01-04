@@ -1,13 +1,13 @@
 from pathlib import Path
 
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.sensors.python import PythonSensor
 
 dag = DAG(
     dag_id="figure_6_12",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data.",
     default_args={"depends_on_past": True},

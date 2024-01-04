@@ -1,11 +1,10 @@
-import airflow
 import pendulum
 from airflow import DAG
 from airflow.exceptions import AirflowSkipException
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import BranchPythonOperator, PythonOperator
 
-ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
+ERP_CHANGE_DATE = pendulum.today("UTC").add(days=-1)
 
 
 def _pick_erp_system(**context):
@@ -26,7 +25,7 @@ def _latest_only(**context):
 
 with DAG(
     dag_id="06_condition_dag",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")

@@ -1,6 +1,5 @@
-from datetime import datetime
-
 import pandas as pd
+import pendulum
 import requests
 from airflow import DAG
 from airflow.datasets import Dataset
@@ -43,7 +42,7 @@ def fetch_new_launches():
 with DAG(
     dag_id="16_fetch_launches_producer",
     schedule="* * * * * ",
-    start_date=datetime.now(),
+    start_date=pendulum.today("UTC"),
     catchup=False,
 ):
     PythonOperator(

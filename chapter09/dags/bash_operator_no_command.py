@@ -1,10 +1,10 @@
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 dag = DAG(
     dag_id="chapter8_bash_operator_no_command",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval=None,
 )
 

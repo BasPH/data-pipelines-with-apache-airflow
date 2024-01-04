@@ -1,9 +1,9 @@
 import io
 import json
 
-import airflow.utils.dates
 import geopandas
 import pandas as pd
+import pendulum
 import requests
 from airflow.hooks.base import BaseHook
 from airflow.models import DAG
@@ -17,7 +17,7 @@ from requests.auth import HTTPBasicAuth
 dag = DAG(
     dag_id="nyc_dag",
     schedule_interval="*/15 * * * *",
-    start_date=airflow.utils.dates.days_ago(1),
+    start_date=pendulum.today("UTC").add(days=-1),
     catchup=False,
 )
 

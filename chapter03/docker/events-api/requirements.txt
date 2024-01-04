@@ -1,0 +1,5 @@
+click==8.1.7
+Faker==22.0.0
+Flask==3.0.0
+pandas==2.0.3
+pendulum==3.0.0

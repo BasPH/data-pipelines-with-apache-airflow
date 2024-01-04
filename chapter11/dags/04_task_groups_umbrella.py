@@ -1,10 +1,10 @@
-import airflow
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import BranchPythonOperator, PythonOperator
 from airflow.utils.task_group import TaskGroup
 
-ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
+ERP_CHANGE_DATE = pendulum.today("UTC").add(days=-1)
 
 
 def _pick_erp_system(**context):
@@ -32,7 +32,7 @@ def _clean_sales_new(**context):
 
 with DAG(
     dag_id="04_task_groups_umbrella",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
