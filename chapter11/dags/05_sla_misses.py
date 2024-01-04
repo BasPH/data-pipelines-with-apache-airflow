@@ -16,7 +16,7 @@ def send_slack_message(message):
 default_args = {"sla": timedelta(seconds=10)}
 
 with DAG(
-    dag_id="03_sla_misses",
+    dag_id="05_sla_misses",
     start_date=date_utils.days_ago(2),
     schedule_interval="@daily",
     default_args=default_args,

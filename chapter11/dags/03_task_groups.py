@@ -36,7 +36,7 @@ def generate_tasks(dataset_name, raw_dir, processed_dir, preprocess_script, outp
 
 
 with DAG(
-    dag_id="04_task_groups",
+    dag_id="03_task_groups",
     start_date=airflow.utils.dates.days_ago(5),
     schedule_interval="@daily",
 ) as dag:
