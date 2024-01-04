@@ -24,8 +24,8 @@ with DAG(
     fetch_events = BashOperator(
         task_id="fetch_events",
         bash_command=(
-            "mkdir -p /data/events && "
-            "curl -o /data/events.json http://events_api:5000/events"
+            "mkdir -p /tmp/data/events && "
+            "curl -o /tmp/data/events.json http://events_api:5000/events"
         ),
     )
 
@@ -33,7 +33,7 @@ with DAG(
     calculate_stats = PythonOperator(
         task_id="calculate_stats",
         python_callable=_calculate_stats,
-        op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv"},
+        op_kwargs={"input_path": "/tmp/data/events.json", "output_path": "/tmp/data/stats.csv"},
     )
 
     fetch_events >> calculate_stats

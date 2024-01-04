@@ -1,4 +1,4 @@
-from datetime import datetime
+import pendulum
 from pathlib import Path
 
 import pandas as pd
@@ -21,8 +21,7 @@ def _calculate_stats(input_path, output_path):
 with DAG(
     dag_id="07_templated_query",
     schedule_interval="@daily",
-    start_date=datetime(year=2019, month=1, day=1),
-    end_date=datetime(year=2019, month=1, day=5),
+    start_date=pendulum.today("UTC").add(days=-10),
 ):
 
     fetch_events = BashOperator(
@@ -31,8 +30,8 @@ with DAG(
             "mkdir -p /data/events && "
             "curl -o /data/events.json "
             "http://events_api:5000/events?"
-            "start_date={{logical_date.strftime('%Y-%m-%d')}}&"
-            "end_date={{next_execution_date.strftime('%Y-%m-%d')}}"
+            "start_date={{data_interval_start.strftime('%Y-%m-%d')}}&"
+            "end_date={{data_interval_end.strftime('%Y-%m-%d')}}"
         ),
     )
 
