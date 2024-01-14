@@ -1,11 +1,11 @@
-FROM python:3.11-slim	
+FROM python:3.11-slim
 
-COPY requirements.txt /tmp/requirements.txt	
-RUN pip install -r /tmp/requirements.txt && rm -f /tmp/requirements.txt	
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
 
-COPY app.py /	
+COPY app.py /
 
-EXPOSE 5000	
+EXPOSE 5000
 
-ENTRYPOINT ["python"]	
-CMD ["/app.py"]	
+ENTRYPOINT ["python"]
+CMD ["/app.py"]

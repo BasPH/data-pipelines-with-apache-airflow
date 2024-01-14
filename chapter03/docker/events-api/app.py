@@ -1,33 +1,29 @@
-from datetime import date, datetime, timedelta
 import time
+from datetime import datetime, timedelta
 
-from numpy import random
 import pandas as pd
 import pendulum
 from faker import Faker
-
 from flask import Flask, jsonify, request
+from numpy import random
 
 
 def _generate_events(end_date):
     """Generates a fake dataset with events for 30 days before end date."""
 
     events = pd.concat(
-        [
-            _generate_events_for_day(date=end_date - timedelta(days=(30 - i)))
-            for i in range(30)
-        ],
+        [_generate_events_for_day(generation_date=end_date - timedelta(days=(30 - i))) for i in range(30)],
         axis=0,
     )
 
     return events
 
 
-def _generate_events_for_day(date):
+def _generate_events_for_day(generation_date):
     """Generates events for a given day."""
 
     # Use date as seed.
-    seed = int(time.mktime(date.timetuple()))
+    seed = int(time.mktime(generation_date.timetuple()))
 
     Faker.seed(seed)
     random_state = random.RandomState(seed)
@@ -43,7 +39,7 @@ def _generate_events_for_day(date):
     return pd.DataFrame(
         {
             "user": random_state.choice(users, size=n_events, replace=True),
-            "date": pd.to_datetime(date),
+            "date": pd.to_datetime(generation_date),
         }
     )
 
