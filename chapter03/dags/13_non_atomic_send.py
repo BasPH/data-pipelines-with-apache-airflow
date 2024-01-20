@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pandas as pd
-import pendulum
+from pendulum import datetime
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -15,9 +15,6 @@ def _calculate_stats(**context):
     events = pd.read_json(input_path)
     stats = events.groupby(["date", "user"]).size().reset_index()
 
-    Path(output_path).parent.mkdir(exist_ok=True)
-    stats.to_csv(output_path, index=False)
-
     _email_stats(stats, email="user@example.com")
 
 
@@ -29,18 +26,17 @@ def _email_stats(stats, email):
 with DAG(
     dag_id="13_non_atomic_send",
     schedule="@daily",
-    start_date=pendulum.today("UTC").add(days=-10),
-    end_date=pendulum.today("UTC").add(days=4),
+    start_date=datetime(2024, 1, 1),
+    end_date=datetime(2024, 1, 5),
     catchup=True,
 ):
     fetch_events = BashOperator(
         task_id="fetch_events",
         bash_command=(
-            "mkdir -p /data/events && "
-            "curl -o /data/events/{{ds}}.json "
+            "curl -o /data/events/{{data_interval_start | ds}}.json "
             "http://events_api:5000/events?"
-            "start_date={{ds}}&"
-            "end_date={{next_ds}}"
+            "start_date={{data_interval_start | ds}}&"
+            "end_date={{data_interval_end | ds}}"
         ),
     )
 
@@ -48,8 +44,8 @@ with DAG(
         task_id="calculate_stats",
         python_callable=_calculate_stats,
         templates_dict={
-            "input_path": "/data/events/{{ds}}.json",
-            "output_path": "/data/stats/{{ds}}.csv",
+            "input_path": "/data/events/{{data_interval_start | ds}}.json",
+            "output_path": "/data/stats/{{data_interval_start | ds}}.csv",
         },
     )
 
