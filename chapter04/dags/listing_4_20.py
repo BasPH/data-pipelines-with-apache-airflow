@@ -19,7 +19,7 @@ def _get_data(year, month, day, hour, output_path, **_):
     request.urlretrieve(url, output_path)
 
 
-def _fetch_pageviews(pagenames, execution_date):
+def _fetch_pageviews(pagenames, data_interval_start):
     result = dict.fromkeys(pagenames, 0)
     with open("/tmp/wikipageviews") as f:
         for line in f:
@@ -31,7 +31,7 @@ def _fetch_pageviews(pagenames, execution_date):
         for pagename, pageviewcount in result.items():
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
-                f"'{pagename}', {pageviewcount}, '{execution_date}'"
+                f"'{pagename}', {pageviewcount}, '{data_interval_start}'"
                 ");\n"
             )
 
@@ -47,10 +47,10 @@ with DAG(
         task_id="get_data",
         python_callable=_get_data,
         op_kwargs={
-            "year": "{{ execution_date.year }}",
-            "month": "{{ execution_date.month }}",
-            "day": "{{ execution_date.day }}",
-            "hour": "{{ execution_date.hour }}",
+            "year": "{{ data_interval_start.year }}",
+            "month": "{{ data_interval_start.month }}",
+            "day": "{{ data_interval_start.day }}",
+            "hour": "{{ data_interval_start.hour }}",
             "output_path": "/tmp/wikipageviews.gz",
         },
     )

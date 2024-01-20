@@ -23,10 +23,10 @@ with DAG(
         task_id="get_data",
         python_callable=_get_data,
         op_kwargs={
-            "year": "{{ execution_date.year }}",
-            "month": "{{ execution_date.month }}",
-            "day": "{{ execution_date.day }}",
-            "hour": "{{ execution_date.hour }}",
+            "year": "{{ data_interval_start.year }}",
+            "month": "{{ data_interval_start.month }}",
+            "day": "{{ data_interval_start.day }}",
+            "hour": "{{ data_interval_start.hour }}",
             "output_path": "/tmp/wikipageviews.gz",
         },
     )

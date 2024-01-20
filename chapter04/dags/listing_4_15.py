@@ -36,20 +36,31 @@ with DAG(
         task_id="get_data",
         python_callable=_get_data,
         op_kwargs={
-            "year": "{{ execution_date.year }}",
-            "month": "{{ execution_date.month }}",
-            "day": "{{ execution_date.day }}",
-            "hour": "{{ execution_date.hour }}",
+            "year": "{{ data_interval_start.year }}",
+            "month": "{{ data_interval_start.month }}",
+            "day": "{{ data_interval_start.day }}",
+            "hour": "{{ data_interval_start.hour }}",
             "output_path": "/tmp/wikipageviews.gz",
         },
     )
 
-    extract_gz = BashOperator(task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz")
+    extract_gz = BashOperator(
+        task_id="extract_gz",
+        bash_command="gunzip --force /tmp/wikipageviews.gz",
+    )
 
     fetch_pageviews = PythonOperator(
         task_id="fetch_pageviews",
         python_callable=_fetch_pageviews,
-        op_kwargs={"pagenames": {"Google", "Amazon", "Apple", "Microsoft", "Facebook"}},
+        op_kwargs={
+            "pagenames": {
+                "Google",
+                "Amazon",
+                "Apple",
+                "Microsoft",
+                "Facebook",
+            }
+        },
     )
 
     get_data >> extract_gz >> fetch_pageviews
