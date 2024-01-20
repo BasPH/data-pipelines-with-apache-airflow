@@ -1,6 +1,6 @@
-from pendulum import datetime
 from airflow import DAG
 from airflow.timetables.events import EventsTimetable
+from pendulum import datetime
 
 scheduled_launches = EventsTimetable(
     event_dates=[

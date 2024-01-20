@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import pandas as pd
-from pendulum import datetime
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
+from pendulum import datetime
 
 
 def _calculate_stats(**context):

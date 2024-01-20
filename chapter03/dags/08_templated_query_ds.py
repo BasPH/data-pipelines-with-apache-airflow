@@ -1,11 +1,10 @@
 from pathlib import Path
-from pendulum import datetime
 
 import pandas as pd
-from pendulum import datetime
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
+from pendulum import datetime
 
 
 def _calculate_stats(input_path, output_path):
@@ -37,7 +36,10 @@ with DAG(
     calculate_stats = PythonOperator(
         task_id="calculate_stats",
         python_callable=_calculate_stats,
-        op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv",},
+        op_kwargs={
+            "input_path": "/data/events.json",
+            "output_path": "/data/stats.csv",
+        },
     )
 
     fetch_events >> calculate_stats

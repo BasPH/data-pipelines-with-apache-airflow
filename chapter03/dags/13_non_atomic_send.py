@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import pandas as pd
-from pendulum import datetime
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
+from pendulum import datetime
 
 
 def _calculate_stats(**context):
@@ -14,6 +14,9 @@ def _calculate_stats(**context):
 
     events = pd.read_json(input_path)
     stats = events.groupby(["date", "user"]).size().reset_index()
+
+    Path(output_path).parent.mkdir(exist_ok=True)
+    stats.to_csv(output_path, index=False)
 
     _email_stats(stats, email="user@example.com")
 
