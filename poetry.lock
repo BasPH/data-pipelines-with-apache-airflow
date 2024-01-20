@@ -462,18 +462,18 @@ apache-airflow = ">=2.5.0"
 
 [[package]]
 name = "apache-airflow-providers-postgres"
-version = "5.8.0"
-description = "Provider for Apache Airflow. Implements apache-airflow-providers-postgres package"
+version = "5.10.0"
+description = "Provider package apache-airflow-providers-postgres for Apache Airflow"
 category = "main"
 optional = false
 python-versions = "~=3.8"
 files = [
-    {file = "apache-airflow-providers-postgres-5.8.0.tar.gz", hash = "sha256:3dba42cb1b982b7cf7b503b6f29e20db6ffba908d2cc7c2690e24f35a1153127"},
-    {file = "apache_airflow_providers_postgres-5.8.0-py3-none-any.whl", hash = "sha256:03181b0cb824d7c6b552ee72857dd5356dc7cb314aa886b6f8732f009624e974"},
+    {file = "apache_airflow_providers_postgres-5.10.0-py3-none-any.whl", hash = "sha256:79aa154826707dec41f828722a3860a2b73107fcfcfb8247f70c29ecc1b28aaa"},
+    {file = "apache_airflow_providers_postgres-5.10.0.tar.gz", hash = "sha256:a1163cf9594b2ff8f8deb121c648008caef261124b8c94feb641dc8cc9e806d3"},
 ]
 
 [package.dependencies]
-apache-airflow = ">=2.5.0"
+apache-airflow = ">=2.6.0"
 apache-airflow-providers-common-sql = ">=1.3.1"
 psycopg2-binary = ">=2.8.0"
 
@@ -4671,4 +4671,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "98df33c547d5101feac3d9647bb35391aa5bfe74e80513d2e9916bea8afe2f2a"
+content-hash = "00a00752badab2f9e0e4b672505db78e5e18c4a6b073408f7302891af56c1e35"
