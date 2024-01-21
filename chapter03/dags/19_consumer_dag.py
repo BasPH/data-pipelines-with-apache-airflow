@@ -4,7 +4,7 @@ from airflow import DAG
 from airflow.datasets import Dataset
 from airflow.operators.python import PythonOperator
 
-FILEPATH = "/tmp/launches.csv"
+FILEPATH = "/data/launches.csv"
 
 target_dataset = Dataset(FILEPATH)
 

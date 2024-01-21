@@ -6,7 +6,7 @@ from airflow.datasets import Dataset
 from airflow.exceptions import AirflowSkipException
 from airflow.operators.python import PythonOperator
 
-FILEPATH = "/tmp/launches.csv"
+FILEPATH = "/data/launches.csv"
 URL = "https://lldev.thespacedevs.com/2.0.0/launch"
 
 target_dataset = Dataset(FILEPATH)

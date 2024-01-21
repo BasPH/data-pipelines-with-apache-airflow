@@ -32,8 +32,8 @@ with DAG(
         task_id="calculate_stats",
         python_callable=_calculate_stats,
         op_kwargs={
-            "input_path": "/tmp/data/events.json",
-            "output_path": "/tmp/data/stats.csv",
+            "input_path": "/data/events.json",
+            "output_path": "/data/stats.csv",
         },
     )
 
