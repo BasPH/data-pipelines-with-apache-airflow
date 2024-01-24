@@ -1,25 +1,23 @@
-import airflow
-
+import pendulum
 from airflow import DAG
-from airflow.operators.dummy import DummyOperator
-
+from airflow.operators.empty import EmptyOperator
 
 with DAG(
     dag_id="01_start",
-    start_date=airflow.utils.dates.days_ago(3),
-    schedule_interval="@daily",
-) as dag:
-    start = DummyOperator(task_id="start")
+    start_date=pendulum.today("UTC").add(days=-3),
+    schedule="@daily",
+):
+    start = EmptyOperator(task_id="start")
 
-    fetch_sales = DummyOperator(task_id="fetch_sales")
-    clean_sales = DummyOperator(task_id="clean_sales")
+    fetch_sales = EmptyOperator(task_id="fetch_sales")
+    clean_sales = EmptyOperator(task_id="clean_sales")
 
-    fetch_weather = DummyOperator(task_id="fetch_weather")
-    clean_weather = DummyOperator(task_id="clean_weather")
+    fetch_weather = EmptyOperator(task_id="fetch_weather")
+    clean_weather = EmptyOperator(task_id="clean_weather")
 
-    join_datasets = DummyOperator(task_id="join_datasets")
-    train_model = DummyOperator(task_id="train_model")
-    deploy_model = DummyOperator(task_id="deploy_model")
+    join_datasets = EmptyOperator(task_id="join_datasets")
+    train_model = EmptyOperator(task_id="train_model")
+    deploy_model = EmptyOperator(task_id="deploy_model")
 
     start >> [fetch_sales, fetch_weather]
     fetch_sales >> clean_sales
