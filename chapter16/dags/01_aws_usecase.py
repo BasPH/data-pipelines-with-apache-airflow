@@ -1,20 +1,16 @@
 import datetime as dt
 import logging
 import os
-from os import path
 import tempfile
+from os import path
 
 import pandas as pd
-
 from airflow import DAG
-
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.athena import AWSAthenaOperator
-
 from custom.hooks import MovielensHook
 from custom.operators import GlueTriggerCrawlerOperator
-
 
 with DAG(
     dag_id="01_aws_usecase",

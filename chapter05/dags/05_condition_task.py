@@ -1,15 +1,13 @@
-import airflow
 import pendulum
-
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
-from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.python import BranchPythonOperator, PythonOperator
 
-ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
+ERP_CHANGE_DATE = pendulum.today("UTC").add(days=-1)
 
 
 def _pick_erp_system(**context):
-    if context["execution_date"] < airflow.utils.dates.days_ago(1):
+    if context["execution_date"] < ERP_CHANGE_DATE:
         return "fetch_sales_old"
     else:
         return "fetch_sales_new"
@@ -29,14 +27,12 @@ def _is_latest_run(**context):
 
 with DAG(
     dag_id="05_condition_function",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    pick_erp = BranchPythonOperator(
-        task_id="pick_erp_system", python_callable=_pick_erp_system
-    )
+    pick_erp = BranchPythonOperator(task_id="pick_erp_system", python_callable=_pick_erp_system)
 
     fetch_sales_old = DummyOperator(task_id="fetch_sales_old")
     clean_sales_old = DummyOperator(task_id="clean_sales_old")

@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 
+
 def _get_data(year, month, day, hour, output_path, **_):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
@@ -12,9 +13,10 @@ def _get_data(year, month, day, hour, output_path, **_):
     )
     request.urlretrieve(url, output_path)
 
-def _fetch_pageviews(pagenames, execution_date, **_):
+
+def _fetch_pageviews(pagenames, data_interval_start, **_):
     result = dict.fromkeys(pagenames, 0)
-    with open("/tmp/wikipageviews", "r") as f:
+    with open("/tmp/wikipageviews") as f:
         for line in f:
             domain_code, page_title, view_counts, _ = line.split(" ")
             if domain_code == "en" and page_title in pagenames:
@@ -24,7 +26,7 @@ def _fetch_pageviews(pagenames, execution_date, **_):
         for pagename, pageviewcount in result.items():
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
-                f"'{pagename}', {pageviewcount}, '{execution_date}'"
+                f"'{pagename}', {pageviewcount}, '{data_interval_start}'"
                 ");\n"
             )
 
@@ -35,23 +37,19 @@ with DAG(
     schedule="@hourly",
     max_active_runs=1,
 ):
-
     get_data = PythonOperator(
         task_id="get_data",
         python_callable=_get_data,
         op_kwargs={
-            "year": "{{ execution_date.year }}",
-            "month": "{{ execution_date.month }}",
-            "day": "{{ execution_date.day }}",
-            "hour": "{{ execution_date.hour }}",
+            "year": "{{ data_interval_start.year }}",
+            "month": "{{ data_interval_start.month }}",
+            "day": "{{ data_interval_start.day }}",
+            "hour": "{{ data_interval_start.hour }}",
             "output_path": "/tmp/wikipageviews.gz",
         },
     )
 
-
-    extract_gz = BashOperator(
-        task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz"
-    )
+    extract_gz = BashOperator(task_id="extract_gz", bash_command="gunzip --force /tmp/wikipageviews.gz")
 
     fetch_pageviews = PythonOperator(
         task_id="fetch_pageviews",

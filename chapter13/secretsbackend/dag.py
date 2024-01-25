@@ -1,10 +1,10 @@
-import airflow.utils.dates
+import pendulum
 from airflow.models import DAG
 from airflow.providers.http.operators.http import SimpleHttpOperator
 
 dag = DAG(
     dag_id="secretsbackend_with_vault",
-    start_date=airflow.utils.dates.days_ago(1),
+    start_date=pendulum.today("UTC").add(days=-1),
     schedule_interval=None,
 )
 

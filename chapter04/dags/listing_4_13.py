@@ -4,6 +4,7 @@ import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
+
 def _get_data(year, month, day, hour, output_path, **_):
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
@@ -11,19 +12,21 @@ def _get_data(year, month, day, hour, output_path, **_):
     )
     request.urlretrieve(url, output_path)
 
+
 with DAG(
     dag_id="listing_4_13",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule="@hourly",
+    max_active_runs=1,
 ):
     get_data = PythonOperator(
         task_id="get_data",
         python_callable=_get_data,
         op_kwargs={
-            "year": "{{ execution_date.year }}",
-            "month": "{{ execution_date.month }}",
-            "day": "{{ execution_date.day }}",
-            "hour": "{{ execution_date.hour }}",
+            "year": "{{ data_interval_start.year }}",
+            "month": "{{ data_interval_start.month }}",
+            "day": "{{ data_interval_start.day }}",
+            "hour": "{{ data_interval_start.hour }}",
             "output_path": "/tmp/wikipageviews.gz",
         },
     )

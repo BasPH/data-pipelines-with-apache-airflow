@@ -8,7 +8,7 @@ and days is determines. We will productionize this use case into an Airflow work
 services are created for this purpose:
 
 1. A service providing Citi Bike rides
-2. A service providing NYC Yellow Taxi rides
+1. A service providing NYC Yellow Taxi rides
 
 An Airflow DAG will periodically scrape these services, wrangle the data, and send the results into a Postgres
 database serving a tiny website, displaying which transportation method is fastest between two NYC

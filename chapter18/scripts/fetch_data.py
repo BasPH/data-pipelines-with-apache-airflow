@@ -1,14 +1,12 @@
 import logging
-from pathlib import Path
 import tempfile
-from urllib.request import urlretrieve
 import zipfile
+from pathlib import Path
+from urllib.request import urlretrieve
 
 import pandas as pd
 
-logging.basicConfig(
-    format="[%(asctime)-15s] %(levelname)s - %(message)s", level=logging.INFO
-)
+logging.basicConfig(format="[%(asctime)-15s] %(levelname)s - %(message)s", level=logging.INFO)
 
 
 def main():

@@ -4,7 +4,6 @@ import os
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 
-
 with DAG(
     dag_id="01_docker",
     description="Fetches ratings from the Movielens API using Docker.",
@@ -12,7 +11,6 @@ with DAG(
     end_date=dt.datetime(2019, 1, 3),
     schedule_interval="@daily",
 ) as dag:
-
     fetch_ratings = DockerOperator(
         task_id="fetch_ratings",
         image="manning-airflow/movielens-fetch",

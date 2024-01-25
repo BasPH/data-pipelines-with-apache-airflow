@@ -1,11 +1,11 @@
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
+from pendulum import datetime
+
 
 def _calculate_stats(**context):
     """Calculates event statistics."""
@@ -22,15 +22,13 @@ def _calculate_stats(**context):
 with DAG(
     dag_id="12_no_catchup",
     schedule="@daily",
-    start_date=datetime(2019,1,1),
-    end_date=datetime(2019,1,5),
+    start_date=datetime(2024, 1, 1),
+    end_date=datetime(2024, 1, 5),
     catchup=False,
 ):
-
     fetch_events = BashOperator(
         task_id="fetch_events",
         bash_command=(
-            "mkdir -p /data/events && "
             "curl -o /data/events/{{data_interval_start | ds}}.json "
             "http://events_api:5000/events?"
             "start_date={{data_interval_start | ds}}&"
@@ -46,6 +44,5 @@ with DAG(
             "output_path": "/data/stats/{{data_interval_start | ds}}.csv",
         },
     )
-
 
     fetch_events >> calculate_stats

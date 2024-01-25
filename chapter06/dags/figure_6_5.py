@@ -1,11 +1,11 @@
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.sensors.filesystem import FileSensor
 
 dag = DAG(
     dag_id="figure_6_05",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="0 16 * * *",
     description="A batch workflow for ingesting supermarket promotions data, demonstrating the FileSensor.",
     default_args={"depends_on_past": True},

@@ -1,10 +1,9 @@
-import airflow
-
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
-from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.python import BranchPythonOperator, PythonOperator
 
-ERP_CHANGE_DATE = airflow.utils.dates.days_ago(1)
+ERP_CHANGE_DATE = pendulum.today("UTC").add(days=-1)
 
 
 def _pick_erp_system(**context):
@@ -32,28 +31,18 @@ def _clean_sales_new(**context):
 
 with DAG(
     dag_id="03_branch_dag",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
 
-    pick_erp_system = BranchPythonOperator(
-        task_id="pick_erp_system", python_callable=_pick_erp_system
-    )
+    pick_erp_system = BranchPythonOperator(task_id="pick_erp_system", python_callable=_pick_erp_system)
 
-    fetch_sales_old = PythonOperator(
-        task_id="fetch_sales_old", python_callable=_fetch_sales_old
-    )
-    clean_sales_old = PythonOperator(
-        task_id="clean_sales_old", python_callable=_clean_sales_old
-    )
+    fetch_sales_old = PythonOperator(task_id="fetch_sales_old", python_callable=_fetch_sales_old)
+    clean_sales_old = PythonOperator(task_id="clean_sales_old", python_callable=_clean_sales_old)
 
-    fetch_sales_new = PythonOperator(
-        task_id="fetch_sales_new", python_callable=_fetch_sales_new
-    )
-    clean_sales_new = PythonOperator(
-        task_id="clean_sales_new", python_callable=_clean_sales_new
-    )
+    fetch_sales_new = PythonOperator(task_id="fetch_sales_new", python_callable=_fetch_sales_new)
+    clean_sales_new = PythonOperator(task_id="clean_sales_new", python_callable=_clean_sales_new)
 
     fetch_weather = DummyOperator(task_id="fetch_weather")
     clean_weather = DummyOperator(task_id="clean_weather")

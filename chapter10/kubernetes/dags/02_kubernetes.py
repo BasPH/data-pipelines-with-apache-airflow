@@ -1,12 +1,9 @@
 import datetime as dt
 import os
 
-from kubernetes.client import models as k8s
-
 from airflow import DAG
-from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import (
-    KubernetesPodOperator,
-)
+from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from kubernetes.client import models as k8s
 
 with DAG(
     dag_id="02_kubernetes",
@@ -16,13 +13,10 @@ with DAG(
     schedule_interval="@daily",
     default_args={"depends_on_past": True},
 ) as dag:
-
     volume_claim = k8s.V1PersistentVolumeClaimVolumeSource(claim_name="data-volume")
     volume = k8s.V1Volume(name="data-volume", persistent_volume_claim=volume_claim)
 
-    volume_mount = k8s.V1VolumeMount(
-        name="data-volume", mount_path="/data", sub_path=None, read_only=False
-    )
+    volume_mount = k8s.V1VolumeMount(name="data-volume", mount_path="/data", sub_path=None, read_only=False)
 
     fetch_ratings = KubernetesPodOperator(
         task_id="fetch_ratings",

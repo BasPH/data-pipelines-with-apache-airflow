@@ -1,7 +1,6 @@
 import uuid
 
-import airflow
-
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -13,15 +12,13 @@ def _train_model(**context):
 
 
 def _deploy_model(**context):
-    model_id = context["task_instance"].xcom_pull(
-        task_ids="train_model", key="model_id"
-    )
+    model_id = context["task_instance"].xcom_pull(task_ids="train_model", key="model_id")
     print(f"Deploying model {model_id}")
 
 
 with DAG(
     dag_id="10_xcoms",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-10),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")

@@ -1,13 +1,11 @@
 import os
 
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 
-def generate_tasks(
-    dataset_name, raw_dir, processed_dir, preprocess_script, output_dir, dag
-):
+def generate_tasks(dataset_name, raw_dir, processed_dir, preprocess_script, output_dir, dag):
     raw_path = os.path.join(raw_dir, dataset_name, "{ds_nodash}.json")
     processed_path = os.path.join(processed_dir, dataset_name, "{ds_nodash}.json")
     output_path = os.path.join(output_dir, dataset_name, "{ds_nodash}.json")
@@ -38,7 +36,7 @@ def generate_tasks(
 
 with DAG(
     dag_id="01_task_factory",
-    start_date=airflow.utils.dates.days_ago(5),
+    start_date=pendulum.today("UTC").add(days=-5),
     schedule_interval="@daily",
 ) as dag:
     for dataset in ["sales", "customers"]:

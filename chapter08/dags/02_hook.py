@@ -1,13 +1,11 @@
 import datetime as dt
-import logging
 import json
+import logging
 import os
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-
 from custom.hooks import MovielensHook
-
 
 with DAG(
     dag_id="02_hook",
@@ -26,11 +24,7 @@ with DAG(
 
         logger.info(f"Fetching ratings for {start_date} to {end_date}")
         hook = MovielensHook(conn_id=conn_id)
-        ratings = list(
-            hook.get_ratings(
-                start_date=start_date, end_date=end_date, batch_size=batch_size
-            )
-        )
+        ratings = list(hook.get_ratings(start_date=start_date, end_date=end_date, batch_size=batch_size))
         logger.info(f"Fetched {len(ratings)} ratings")
 
         logger.info(f"Writing ratings to {output_path}")

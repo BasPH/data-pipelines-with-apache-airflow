@@ -42,7 +42,7 @@ class MovielensFetchRatingsOperator(BaseOperator):
         batch_size=1000,
         **kwargs,
     ):
-        super(MovielensFetchRatingsOperator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self._conn_id = conn_id
         self._output_path = output_path
@@ -55,9 +55,7 @@ class MovielensFetchRatingsOperator(BaseOperator):
         hook = MovielensHook(self._conn_id)
 
         try:
-            self.log.info(
-                f"Fetching ratings for {self._start_date} to {self._end_date}"
-            )
+            self.log.info(f"Fetching ratings for {self._start_date} to {self._end_date}")
             ratings = list(
                 hook.get_ratings(
                     start_date=self._start_date,

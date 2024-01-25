@@ -1,7 +1,6 @@
 import uuid
 
-import airflow
-
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
@@ -19,7 +18,7 @@ def _deploy_model(templates_dict, **context):
 
 with DAG(
     dag_id="10_xcoms_template",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval="@daily",
 ) as dag:
     start = DummyOperator(task_id="start")
@@ -37,9 +36,7 @@ with DAG(
     deploy_model = PythonOperator(
         task_id="deploy_model",
         python_callable=_deploy_model,
-        templates_dict={
-            "model_id": "{{task_instance.xcom_pull(task_ids='train_model', key='model_id')}}"
-        },
+        templates_dict={"model_id": "{{task_instance.xcom_pull(task_ids='train_model', key='model_id')}}"},
     )
 
     start >> [fetch_sales, fetch_weather]

@@ -1,10 +1,10 @@
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 
 dag = DAG(
     dag_id="chapter8_duplicate_task_ids",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=pendulum.today("UTC").add(days=-3),
     schedule_interval=None,
 )
 

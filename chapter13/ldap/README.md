@@ -20,6 +20,7 @@ OpenLDAP is bootstrapped with:
 - A user in this group (DN=`cn=bob smith,dc=apacheairflow,dc=com`, password=`test`)
 
 Exposed ports on host:
+
 - 5432: PostgreSQL (user=airflow, pass=airflow)
 - 8080: Airflow webserver
 - 8081: phpLDAPadmin (OpenLDAP UI)

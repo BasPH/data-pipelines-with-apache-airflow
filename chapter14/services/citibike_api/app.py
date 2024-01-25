@@ -3,9 +3,9 @@ from datetime import date
 
 import psycopg2
 import psycopg2.extras
-from flask import Flask, jsonify, Response
+from flask import Flask, Response, jsonify
 from flask_httpauth import HTTPBasicAuth
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()

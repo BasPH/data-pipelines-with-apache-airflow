@@ -1,11 +1,11 @@
-import airflow.utils.dates
+import pendulum
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.sensors.filesystem import FileSensor
 
 dag = DAG(
     dag_id="figure_6_08",
-    start_date=airflow.utils.dates.days_ago(14),
+    start_date=pendulum.today("UTC").add(days=-14),
     schedule_interval="0 16 * * *",
     description="Create a file /data/supermarket1/data.csv, and behold a sensor deadlock.",
 )
