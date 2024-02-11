@@ -32,7 +32,8 @@ def _fetch_pageviews(pagenames, data_interval_start):
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
                 f"'{pagename}', {pageviewcount}, '{data_interval_start}'"
-                ");\n"
+                ")"
+                "ON CONFLICT (date) DO NOTHINHG);\n"
             )
 
 
