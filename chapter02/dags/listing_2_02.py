@@ -32,7 +32,7 @@ def _get_pictures():
 
 
 with DAG(
-    dag_id="listing_2_02",
+    dag_id="02_download_rocket_launches",
     start_date=pendulum.today("UTC").add(days=-14),
     schedule=None,
 ):

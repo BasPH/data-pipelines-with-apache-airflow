@@ -27,7 +27,7 @@ def _fetch_pageviews(pagenames):
 
 
 with DAG(
-    dag_id="listing_4_15",
+    dag_id="15_wikipedia_pageviews",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule="@hourly",
     max_active_runs=1,

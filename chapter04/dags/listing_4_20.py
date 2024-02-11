@@ -37,7 +37,7 @@ def _fetch_pageviews(pagenames, data_interval_start):
 
 
 with DAG(
-    dag_id="listing_4_20",
+    dag_id="20_postgres_call",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule="@hourly",
     template_searchpath="/tmp",

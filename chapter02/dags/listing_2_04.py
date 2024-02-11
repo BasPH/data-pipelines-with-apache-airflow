@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 with DAG(
-    dag_id="listing_2_03",
+    dag_id="04_BashOperator",
     start_date=pendulum.today("UTC").add(days=-14),
     schedule=None,
 ):

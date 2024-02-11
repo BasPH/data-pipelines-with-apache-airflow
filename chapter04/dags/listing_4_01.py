@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 with DAG(
-    dag_id="listing_4_01",
+    dag_id="01_stocksense_bashoperator",
     start_date=pendulum.today("UTC").add(days=-3),
     schedule="@hourly",
     max_active_runs=1,

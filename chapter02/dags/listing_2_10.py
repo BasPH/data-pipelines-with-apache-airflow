@@ -32,7 +32,7 @@ def _get_pictures():
 
 
 with DAG(
-    dag_id="listing_2_10",
+    dag_id="10_notify_image_count_change",
     start_date=pendulum.today("UTC").add(days=-14),
     schedule=None,
 ):
