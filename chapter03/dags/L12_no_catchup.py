@@ -20,7 +20,7 @@ def _calculate_stats(**context):
 
 
 with DAG(
-    dag_id="12_no_catchup",
+    dag_id="L12_no_catchup",
     schedule="@daily",
     start_date=datetime(2024, 1, 1),
     end_date=datetime(2024, 1, 5),

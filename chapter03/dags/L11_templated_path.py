@@ -19,19 +19,9 @@ def _calculate_stats(**context):
     stats.to_csv(output_path, index=False)
 
 
-def email_stats(stats, email):
-    """Send an email..."""
-    print(f"Sending stats to {email}...{stats}")
-
-
-def _send_stats(email, **context):
-    stats = pd.read_csv(context["templates_dict"]["stats_path"])
-    email_stats(stats, email=email)
-
-
 with DAG(
-    dag_id="14_atomic_send",
-    schedule_interval="@daily",
+    dag_id="L11_templated_path",
+    schedule="@daily",
     start_date=datetime(2024, 1, 1),
     end_date=datetime(2024, 1, 5),
 ):
@@ -54,13 +44,4 @@ with DAG(
         },
     )
 
-    send_stats = PythonOperator(
-        task_id="send_stats",
-        python_callable=_send_stats,
-        op_kwargs={"email": "user@example.com"},
-        templates_dict={
-            "stats_path": "/data/stats/{{data_interval_start | ds}}.csv",
-        },
-    )
-
-    fetch_events >> calculate_stats >> send_stats
+    fetch_events >> calculate_stats

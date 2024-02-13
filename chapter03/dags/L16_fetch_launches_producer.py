@@ -40,7 +40,7 @@ def fetch_new_launches():
 
 
 with DAG(
-    dag_id="16_fetch_launches_producer",
+    dag_id="L16_fetch_launches_producer",
     schedule="* * * * * ",
     start_date=pendulum.today("UTC"),
     catchup=False,

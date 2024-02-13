@@ -10,22 +10,27 @@ from pendulum import datetime
 def _calculate_stats(input_path, output_path):
     """Calculates event statistics."""
 
-    Path(output_path).parent.mkdir(exist_ok=True)
-
     events = pd.read_json(input_path)
     stats = events.groupby(["date", "user"]).size().reset_index()
 
+    Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
 
 with DAG(
-    dag_id="01_unscheduled",
+    dag_id="L06_query_with_dates",
+    schedule="@daily",
     start_date=datetime(2024, 1, 1),
-    schedule=None,
+    end_date=datetime(2024, 1, 5),
 ):
     fetch_events = BashOperator(
         task_id="fetch_events",
-        bash_command=("curl -o /data/events.json http://events_api:5000/events"),
+        bash_command=(
+            "curl -o /data/events.json "
+            "http://events_api:5000/events?"
+            "start_date=2024-01-01&"
+            "end_date=2024-01-02"
+        ),
     )
 
     calculate_stats = PythonOperator(

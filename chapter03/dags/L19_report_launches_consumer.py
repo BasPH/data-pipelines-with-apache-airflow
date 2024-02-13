@@ -19,7 +19,7 @@ def print_data():
 
 
 with DAG(
-    dag_id="19_report_launches_consumer",
+    dag_id="L19_report_launches_consumer",
     schedule=[target_dataset],
     start_date=pendulum.today("UTC"),
 ):
