@@ -32,9 +32,10 @@ def _get_pictures():
 
 
 with DAG(
-    dag_id="10_notify_image_count_change",
+    dag_id="L11_download_rocket_launches",
+    description="Download rocket pictures of recently launched rockets.",
     start_date=pendulum.today("UTC").add(days=-14),
-    schedule=None,
+    schedule="@daily",
 ):
     download_launches = BashOperator(
         task_id="download_launches",
