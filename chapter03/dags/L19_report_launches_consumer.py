@@ -9,7 +9,7 @@ FILEPATH = "/data/launches.csv"
 target_dataset = Dataset(FILEPATH)
 
 
-def print_data():
+def _print_data():
     try:
         data = pd.read_csv(FILEPATH)
     except FileNotFoundError:
@@ -25,5 +25,5 @@ with DAG(
 ):
     PythonOperator(
         task_id="print_data",
-        python_callable=print_data,
+        python_callable=_print_data,
     )
