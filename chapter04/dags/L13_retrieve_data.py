@@ -14,7 +14,7 @@ def _get_data(year, month, day, hour, output_path, **_):
 
 
 with DAG(
-    dag_id="listing_4_13",
+    dag_id="L13_retrieve_data",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule="@hourly",
     max_active_runs=1,

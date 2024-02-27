@@ -4,7 +4,7 @@ import pandas as pd
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-from pendulum import datetime
+from pendulum import datetime, timedelta
 
 
 def _calculate_stats(input_path, output_path):
@@ -18,9 +18,10 @@ def _calculate_stats(input_path, output_path):
 
 
 with DAG(
-    dag_id="02_daily_schedule",
-    schedule="@daily",
+    dag_id="L04_time_delta",
+    schedule=timedelta(days=3),
     start_date=datetime(2024, 1, 1),
+    end_date=datetime(2024, 1, 5),
 ):
     fetch_events = BashOperator(
         task_id="fetch_events",

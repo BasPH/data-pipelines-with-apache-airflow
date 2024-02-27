@@ -12,7 +12,7 @@ def _print_context(**context):
 
 
 with DAG(
-    dag_id="listing_4_08",
+    dag_id="L08_print_execution_date",
     start_date=pendulum.today("UTC").add(days=-3),
     schedule="@daily",
 ):

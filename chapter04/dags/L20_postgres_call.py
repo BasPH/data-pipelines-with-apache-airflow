@@ -32,12 +32,13 @@ def _fetch_pageviews(pagenames, data_interval_start):
             f.write(
                 "INSERT INTO pageview_counts VALUES ("
                 f"'{pagename}', {pageviewcount}, '{data_interval_start}'"
-                ");\n"
+                ")"
+                "ON CONFLICT (date) DO NOTHINHG);\n"
             )
 
 
 with DAG(
-    dag_id="listing_4_20",
+    dag_id="L20_postgres_call",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule="@hourly",
     template_searchpath="/tmp",

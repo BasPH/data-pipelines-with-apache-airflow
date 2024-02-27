@@ -32,7 +32,7 @@ def _get_pictures():
 
 
 with DAG(
-    dag_id="listing_2_02",
+    dag_id="L06_PythonOperator_get_pictures",
     start_date=pendulum.today("UTC").add(days=-14),
     schedule=None,
 ):
@@ -43,9 +43,4 @@ with DAG(
 
     get_pictures = PythonOperator(task_id="get_pictures", python_callable=_get_pictures)
 
-    notify = BashOperator(
-        task_id="notify",
-        bash_command='echo "There are now $(ls /tmp/images/ | wc -l) images."',
-    )
-
-    download_launches >> get_pictures >> notify
+    download_launches >> get_pictures

@@ -11,7 +11,7 @@ scheduled_launches = EventsTimetable(
 )
 
 with DAG(
-    dag_id="05_query_with_events",
+    dag_id="L05_query_with_events",
     schedule=scheduled_launches,
     start_date=datetime(2024, 1, 1),
 ):

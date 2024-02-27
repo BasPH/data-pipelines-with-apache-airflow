@@ -16,7 +16,7 @@ def _get_data(data_interval_start):
 
 
 with DAG(
-    dag_id="listing_4_05",
+    dag_id="L05_stocksense",
     start_date=pendulum.today("UTC").add(days=-1),
     schedule="@hourly",
     max_active_runs=1,

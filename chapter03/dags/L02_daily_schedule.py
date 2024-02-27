@@ -18,19 +18,13 @@ def _calculate_stats(input_path, output_path):
 
 
 with DAG(
-    dag_id="07_templated_query",
-    schedule_interval="@daily",
+    dag_id="L02_daily_schedule",
+    schedule="@daily",
     start_date=datetime(2024, 1, 1),
-    end_date=datetime(2024, 1, 5),
 ):
     fetch_events = BashOperator(
         task_id="fetch_events",
-        bash_command=(
-            "curl -o /data/events.json "
-            "http://events_api:5000/events?"
-            "start_date={{data_interval_start.strftime('%Y-%m-%d')}}&"
-            "end_date={{data_interval_end.strftime('%Y-%m-%d')}}"
-        ),
+        bash_command="curl -o /data/events.json http://events_api:5000/events",
     )
 
     calculate_stats = PythonOperator(

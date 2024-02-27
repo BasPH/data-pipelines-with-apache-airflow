@@ -18,7 +18,7 @@ def _calculate_stats(input_path, output_path):
 
 
 with DAG(
-    dag_id="06_query_with_dates",
+    dag_id="L08_templated_query_ds",
     schedule="@daily",
     start_date=datetime(2024, 1, 1),
     end_date=datetime(2024, 1, 5),
@@ -28,8 +28,8 @@ with DAG(
         bash_command=(
             "curl -o /data/events.json "
             "http://events_api:5000/events?"
-            "start_date=2024-01-01&"
-            "end_date=2024-01-02"
+            "start_date={{data_interval_start | ds}}&"
+            "end_date={{data_interval_end | ds}}"
         ),
     )
 

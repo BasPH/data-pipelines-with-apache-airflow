@@ -18,12 +18,20 @@ def _calculate_stats(**context):
     Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
+    _email_stats(stats, email="user@example.com")
+
+
+def _email_stats(stats, email):
+    """Send an email..."""
+    print(f"Sending stats to {email}...")
+
 
 with DAG(
-    dag_id="11_templated_path",
+    dag_id="L13_non_atomic_send",
     schedule="@daily",
     start_date=datetime(2024, 1, 1),
     end_date=datetime(2024, 1, 5),
+    catchup=True,
 ):
     fetch_events = BashOperator(
         task_id="fetch_events",
