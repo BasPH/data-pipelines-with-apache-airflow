@@ -32,7 +32,7 @@ def _get_pictures():
 
 
 with DAG(
-    dag_id="L06_PythonOperator_get_pictures",
+    dag_id="06_PythonOperator_get_pictures",
     start_date=pendulum.today("UTC").add(days=-14),
     schedule=None,
 ):
